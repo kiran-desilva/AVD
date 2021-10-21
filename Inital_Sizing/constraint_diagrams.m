@@ -43,6 +43,17 @@ sizing.w_total_S_max_landing = nan;
 sizing.w_total_S_max_stall = nan;
 
 
+%% shit from errikos' excel
+sizing.cl_max = nan;
+sizing.AR = nan;
+sizing.cd_0 = nan;
+sizing.e = nan;
+sizing.field_length = nan;
+
+sizing.w_landing_w_total_max = nan;
+sizing.rho_landing = nan;
+sizing.v_stall_max = nan;
+
 %% What's next?
 %% Make sure aircraft can complete the stipulated design mission profile
 %% Make sure aircraft capable of achieving performance targets like
