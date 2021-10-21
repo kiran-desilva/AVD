@@ -13,6 +13,11 @@ sizing.ld_cruise = 0.866*sizing.ld_max;
 sizing.sfc = 10;
 sizing.maxTakeoffWeight = 1000;
 
+%% shit from errikos' excel
+sizing.cl_max = nan;
+sizing.AR = nan;
+sizing.cd_
+
 %% What's next?
 %% Make sure aircraft can complete the stipulated design mission profile
 %% Make sure aircraft capable of achieving performance targets like
