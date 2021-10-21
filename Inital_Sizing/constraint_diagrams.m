@@ -16,7 +16,13 @@ sizing.maxTakeoffWeight = 1000;
 %% shit from errikos' excel
 sizing.cl_max = nan;
 sizing.AR = nan;
-sizing.cd_
+sizing.cd_0 = nan;
+sizing.e = nan;
+sizing.field_length = nan;
+
+sizing.w_landing_w_total_max = nan;
+sizing.rho_landing = nan;
+sizing.v_stall_max = nan;
 
 %% What's next?
 %% Make sure aircraft can complete the stipulated design mission profile
