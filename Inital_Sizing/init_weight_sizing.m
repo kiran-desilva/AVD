@@ -4,9 +4,16 @@ clc
 p = open('parameters.mat');
 r = open('roskamdata.mat');
 
+AR = 10; %check this
+lambdaLE = 13; %ish? used t/c of abt 0.12-0.14
+e = 4.61 * (1 - 0.045 * AR ^ 0.68) * ((cos(lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud
+L_Dmax = 
+
 roskam.c = 0.7; %ish? 1/hr
-roskam.LoverD_cruise = 11; %ish?
-roskam.LoverD_loiter = 13; %ish?
+roskam.LoverD_cruise(1) = 11; %ish?
+roskam.LoverD_cruise(2) = ; %ish?
+roskam.LoverD_loiter(1) = 13; %ish?
+roskam.LoverD_loiter(2) = ; %ish?
 roskam.Wx_W0 = 1; %initialize
 roskam.A = 0.2678;
 roskam.B = 0.9979;
