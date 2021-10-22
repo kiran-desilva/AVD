@@ -62,15 +62,17 @@ for j = 1:2
             roskam.Wx_W0(j) = roskam.Wx_W0(j) * roskam.fuelfrac(i); %multiply fuel mass fractions 
         end
 
-        roskam.Wf_W0(j) = 1.01 * (1 - roskam.Wx_W0(j));   %calculate total fuel mass fraction for mission
-
+        roskam.Wf_W0(j) = 1.03 * (1 - roskam.Wx_W0(j));   %calculate total fuel mass fraction for mission
+                                                          %2% fuel reserve
+                                                          % + 1% unuseable
 
         for i = 1:length(raymer.fuelfrac)
             raymer.Wx_W0(j) = raymer.Wx_W0(j) * raymer.fuelfrac(i); %multiply fuel mass fractions 
         end
 
-        raymer.Wf_W0(j) = 1.01 * (1 - raymer.Wx_W0(j));   %calculate total fuel mass fraction for mission
-
+        raymer.Wf_W0(j) = 1.03 * (1 - raymer.Wx_W0(j));   %calculate total fuel mass fraction for mission
+                                                          %2% fuel reserve
+                                                          % + 1% unuseable
         %Roskam W0
 
         roskam.W0(j) = initialW0; %initial W0 guess (N)
@@ -80,7 +82,7 @@ for j = 1:2
         hold on
         error = 10; 
 
-        while abs(error) > 1e-10
+        while abs(error) > 1e-8
             roskam.W0prev = roskam.W0(j); 
             We_W0_roskam_regress = (10^((log10(roskam.W0(j)) - roskam.A) / roskam.B)) / roskam.W0(j);   %Roskam regression method
             roskam.W0(j) = (W_crew + W_pld) / (1 - roskam.Wf_W0(j) - (We_W0_roskam_regress));    %W0 calculation 
