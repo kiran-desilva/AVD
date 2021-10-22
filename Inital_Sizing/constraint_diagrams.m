@@ -14,7 +14,8 @@ sizing.ld_max = 10;
 sizing.ld_cruise = 0.866*sizing.ld_max;
 sizing.sfc = 10;
 sizing.maxTakeoffWeight = 1000;
-sizing.cd_min = 0.004;
+sizing.cd_min = 0.02;
+sizing.sref = 69420;
 
 sizing.absolute_ceiling = 45000; % ft
 sizing.service_ceiling = 40000; % ft
@@ -22,9 +23,10 @@ sizing.service_ceiling = 40000; % ft
 %% shit from errikos excel
 sizing.cl_max = 1.5;
 sizing.AR = 5;
-sizing.cd_0 = nan;
+sizing.cd_0 = 0.02;
 sizing.e = 0.8;
-sizing.k = 1 / sizing.e;  % idk what k is, Gudmundsson p. 59 says lift-induced drag constant
+sizing.k = nan;
+
 
 
 sizing.w_landing_w_total_max = 0.8;
@@ -33,12 +35,13 @@ q = @(V_inf, rho) 0.5*rho*V_inf^2;
 
 %% takeoff 
 sizing.takeoff.rho = 1.225;
-sizing.takeoff.v_inf = nan;
+sizing.takeoff.v_inf = 1.3*sizing.v_stall;
 sizing.takeoff.q = q(sizing.takeoff.v_inf, sizing.takeoff.rho)
+sizing.takeoff.v_stall = sqrt((sizing.maxTakeoffWeight/sizing.sref) * 2/(sizing.takeoff.rho * sizing.cl_max));
 
 %% climb
 sizing.climb.rho = sizing.takeoff.rho;
-sizing.climb.v_inf= nan;
+sizing.climb.v_inf= 1.3*sizing.v_stall;
 sizing.climb.q = q(sizing.climb.v_inf, sizing.climb.rho);
 sizing.climb.dh_dt = nan;
 
@@ -52,11 +55,13 @@ sizing.cruise.q = q(sizing.cruise.v_inf, sizing.cruise.rho);
 
 %% loiter
 [~, ~, ~, sizing.loiter.rho] = atmosisa(distdim(5000, 'ft', 'm'));
-sizing.loiter.v_inf= nan;
+sizing.loiter.v_inf = sqrt(1.225/subindex(atmopow, 4))*pow((4*sizing.k*sizing.loiter.w^2)/(pi*sizing.cd_0*sizing.AR), 0.25);
 sizing.loiter.q = q(sizing.loiter.v_inf, sizing.loiter.rho);
 
-%% land
-sizing.land.rho = sizing.takeoff.rho;
+%% landing
+sizing.landing.rho = sizing.takeoff.rho;
+sizing.landing.obstacle_height = 183; %m
+sizing.landing.kr = 0.66; % with thrust reversers
 
 
 
@@ -64,16 +69,8 @@ sizing.land.rho = sizing.takeoff.rho;
 
 
 
-sizing.v_stall_max = nan;
-
-sizing.w_total_S_max_landing = nan;
-sizing.w_total_S_max_stall = nan;
 
 
-
-sizing.w_landing_w_total_max = nan;
-sizing.rho_landing = nan;
-sizing.v_stall_max = nan;
 
 %% What's next?
 %% Make sure aircraft can complete the stipulated design mission profile
@@ -92,6 +89,7 @@ sizing.v_stall_max = nan;
 
 
 syms wing_loading thrust_to_weight V_inf rho turn_height_m % use syms for constraints
+syms alpha beta % alpha -> scales weight to initial weight, beta -> scales thrust to sea level thrust
 
 %% Computing climb constraint
 
@@ -99,7 +97,7 @@ climb_constraint(wing_loading) = sizing.climb.dh_dt/sizing.climb.v_inf + sizing.
 
 %% Cruise constraint
 
-cruise_constraint(wing_loading) = sizing.cruise.q*sizing.cd_min/wing_loading + sizing.k*wing_loading/sizing.cruise.q;
+cruise_constraint(wing_loading, alpha, beta) = alpha/beta*(sizing.cruise.q*sizing.cd_min/(alpha*wing_loading) + alpha*sizing.k*wing_loading/sizing.cruise.q);
 
 %% Take-off distance constraint
 take_off_constraint(wing_loading) = 0*wing_loading;
@@ -123,6 +121,15 @@ absolute_ceiling_constraint(wing_loading) = sizing.service_climb_velocity_at_cei
 %% turn constraint
 
 turn_constraint(wing_loading, turn_height_m, V_inf) = q(V_inf, subindex(atmosisa(turn_height_m), 4))*(sizing.cd_min/wing_loading + sizing.k*wing_loading*(sizing.n/q(V_inf, subindex(atmosisa(turn_height_m), 4)))^2);
+
+%% landing constraint
+%% page 111 in roskam
+%% 
+%% landing_distance_thrust_reversal_constraint = sizing.runway_length - 
+
+%% stall constraint
+
+stall_constraint
 
 
 figure
