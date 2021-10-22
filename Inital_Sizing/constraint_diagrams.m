@@ -14,6 +14,9 @@ sizing.sfc = 10;
 sizing.maxTakeoffWeight = 1000;
 sizing.cd_min = nan;
 
+sizing.absolute_ceiling = 45000; % ft
+sizing.service_ceiling = 40000; % ft
+
 %% shit from errikos' excel
 sizing.cl_max = nan;
 sizing.AR = nan;
@@ -71,30 +74,43 @@ sizing.v_stall_max = nan;
 
 
 syms wing_loading thrust_to_weight V_inf rho % use syms for constraints
-q(V_inf, rho) = 0.5*rho*V_inf^2;
+q = @(V_inf, rho) 0.5*rho*V_inf^2;
 
 %% Computing climb constraint
 climb = sizing.climb;
 
 q_climb = q(climb.v_inf, climb.rho);
-thrust_to_weight(wing_loading) = climb.dh_dt/climb.v_inf + q_climb/wing_loading*sizing.cd_min + sizing.k/q*wing_loading;
+climb_constraint(wing_loading) = climb.dh_dt/climb.v_inf + q_climb/wing_loading*sizing.cd_min + sizing.k/q*wing_loading;
 
 %% Cruise constraint
 cruise = sizing.cruise;
 
 q_cruise = q(cruise.v_inf, cruise.rho);
-thrust_to_weight(wing_loading) = q_cruise*sizing.cd_min/wing_loading + sizing.k*wing_loading/q_cruise;
+cruise_constraint(wing_loading) = q_cruise*sizing.cd_min/wing_loading + sizing.k*wing_loading/q_cruise;
 
 %% Take-off distance constraint
 takeoff = sizing.takeoff;
 
 q_takeoff = q(takeoff.v_inf, takeoff.rho);
-thrust_to_weight(wing_loading) = nan;
+take_off_constraint(wing_loading) = nan;
 
-%% Operating ceiling constraint
-sizing.ceiling_rho = nan;
-sizing.climb_velocity_at_ceiling = nan; % what is the rate of climb at the ceiling alt we want? Look at far mby...
+%% service ceiling constraint
+[~, ~, ~, sizing.serivce_ceiling_rho] = atmosisa(distdim(sizing.service_ceiling_rho, 'ft', 'km'));
+sizing.service_climb_velocity_at_ceiling = nan; % what is the rate of climb at the ceiling alt we want? Look at far mby...
 
 thing = sqrt(sizing.k/(3*sizing.cd_min));
-thrust_to_weight(wing_loading) = sizing.climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_min/3);
+service_ceiling_constraint(wing_loading) = sizing.climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_min/3);
+
+%% absolute ceiling constraint
+
+[~, ~, ~, sizing.absolute_ceiling_rho] = atmosisa(distdim(sizing.absolute_ceiling,'ft','km'))
+
+sizing.absolute_climb_velocity_at_ceiling = 0; % at absolute ceiling, climb rate should be zero
+
+thing = sqrt(sizing.k/(3*sizing.cd_min));
+absolute_ceiling_constraint(wing_loading) = sizing.climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_min/3);
+
+
+
+
 
