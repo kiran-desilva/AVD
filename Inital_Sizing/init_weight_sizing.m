@@ -122,6 +122,8 @@ for j = 1:2
         raymer.W0(j) = raymer.W0(j) * 0.2248; %N to ib force
 end
 
+Roskam_fit = fit(r.roskamdata.W0', r.roskamdata.We_W0','poly1');
+
 figure
 plot(roskam.W0(1), roskam.We_W0(1),'r*')
 hold on
@@ -131,12 +133,12 @@ plot(raymer.W0(1), raymer.We_W0(1),'b*')
 hold on
 plot(raymer.W0(2), raymer.We_W0(2),'bo')
 hold on
-plot(r.roskamdata.W0, r.roskamdata.We_W0,'x')
+plot(Roskam_fit,r.roskamdata.W0, r.roskamdata.We_W0,'x')
 hold off
 grid on
 xlabel("$W_{0}$ Ibs", 'interpreter', 'Latex','FontSize', 15)
 ylabel("$\frac{W_{e}}{W_{0}}$ Ibs", 'interpreter', 'Latex','FontSize', 15)
 title("Comparison to Roskam data",'interpreter', 'Latex','FontSize', 15)
-
+legend("Roskam reg w Roskam L/D","Roskam reg w sweep method L/D","Raymer reg w Roskam L/D","Raymer reg w sweep method L/D","Data from Roskam")
 %% save sizing to 
 save('sizing','sizing');
