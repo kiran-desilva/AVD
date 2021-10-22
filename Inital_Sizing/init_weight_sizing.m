@@ -4,17 +4,17 @@ clc
 p = open('parameters.mat');
 r = open('roskamdata.mat');
 
-AR = 5.58; %check this
-lambdaLE = 13; %ish? used t/c of abt 0.12-0.14
-e = 4.61 * (1 - 0.045 * AR ^ 0.68) * ((cos(lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud
-CD0 = 0.02;%from 
-L_Dmax = 0.5 * sqrt((pi * AR * e) / CD0); %LoverDmax
+sizing.AR = 5.85; %check this
+sizing.lambdaLE = 13; %ish? used t/c of abt 0.12-0.14
+sizing.e = 4.61 * (1 - 0.045 * sizing.AR ^ 0.68) * ((cos(sizing.lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud
+sizing.CD0 = 0.02;
+sizing.L_Dmax = 0.5 * sqrt((pi * sizing.AR * sizing.e) / sizing.CD0); %LoverDmax
 
 roskam.c = 0.7; %ish? 1/hr
 roskam.LoverD_cruise(1) = 11; %ish?
 roskam.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
 roskam.LoverD_loiter(1) = 13; %ish?
-roskam.LoverD_loiter(2) = L_Dmax; %raymer?
+roskam.LoverD_loiter(2) = sizing.L_Dmax; %raymer?
 roskam.Wx_W0(1) = 1; %initialize
 roskam.Wx_W0(2) = 1; %initialize
 roskam.A = 0.2678;
@@ -24,14 +24,14 @@ raymer.c = 0.7; %ish? 1/hr
 raymer.LoverD_cruise(1) = 11; %ish?
 raymer.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
 raymer.LoverD_loiter(1) = 13; %ish?
-raymer.LoverD_loiter(2) = L_Dmax; %raymer
+raymer.LoverD_loiter(2) = sizing.L_Dmax; %raymer
 raymer.Wx_W0(1) = 1; %initialize
 raymer.Wx_W0(2) = 1; %initialize
 raymer.A = 1.51;
 raymer.C = -0.1;
 
-W_crew = 94 * 6 * 9.81; %
-W_pld = 20 * 6 * 9.81; %EASA
+W_crew = 94 * 6 * 9.81; %???
+W_pld = 20 * 6 * 9.81; %???
 initialW0 = 80000;
 
 %fuel mass fractions
@@ -86,7 +86,7 @@ for j = 1:2
             roskam.W0(j) = (W_crew + W_pld) / (1 - roskam.Wf_W0(j) - (We_W0_roskam_regress));    %W0 calculation 
             count = count + 1;  %count number of iterations
             error = roskam.W0(j) - roskam.W0prev;    %Calculate difference between consecutive W0 values
-            plot(count, error, 'b*') %plot error 
+            plot(count, error, 'r*') %plot error 
             grid on
             pause(0.05)
         end  
@@ -112,7 +112,7 @@ for j = 1:2
             raymer.W0(j) = (W_crew + W_pld) / (1 - raymer.Wf_W0(j) - (We_W0_raymer_regress));    %W0 calculation 
             count = count + 1;  %count number of iterations
             error = raymer.W0(j) - raymer.W0prev;    %Calculate difference between consecutive W0 values
-            plot(count, error, 'r*') %plot error 
+            plot(count, error, 'b*') %plot error 
             grid on
             pause(0.05)
         end  
@@ -137,4 +137,6 @@ grid on
 xlabel("$W_{0}$ Ibs", 'interpreter', 'Latex','FontSize', 15)
 ylabel("$\frac{W_{e}}{W_{0}}$ Ibs", 'interpreter', 'Latex','FontSize', 15)
 title("Comparison to Roskam data",'interpreter', 'Latex','FontSize', 15)
-legend("Roskam reg w Roskam L/D","Roskam reg w sweep method L/D","Raymer reg w Roskam L/D","Raymer reg w sweep method L/D","Data from Roskam")
+
+%% save sizing to 
+save('sizing','sizing');
