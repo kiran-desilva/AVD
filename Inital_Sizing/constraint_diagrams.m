@@ -1,5 +1,7 @@
+subindex = @(A, idx) A(idx); %% function for anonymous indexing
 
 open("parameters.mat");
+%open("sizing.mat");
 
 %% shit we want
 %% l/d max - l_dmax
@@ -12,30 +14,55 @@ sizing.ld_max = 10;
 sizing.ld_cruise = 0.866*sizing.ld_max;
 sizing.sfc = 10;
 sizing.maxTakeoffWeight = 1000;
-sizing.cd_min = nan;
+sizing.cd_min = 0.004;
 
-%% shit from errikos' excel
-sizing.cl_max = nan;
-sizing.AR = nan;
+sizing.absolute_ceiling = 45000; % ft
+sizing.service_ceiling = 40000; % ft
+
+%% shit from errikos excel
+sizing.cl_max = 1.5;
+sizing.AR = 5;
 sizing.cd_0 = nan;
-sizing.e = nan;
-sizing.k = nan;  % idk what k is, Gudmundsson p. 59 says lift-induced drag constant
-sizing.field_length = nan;
-
-sizing.w_landing_w_total_max = nan;
-
-sizing.takeoff.rho = nan;
-sizing.cruise.rho = nan;
-sizing.loiter.rho = nan;
-sizing.climb.rho = nan;
+sizing.e = 0.8;
+sizing.k = 1 / sizing.e;  % idk what k is, Gudmundsson p. 59 says lift-induced drag constant
 
 
+sizing.w_landing_w_total_max = 0.8;
+
+q = @(V_inf, rho) 0.5*rho*V_inf^2;
+
+%% takeoff 
+sizing.takeoff.rho = 1.225;
 sizing.takeoff.v_inf = nan;
-sizing.cruise.v_inf= nan;
-sizing.loiter.v_inf= nan;
-sizing.climb.v_inf= nan;
+sizing.takeoff.q = q(sizing.takeoff.v_inf, sizing.takeoff.rho)
 
+%% climb
+sizing.climb.rho = sizing.takeoff.rho;
+sizing.climb.v_inf= nan;
+sizing.climb.q = q(sizing.climb.v_inf, sizing.climb.rho);
 sizing.climb.dh_dt = nan;
+
+
+
+%% cruise
+[~, sizing.cruise.a, ~, sizing.cruise.rho] = atmosisa(distdim(40000, 'ft', 'm'));
+sizing.cruise.v_inf= 0.75*sizing.cruise.a;
+sizing.cruise.q = q(sizing.cruise.v_inf, sizing.cruise.rho);
+
+
+%% loiter
+[~, ~, ~, sizing.loiter.rho] = atmosisa(distdim(5000, 'ft', 'm'));
+sizing.loiter.v_inf= nan;
+sizing.loiter.q = q(sizing.loiter.v_inf, sizing.loiter.rho);
+
+%% land
+sizing.land.rho = sizing.takeoff.rho;
+
+
+
+
+
+
 
 sizing.v_stall_max = nan;
 
@@ -43,12 +70,6 @@ sizing.w_total_S_max_landing = nan;
 sizing.w_total_S_max_stall = nan;
 
 
-%% shit from errikos' excel
-sizing.cl_max = nan;
-sizing.AR = nan;
-sizing.cd_0 = nan;
-sizing.e = nan;
-sizing.field_length = nan;
 
 sizing.w_landing_w_total_max = nan;
 sizing.rho_landing = nan;
@@ -70,31 +91,52 @@ sizing.v_stall_max = nan;
 %% take off speed = 1.1* stall speed
 
 
-syms wing_loading thrust_to_weight V_inf rho % use syms for constraints
-q(V_inf, rho) = 0.5*rho*V_inf^2;
+syms wing_loading thrust_to_weight V_inf rho turn_height_m % use syms for constraints
 
 %% Computing climb constraint
-climb = sizing.climb;
 
-q_climb = q(climb.v_inf, climb.rho);
-thrust_to_weight(wing_loading) = climb.dh_dt/climb.v_inf + q_climb/wing_loading*sizing.cd_min + sizing.k/q*wing_loading;
+climb_constraint(wing_loading) = sizing.climb.dh_dt/sizing.climb.v_inf + sizing.climb.q/wing_loading*sizing.cd_min + sizing.k/sizing.climb.q*wing_loading;
 
 %% Cruise constraint
-cruise = sizing.cruise;
 
-q_cruise = q(cruise.v_inf, cruise.rho);
-thrust_to_weight(wing_loading) = q_cruise*sizing.cd_min/wing_loading + sizing.k*wing_loading/q_cruise;
+cruise_constraint(wing_loading) = sizing.cruise.q*sizing.cd_min/wing_loading + sizing.k*wing_loading/sizing.cruise.q;
 
 %% Take-off distance constraint
-takeoff = sizing.takeoff;
+take_off_constraint(wing_loading) = 0*wing_loading;
 
-q_takeoff = q(takeoff.v_inf, takeoff.rho);
-thrust_to_weight(wing_loading) = nan;
-
-%% Operating ceiling constraint
-sizing.ceiling_rho = nan;
-sizing.climb_velocity_at_ceiling = nan; % what is the rate of climb at the ceiling alt we want? Look at far mby...
+%% service ceiling constraint
+sizing.service_ceiling_rho = sizing.cruise.rho;
+sizing.service_climb_velocity_at_ceiling = nan; % what is the rate of climb at the ceiling alt we want? Look at far mby...
 
 thing = sqrt(sizing.k/(3*sizing.cd_min));
-thrust_to_weight(wing_loading) = sizing.climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_min/3);
+service_ceiling_constraint(wing_loading) = sizing.service_climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.service_ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_min/3);
+
+%% absolute ceiling constraint
+
+[~, ~, ~, sizing.absolute_ceiling_rho] = atmosisa(distdim(sizing.absolute_ceiling,'ft','km'))
+
+sizing.absolute_climb_velocity_at_ceiling = 0; % at absolute ceiling, climb rate should be zero
+
+thing = sqrt(sizing.k/(3*sizing.cd_min));
+absolute_ceiling_constraint(wing_loading) = sizing.service_climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.service_ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_min/3);
+
+%% turn constraint
+
+turn_constraint(wing_loading, turn_height_m, V_inf) = q(V_inf, subindex(atmosisa(turn_height_m), 4))*(sizing.cd_min/wing_loading + sizing.k*wing_loading*(sizing.n/q(V_inf, subindex(atmosisa(turn_height_m), 4)))^2);
+
+
+figure
+
+hold on
+
+weight_loading_interval = [0, 4000];
+fplot(climb_constraint, weight_loading_interval);
+fplot(cruise_constraint, weight_loading_interval);
+fplot(take_off_constraint, weight_loading_interval);
+fplot(service_ceiling_constraint, weight_loading_interval);
+fplot(absolute_ceiling_constraint, weight_loading_interval);
+
+hold off;
+
+
 

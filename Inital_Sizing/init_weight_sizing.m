@@ -12,7 +12,7 @@ L_Dmax = 0.5 * sqrt((pi * AR * e) / CD0); %LoverDmax
 
 roskam.c = 0.7; %ish? 1/hr
 roskam.LoverD_cruise(1) = 11; %ish?
-roskam.LoverD_cruise(2) = 0.866 * L_Dmax; % Raymer 
+roskam.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
 roskam.LoverD_loiter(1) = 13; %ish?
 roskam.LoverD_loiter(2) = L_Dmax; %raymer?
 roskam.Wx_W0(1) = 1; %initialize
@@ -22,7 +22,7 @@ roskam.B = 0.9979;
 
 raymer.c = 0.7; %ish? 1/hr
 raymer.LoverD_cruise(1) = 11; %ish?
-raymer.LoverD_cruise(2) = 0.866 * L_Dmax; % Raymer 
+raymer.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
 raymer.LoverD_loiter(1) = 13; %ish?
 raymer.LoverD_loiter(2) = L_Dmax; %raymer
 raymer.Wx_W0(1) = 1; %initialize
