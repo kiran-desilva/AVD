@@ -4,11 +4,11 @@ clc
 p = open('parameters.mat');
 r = open('roskamdata.mat');
 
-AR = 10; %check this
-lambdaLE = 13; %ish? used t/c of abt 0.12-0.14
-e = 4.61 * (1 - 0.045 * AR ^ 0.68) * ((cos(lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud
-CD0 = 
-L_Dmax = 0.5 * sqrt((pi * AR * e) / CD0); %LoverDmax
+sizing.AR = 10; %check this
+sizing.lambdaLE = 13; %ish? used t/c of abt 0.12-0.14
+sizing.e = 4.61 * (1 - 0.045 * sizing.AR ^ 0.68) * ((cos(sizing.lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud
+sizing.CD0 = 
+sizing.L_Dmax = 0.5 * sqrt((pi * sizing.AR * sizing.e) / sizing.CD0); %LoverDmax
 
 roskam.c = 0.7; %ish? 1/hr
 roskam.LoverD_cruise(1) = 11; %ish?
@@ -135,3 +135,6 @@ grid on
 xlabel("$W_{0}$ Ibs", 'interpreter', 'Latex','FontSize', 15)
 ylabel("$\frac{W_{e}}{W_{0}}$ Ibs", 'interpreter', 'Latex','FontSize', 15)
 title("Comparison to Roskam data",'interpreter', 'Latex','FontSize', 15)
+
+%% save sizing to 
+save(sizing,"sizing");
