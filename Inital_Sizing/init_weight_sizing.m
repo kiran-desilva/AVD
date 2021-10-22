@@ -7,23 +7,23 @@ r = open('roskamdata.mat');
 sizing.AR = 10; %check this
 sizing.lambdaLE = 13; %ish? used t/c of abt 0.12-0.14
 sizing.e = 4.61 * (1 - 0.045 * sizing.AR ^ 0.68) * ((cos(sizing.lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud
-sizing.CD0 = 
+sizing.CD0 = nan;
 sizing.L_Dmax = 0.5 * sqrt((pi * sizing.AR * sizing.e) / sizing.CD0); %LoverDmax
 
 roskam.c = 0.7; %ish? 1/hr
 roskam.LoverD_cruise(1) = 11; %ish?
-roskam.LoverD_cruise(2) = 0.866 * L_Dmax; % Raymer 
+roskam.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
 roskam.LoverD_loiter(1) = 13; %ish?
-roskam.LoverD_loiter(2) = L_Dmax; %raymer?
+roskam.LoverD_loiter(2) = sizing.L_Dmax; %raymer?
 roskam.Wx_W0 = 1; %initialize
 roskam.A = 0.2678;
 roskam.B = 0.9979;
 
 raymer.c = 0.7; %ish? 1/hr
 raymer.LoverD_cruise(1) = 11; %ish?
-raymer.LoverD_cruise(2) = 0.866 * L_Dmax; % Raymer 
+raymer.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
 raymer.LoverD_loiter(1) = 13; %ish?
-raymer.LoverD_loiter(2) = L_Dmax; %raymer
+raymer.LoverD_loiter(2) = sizing.L_Dmax; %raymer
 raymer.Wx_W0 = 1; %initialize
 raymer.A = 1.51;
 raymer.C = -0.1;
@@ -137,4 +137,4 @@ ylabel("$\frac{W_{e}}{W_{0}}$ Ibs", 'interpreter', 'Latex','FontSize', 15)
 title("Comparison to Roskam data",'interpreter', 'Latex','FontSize', 15)
 
 %% save sizing to 
-save(sizing,"sizing");
+save('sizing','sizing');
