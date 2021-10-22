@@ -10,7 +10,7 @@ sizing.e = 4.61 * (1 - 0.045 * sizing.AR ^ 0.68) * ((cos(sizing.lambdaLE))^0.15)
 sizing.CD0 = 0.02;
 sizing.L_Dmax = 0.5 * sqrt((pi * sizing.AR * sizing.e) / sizing.CD0); %LoverDmax
 
-roskam.c = 0.7; %ish? 1/hr
+roskam.c = 0.7; %ish? 1/hr 
 roskam.LoverD_cruise(1) = 11; %ish?
 roskam.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
 roskam.LoverD_loiter(1) = 13; %ish?
