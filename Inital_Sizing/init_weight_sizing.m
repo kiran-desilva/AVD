@@ -4,7 +4,7 @@ clc
 p = open('parameters.mat');
 r = open('roskamdata.mat');
 
-sizing.AR = 5.85; %check this
+sizing.AR = 6.8; %check this
 sizing.lambdaLE = 13; %ish? used t/c of abt 0.12-0.14
 sizing.e = 4.61 * (1 - 0.045 * sizing.AR ^ 0.68) * ((cos(sizing.lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud
 sizing.CD0 = 0.02;
@@ -124,7 +124,7 @@ for j = 1:2
         raymer.W0(j) = raymer.W0(j) * 0.2248; %N to ib force
 end
 
-Roskam_fit = fit(r.roskamdata.W0', r.roskamdata.We_W0','poly1');
+Roskam_fit = fit(r.roskamdata.W0',r.roskamdata.We_W0','poly1');
 
 figure
 plot(roskam.W0(1), roskam.We_W0(1),'r*')
