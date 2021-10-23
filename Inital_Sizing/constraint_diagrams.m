@@ -1,7 +1,7 @@
 subindex = @(A, idx) A(idx); %% function for anonymous indexing
 
 open("parameters.mat");
-%open("sizing.mat");
+open("sizing.mat");
 
 %% shit we want
 %% l/d max - l_dmax
@@ -10,32 +10,38 @@ open("parameters.mat");
 %% operating empty weight - we
 %% fuel weight - wf
 
+%{
+
+We don't seem to be using any of these??
+
 sizing.ld_max = 10;
 sizing.ld_cruise = 0.866*sizing.ld_max;
 sizing.sfc = 10;
-sizing.maxTakeoffWeight = 1000;
-sizing.cd_min = 0.02;
-sizing.sref = 69420;
 
-sizing.absolute_ceiling = 45000; % ft
 sizing.service_ceiling = 40000; % ft
 
 %% shit from errikos excel
-sizing.cl_max = 1.5;
-sizing.AR = 5;
-sizing.cd_0 = 0.02;
 sizing.e = 0.8;
-sizing.k = nan;
 
 
 
 sizing.w_landing_w_total_max = 0.8;
+%}
+
+sizing.absolute_ceiling = 45000; % ft
+sizing.AR = 5;
+sizing.maxTakeoffWeight = 1000;
+sizing.cl_max = 1.5;
+sizing.k = nan;
+sizing.cd_min = 0.02;
+sizing.cd_0 = 0.02;
+sizing.sref = 69420;
 
 q = @(V_inf, rho) 0.5*rho*V_inf^2;
 
 %% takeoff 
 sizing.takeoff.rho = 1.225;
-sizing.takeoff.v_inf = 1.3*sizing.v_stall;
+sizing.takeoff.v_inf = 1.3*sizing.v_stall; % we should check if this is reasonable... Errikos did it in his excel but idk
 sizing.takeoff.q = q(sizing.takeoff.v_inf, sizing.takeoff.rho)
 sizing.takeoff.v_stall = sqrt((sizing.maxTakeoffWeight/sizing.sref) * 2/(sizing.takeoff.rho * sizing.cl_max));
 
@@ -55,7 +61,7 @@ sizing.cruise.q = q(sizing.cruise.v_inf, sizing.cruise.rho);
 
 %% loiter
 [~, ~, ~, sizing.loiter.rho] = atmosisa(distdim(5000, 'ft', 'm'));
-sizing.loiter.v_inf = sqrt(1.225/subindex(atmopow, 4))*pow((4*sizing.k*sizing.loiter.w^2)/(pi*sizing.cd_0*sizing.AR), 0.25);
+sizing.loiter.v_inf = sqrt(1.225/sizing.loiter.rho)*pow((4*sizing.k*sizing.loiter.w^2)/(pi*sizing.cd_0*sizing.AR), 0.25);
 sizing.loiter.q = q(sizing.loiter.v_inf, sizing.loiter.rho);
 
 %% landing
