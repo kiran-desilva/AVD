@@ -30,23 +30,25 @@ sizing.w_landing_w_total_max = 0.8;
 
 sizing.absolute_ceiling = 45000; % ft
 sizing.AR = 5;
-sizing.maxTakeoffWeight = 5000*9.81; % TODO:
-sizing.cl_max = 1.5; % TODO:
-sizing.e = 0.8;
-sizing.k = 1/(sizing.AR*pi*sizing.e); % This eq. is used in Gudmundsson p. 64
-sizing.cd_min = 0.05; % TODO:
+sizing.maxTakeoffWeight = 5000*9.81; % TODO: -> from chorley are we sure this is in Newtons
+sizing.cl_max = 1.5; % TODO:        
+sizing.e = 0.8; %% e will change with the addition of hld
+sizing.k = 1/(sizing.AR*pi*sizing.e); % This eq. is used in Gudmundsson p. 64 -> idk if this is valid 
+sizing.cd_min = 0.05; % TODO: 
 sizing.cd_0 = 0.05; % TODO:
 sizing.sref = 73.73; % TODO:
 sizing.n = 1/cosd(40); % max load factor as defined by far
-sizing.runway_length = 1200;
+sizing.runway_length = 1200; %% in meters
+sizing.engine_number = 2;
+sizing.rho_0 = 1.225; % reference density
 
 q = @(V_inf, rho) 0.5*rho*V_inf^2;
 
 %% takeoff 
 sizing.takeoff.rho = 1.225;
-sizing.takeoff.cl_max = 1.6; % TODO:
+sizing.takeoff.cl_max = 1.6; % TODO: -> raymer?
 sizing.takeoff.v_stall = sqrt((sizing.maxTakeoffWeight/sizing.sref) * 2/(sizing.takeoff.rho * sizing.takeoff.cl_max));
-sizing.takeoff.v_inf = 1.3*sizing.takeoff.v_stall; % we should check if this is reasonable... Errikos did it in his excel but idk
+sizing.takeoff.v_inf = 1.3*sizing.takeoff.v_stall; % we should check if this is reasonable... Errikos did it in his excel but idk -> from FAR25
 sizing.takeoff.q = q(sizing.takeoff.v_inf, sizing.takeoff.rho);
 
 %% climb
@@ -111,6 +113,10 @@ climb_constraint(wing_loading) = sizing.climb.dh_dt/sizing.climb.v_inf + sizing.
 cruise_constraint(wing_loading, alpha, beta) = alpha/beta*(sizing.cruise.q*sizing.cd_min/(alpha*wing_loading) + alpha*sizing.k*wing_loading/sizing.cruise.q);
 
 %% Take-off distance constraint
+
+takeoff_bfl_constraint(wing_loading) = ( wing_loading*(0.297-0.019*sizing.engine_number) ) / ( sizing.runway_length * (sizing.takeoff.rho / sizing.rho_0) * sizing.takeoff.cl_max) ; 
+
+
 take_off_constraint(wing_loading) = double(separateUnits(unitConvert(37.5*(u.ft^3/u.lbf), u.m^3/u.N)))*wing_loading/(sizing.takeoff.cl_max*sizing.runway_length);
 % take_off_constraint(wing_loading) = 37.5*wing_loading/(sizing.takeoff.cl_max*sizing.runway_length);
 
@@ -144,6 +150,7 @@ landing_constraint_wing_loading = sizing.runway_length*sizing.landing.rho*sizing
 %% stall constraint
 
 %TODO: stall_constraint
+stall_constraint = @(cl_max,q_stall) q_stall*cl_max;
 
 
 hold on
