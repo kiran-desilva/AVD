@@ -55,7 +55,7 @@ sizing.takeoff.q = q(sizing.takeoff.v_inf, sizing.takeoff.rho);
 sizing.climb.rho = sizing.takeoff.rho;
 sizing.climb.v_inf= sizing.takeoff.v_inf; % we should check if this is reasonable... Errikos did it in his excel but idk
 sizing.climb.q = q(sizing.climb.v_inf, sizing.climb.rho);
-sizing.climb.dh_dt = 12200/(30*60); % TODO
+sizing.climb.dh_dt = double(separateUnits(unitConvert(2500*u.ft/u.min, u.m/u.s))); % TODO
 
 
 
@@ -145,7 +145,8 @@ turn_constraint = @(wing_loading, turn_height_m, V_inf) q(V_inf, subindex(atmosi
 %% 
 %% landing_distance_thrust_reversal_constraint = sizing.runway_length - 
 % TODO: Add constraint with thrust reversals?
-landing_constraint_wing_loading = sizing.runway_length*sizing.landing.rho*sizing.landing.cl_max/(0.6*1.3*double(separateUnits(unitConvert(u.ft/u.kts^2, u.m/(u.m/u.s)^2))))^2;
+landing_constraint_wing_loading_roskam = sizing.runway_length*sizing.landing.rho*sizing.landing.cl_max/((0.6*1.3)^2*double(separateUnits(unitConvert(u.ft/u.kts^2, u.m/(u.m/u.s)^2))));
+landing_constraint_wing_loading = (sizing.runway_length - sizing.landing.obstacle_height)*sizing.landing.cl_max/0.51;
 
 %% stall constraint
 
@@ -155,16 +156,21 @@ stall_constraint = @(cl_max,q_stall) q_stall*cl_max;
 
 hold on
 
-weight_loading_interval = [0, 4000];
+weight_loading_interval = [1, 4000];
 fplot(climb_constraint, weight_loading_interval);
 fplot(@(wing_loading) cruise_constraint(wing_loading, 1, 1), weight_loading_interval);
 fplot(take_off_constraint, weight_loading_interval);
 fplot(service_ceiling_constraint, weight_loading_interval);
 fplot(absolute_ceiling_constraint, weight_loading_interval);
-fplot(@(wing_loading) turn_constraint(wing_loading, distdim(40000, 'ft', 'm'), sizing.cruise.v_inf), weight_loading_interval);
-xline(landing_constraint_wing_loading)
+//fplot(@(wing_loading) turn_constraint(wing_loading, distdim(40000, 'ft', 'm'), sizing.cruise.v_inf), weight_loading_interval);
+xline(landing_constraint_wing_loading,'color','red');
+xline(sizing.maxTakeoffWeight/sizing.sref);
+xline(landing_constraint_wing_loading_roskam, 'color', 'magenta');
 
-legend('Climb', 'Cruise', 'Take-Off', 'Service Ceiling', 'Absolute Ceiling', 'Turn', 'Landing');
+
+ylim([0 1]);
+grid on;
+legend('Climb', 'Cruise', 'Take-Off', 'Service Ceiling', 'Absolute Ceiling', 'Turn', 'Landing','Stall', 'Landing Roskam');
 
 hold off;
 
