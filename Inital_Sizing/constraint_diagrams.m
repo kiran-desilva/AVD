@@ -1,3 +1,8 @@
+clear
+clc
+clf
+
+u = symunit; % used for units
 subindex = @(A, idx) A(idx); %% function for anonymous indexing
 
 open("parameters.mat");
@@ -10,6 +15,7 @@ open("sizing.mat");
 %% operating empty weight - we
 %% fuel weight - wf
 
+
 %{
 
 We don't seem to be using any of these??
@@ -20,36 +26,37 @@ sizing.sfc = 10;
 
 sizing.service_ceiling = 40000; % ft
 
-%% shit from errikos excel
-sizing.e = 0.8;
-
-
-
 sizing.w_landing_w_total_max = 0.8;
 %}
 
 sizing.absolute_ceiling = 45000; % ft
 sizing.AR = 5;
-sizing.maxTakeoffWeight = 1000;
-sizing.cl_max = 1.5;
-sizing.k = nan;
-sizing.cd_min = 0.02;
-sizing.cd_0 = 0.02;
-sizing.sref = 69420;
+sizing.maxTakeoffWeight = 5000*9.81; % TODO: -> from chorley are we sure this is in Newtons
+sizing.cl_max = 1.5; % TODO:        
+sizing.e = 0.8; %% e will change with the addition of hld
+sizing.k = 1/(sizing.AR*pi*sizing.e); % This eq. is used in Gudmundsson p. 64 -> idk if this is valid 
+sizing.cd_min = 0.02; % TODO: 
+sizing.cd_0 = 0.02; % TODO:
+sizing.sref = 73.73; % TODO:
+sizing.n = 1/cosd(40); % max load factor as defined by far
+sizing.runway_length = 1200; %% in meters
+sizing.engine_number = 2;
+sizing.rho_0 = 1.225; % reference density
 
 q = @(V_inf, rho) 0.5*rho*V_inf^2;
 
 %% takeoff 
 sizing.takeoff.rho = 1.225;
-sizing.takeoff.v_inf = 1.3*sizing.v_stall; % we should check if this is reasonable... Errikos did it in his excel but idk
-sizing.takeoff.q = q(sizing.takeoff.v_inf, sizing.takeoff.rho)
-sizing.takeoff.v_stall = sqrt((sizing.maxTakeoffWeight/sizing.sref) * 2/(sizing.takeoff.rho * sizing.cl_max));
+sizing.takeoff.cl_max = 1.6; % TODO: -> raymer?
+sizing.takeoff.v_stall = sqrt((sizing.maxTakeoffWeight/sizing.sref) * 2/(sizing.takeoff.rho * sizing.takeoff.cl_max));
+sizing.takeoff.v_inf = 1.3*sizing.takeoff.v_stall; % we should check if this is reasonable... Errikos did it in his excel but idk -> from FAR25
+sizing.takeoff.q = q(sizing.takeoff.v_inf, sizing.takeoff.rho);
 
 %% climb
 sizing.climb.rho = sizing.takeoff.rho;
-sizing.climb.v_inf= 1.3*sizing.v_stall;
+sizing.climb.v_inf= sizing.takeoff.v_inf*1.5; % we should check if this is reasonable... Errikos did it in his excel but idk
 sizing.climb.q = q(sizing.climb.v_inf, sizing.climb.rho);
-sizing.climb.dh_dt = nan;
+sizing.climb.dh_dt = double(separateUnits(unitConvert(2500*u.ft/u.min, u.m/u.s))); % TODO
 
 
 
@@ -61,11 +68,12 @@ sizing.cruise.q = q(sizing.cruise.v_inf, sizing.cruise.rho);
 
 %% loiter
 [~, ~, ~, sizing.loiter.rho] = atmosisa(distdim(5000, 'ft', 'm'));
-sizing.loiter.v_inf = sqrt(1.225/sizing.loiter.rho)*pow((4*sizing.k*sizing.loiter.w^2)/(pi*sizing.cd_0*sizing.AR), 0.25);
+sizing.loiter.v_inf = sizing.cruise.v_inf*(1/3)^(0.25); %TODO: this would be the exact equation for VminD, we need the loiter weight for that tho sqrt(1.225/sizing.loiter.rho)*pow((4*sizing.k*sizing.loiter.w^2)/(pi*sizing.cd_0*sizing.AR), 0.25);
 sizing.loiter.q = q(sizing.loiter.v_inf, sizing.loiter.rho);
 
 %% landing
 sizing.landing.rho = sizing.takeoff.rho;
+sizing.landing.cl_max = sizing.takeoff.cl_max; % TODO:
 sizing.landing.obstacle_height = 183; %m
 sizing.landing.kr = 0.66; % with thrust reversers
 
@@ -106,48 +114,81 @@ climb_constraint(wing_loading) = sizing.climb.dh_dt/sizing.climb.v_inf + sizing.
 cruise_constraint(wing_loading, alpha, beta) = alpha/beta*(sizing.cruise.q*sizing.cd_min/(alpha*wing_loading) + alpha*sizing.k*wing_loading/sizing.cruise.q);
 
 %% Take-off distance constraint
-take_off_constraint(wing_loading) = 0*wing_loading;
+
+takeoff_bfl_constraint(wing_loading) = ( wing_loading*(0.297-0.019*sizing.engine_number) ) / ( sizing.runway_length * (sizing.takeoff.rho / sizing.rho_0) * sizing.takeoff.cl_max) ; 
+
+
+take_off_constraint(wing_loading) = double(separateUnits(unitConvert(37.5*(u.ft^3/u.lbf), u.m^3/u.N)))*wing_loading/(sizing.takeoff.cl_max*sizing.runway_length);
+% take_off_constraint(wing_loading) = 37.5*wing_loading/(sizing.takeoff.cl_max*sizing.runway_length);
+
+% max velocity constraint
+max_velocity_q = q(sizing.cruise.a*0.78, sizing.cruise.rho);
+max_velocity_constraint(wing_loading, alpha, beta) =alpha/beta*(max_velocity_q*sizing.cd_min/(alpha*wing_loading) + alpha*sizing.k*wing_loading/max_velocity_q);
+%  max_velocity_q/wing_loading*sizing.cd_min + sizing.k/max_velocity_q*wing_loading;
 
 %% service ceiling constraint
 sizing.service_ceiling_rho = sizing.cruise.rho;
-sizing.service_climb_velocity_at_ceiling = nan; % what is the rate of climb at the ceiling alt we want? Look at far mby...
+sizing.service_climb_velocity_at_ceiling = 6; % TODO: what is the rate of climb at the ceiling alt we want? Look at far mby...
 
 thing = sqrt(sizing.k/(3*sizing.cd_min));
 service_ceiling_constraint(wing_loading) = sizing.service_climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.service_ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_min/3);
 
 %% absolute ceiling constraint
 
-[~, ~, ~, sizing.absolute_ceiling_rho] = atmosisa(distdim(sizing.absolute_ceiling,'ft','km'))
+[~, ~, ~, sizing.absolute_ceiling_rho] = atmosisa(distdim(sizing.absolute_ceiling,'ft','km'));
 
-sizing.absolute_climb_velocity_at_ceiling = 0; % at absolute ceiling, climb rate should be zero
+% sizing.absolute_climb_velocity_at_ceiling = 0; % at absolute ceiling, climb rate should be zero
 
-thing = sqrt(sizing.k/(3*sizing.cd_min));
-absolute_ceiling_constraint(wing_loading) = sizing.service_climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.service_ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_min/3);
+% thing = sqrt(sizing.k/(3*sizing.cd_min));
+% absolute_ceiling_constraint(wing_loading,alpha,beta) = sizing.absolute_climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.service_ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_min/3);
+
+Vx(wing_loading) = sqrt( (2/sizing.absolute_ceiling_rho) * (wing_loading) * sqrt(sizing.k/sizing.cd_min) * 1);
+
+absolute_ceiling_constraint(wing_loading,alpha,beta) = simplify((alpha/beta) * ( ( (0.5*sizing.absolute_ceiling_rho*(Vx^2)*sizing.cd_min)/(wing_loading) ) + ( ((1^2)*(wing_loading))/(0.5*sizing.absolute_ceiling_rho*(Vx^2)*pi*sizing.AR*sizing.e) ) ));
+
+
 
 %% turn constraint
 
-turn_constraint(wing_loading, turn_height_m, V_inf) = q(V_inf, subindex(atmosisa(turn_height_m), 4))*(sizing.cd_min/wing_loading + sizing.k*wing_loading*(sizing.n/q(V_inf, subindex(atmosisa(turn_height_m), 4)))^2);
+turn_constraint = @(wing_loading, turn_height_m, V_inf) q(V_inf, atmos(turn_height_m, 4))*(sizing.cd_min/wing_loading + sizing.k*wing_loading*(sizing.n/q(V_inf, atmos(turn_height_m, 4)))^2);
 
 %% landing constraint
 %% page 111 in roskam
 %% 
 %% landing_distance_thrust_reversal_constraint = sizing.runway_length - 
+% TODO: Add constraint with thrust reversals?
+landing_constraint_wing_loading_roskam = sizing.runway_length*sizing.landing.rho*sizing.landing.cl_max/((0.6*1.3)^2*double(separateUnits(unitConvert(u.ft/u.kts^2, u.m/(u.m/u.s)^2))));
+landing_constraint_wing_loading = (sizing.runway_length - sizing.landing.obstacle_height)*sizing.landing.cl_max/0.51;
+landing_constraint_wing_loading_trev = (sizing.runway_length - sizing.landing.obstacle_height)*sizing.landing.cl_max/(0.51*0.66);
 
 %% stall constraint
 
-stall_constraint
-
-
-figure
+%TODO: stall_constraint
+stall_constraint = @(cl_max,q_stall) q_stall*cl_max;
 
 hold on
 
-weight_loading_interval = [0, 4000];
-fplot(climb_constraint, weight_loading_interval);
-fplot(cruise_constraint, weight_loading_interval);
+weight_loading_interval = [1, 12000];
+% fplot(climb_constraint, weight_loading_interval);
+fplot(@(wing_loading) cruise_constraint(wing_loading, 0.8296, 0.24), weight_loading_interval);
 fplot(take_off_constraint, weight_loading_interval);
 fplot(service_ceiling_constraint, weight_loading_interval);
-fplot(absolute_ceiling_constraint, weight_loading_interval);
+%fplot(absolute_ceiling_constraint, weight_loading_interval);
+fplot(@(wing_loading) absolute_ceiling_constraint(wing_loading,0.8296, 0.25))
+fplot(@(wing_loading) turn_constraint(wing_loading, distdim(40000, 'ft', 'm'), sizing.cruise.v_inf), weight_loading_interval);
+xline(landing_constraint_wing_loading,'color','red');
+xline(landing_constraint_wing_loading_trev,'color','cyan');
+% xline(sizing.maxTakeoffWeight/sizing.sref);
+xline(landing_constraint_wing_loading_roskam, 'color', 'magenta');
+
+fplot(@(wing_loading) max_velocity_constraint(wing_loading, 0.8296, 0.25), weight_loading_interval);
+
+
+ylim([0 1]);
+xlim([0,10000]);
+grid on;
+legend('Cruise', 'Take-Off', 'Service Ceiling', 'Absolute Ceiling', 'Turn', 'Landing Raymer','Landing Raymer Trev', 'Landing Roskam', 'Max Velocity');
+% legend('Climb', 'Cruise', 'Take-Off', 'Service Ceiling', 'Absolute Ceiling', 'Turn', 'Landing','Stall', 'Landing Roskam');
 
 hold off;
 
