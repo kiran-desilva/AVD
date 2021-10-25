@@ -5,12 +5,11 @@ p = open('parameters.mat');
 r = open('roskamdata.mat');
 
 sizing.AR = 7.8;
-sizing.lambdaLE = 13; %ish? used t/c of abt 0.12-0.14
-sizing.e = 4.61 * (1 - 0.045 * sizing.AR ^ 0.68) * ((cos(sizing.lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud
+sizing.lambdaLE = 20; %ish? used t/c of abt 0.12-0.14
+sizing.e = 4.61 * (1 - 0.045 * sizing.AR ^ 0.68) * ((cosd(sizing.lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud
 sizing.CD0 = 0.02;
 sizing.L_Dmax = 0.5 * sqrt((pi * sizing.AR * sizing.e) / sizing.CD0); %LoverDmax
 
-roskam.c = 0.7; %ish? 1/hr
 roskam.c_1=0.6197; %cruise
 roskam.c_2=0.7; %alternate cruise
 roskam.c_3=0.5191; %loiter
@@ -23,7 +22,6 @@ roskam.Wx_W0(2) = 1; %initialize
 roskam.A = 0.2678;
 roskam.B = 0.9979;
 
-raymer.c = 0.7; %ish? 1/hr
 raymer.c_1=0.6197; %cruise
 raymer.c_2=0.7; %alternate
 raymer.c_3=0.5194; %loiter
@@ -130,7 +128,7 @@ for j = 1:2
         raymer.W0(j) = raymer.W0(j) * 0.2248; %N to ib force
 end
 
-%Roskam_fit = fit(r.roskamdata.W0',r.roskamdata.We_W0','poly1');
+Roskam_fit = fit(r.roskamdata.W0',r.roskamdata.We_W0','poly1');
 
 figure
 plot(roskam.W0(1), roskam.We_W0(1),'r*')
@@ -141,7 +139,7 @@ plot(raymer.W0(1), raymer.We_W0(1),'b*')
 hold on
 plot(raymer.W0(2), raymer.We_W0(2),'bo')
 hold on
-%plot(Roskam_fit,r.roskamdata.W0, r.roskamdata.We_W0,'x')
+plot(Roskam_fit,r.roskamdata.W0, r.roskamdata.We_W0,'x')
 hold off
 grid on
 xlabel("$W_{0}$ Ibs", 'interpreter', 'Latex','FontSize', 15)
