@@ -111,12 +111,12 @@ sizing.takeoff.en_route_climb.q = q(1.25*sizing.v_stall, sizing.takeoff.rho);
 sizing.takeoff.en_route_climb.e = sizing.e;
 sizing.takeoff.en_route_climb.cd_0 = sizing.cd_0;
 
-sizing.landing.first.q = q(1.3*sizing.takeoff.v_stall, sizing.takeoff.rho);
+sizing.landing.first.q = q(1.3*sizing.landing.v_stall, sizing.landing.rho);
 sizing.landing.first.e = sizing.e + sizing.landing_flaps_e + sizing.undercarriage_e;
 sizing.landing.first.cd_0 = sizing.cd_0 + sizing.landing_flaps_cd0 + sizing.undercarriage_cd0;
 
 
-sizing.landing.second.q = q(1.5*1.1*sizing.landing.v_stall, sizing.takeoff.rho);
+sizing.landing.second.q = q(1.5*1.1*sizing.landing.v_stall, sizing.landing.rho);
 sizing.landing.second.e = sizing.e + sizing.t_o_flaps_e + sizing.undercarriage_e;
 sizing.landing.second.cd_0 = sizing.cd_0 + sizing.t_o_flaps_cd0 + sizing.undercarriage_cd0;
 
@@ -205,8 +205,6 @@ Vx(wing_loading) = sqrt( (2/sizing.absolute_ceiling_rho) * (wing_loading) * sqrt
 
 absolute_ceiling_constraint(wing_loading,alpha,beta) = simplify((alpha/beta) * ( ( (0.5*sizing.absolute_ceiling_rho*(Vx^2)*sizing.cd_0)/(wing_loading) ) + ( ((1^2)*(wing_loading))/(0.5*sizing.absolute_ceiling_rho*(Vx^2)*pi*sizing.AR*sizing.e) ) ));
 
-
-
 %% turn constraint
 
 turn_constraint = @(wing_loading, turn_height_m, V_inf) q(V_inf, atmos(turn_height_m, 4))*(sizing.cd_0/wing_loading + sizing.k*wing_loading*(sizing.n/q(V_inf, atmos(turn_height_m, 4)))^2);
@@ -238,22 +236,39 @@ xline(landing_constraint_wing_loading_roskam, 'color', 'magenta');
 fplot(@(wing_loading) max_velocity_constraint(wing_loading, 0.8296, 0.25), weight_loading_interval);
 
 k_func = @(e) 1/(pi*sizing.AR*e);
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff.initial_climb.q, k_func(sizing.takeoff.initial_climb.e), sizing.takeoff.initial_climb.cd_0))
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 0, sizing.takeoff.transition.q, k_func(sizing.takeoff.transition.e), sizing.takeoff.transition.cd_0))
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.4/100, sizing.takeoff.second_segment.q, k_func(sizing.takeoff.second_segment.e), sizing.takeoff.second_segment.cd_0))
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff.en_route_climb.q, k_func(sizing.takeoff.en_route_climb.e), sizing.takeoff.en_route_climb.cd_0))
-fplot(@(wing_loading) 0.5*climb_constraint_oei(wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd_0))
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.1/100, sizing.landing.second.q, k_func(sizing.landing.second.e), sizing.landing.first.cd_0))
+% fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff.initial_climb.q, k_func(sizing.takeoff.initial_climb.e), sizing.takeoff.initial_climb.cd_0))
+% fplot(@(wing_loading) climb_constraint_oei(wing_loading, 0, sizing.takeoff.transition.q, k_func(sizing.takeoff.transition.e), sizing.takeoff.transition.cd_0))
+% fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.4/100, sizing.takeoff.second_segment.q, k_func(sizing.takeoff.second_segment.e), sizing.takeoff.second_segment.cd_0))
+% fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff.en_route_climb.q, k_func(sizing.takeoff.en_route_climb.e), sizing.takeoff.en_route_climb.cd_0))
+% fplot(@(wing_loading) 0.5*climb_constraint_oei(wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd_0))
+% fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.1/100, sizing.landing.second.q, k_func(sizing.landing.second.e), sizing.landing.second.cd_0))
 
-% yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 1.2/100, sizing.takeoff.initial_climb.q, k_func(sizing.takeoff.initial_climb.e), sizing.takeoff.initial_climb.cd_0)))
-% yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 0, sizing.takeoff.transition.q, k_func(sizing.takeoff.transition.e), sizing.takeoff.transition.cd_0)))
-% yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 2.4/100, sizing.takeoff.second_segment.q, k_func(sizing.takeoff.second_segment.e), sizing.takeoff.second_segment.cd_0)))
-% yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 1.2/100, sizing.takeoff.en_route_climb.q, k_func(sizing.takeoff.en_route_climb.e), sizing.takeoff.en_route_climb.cd_0)))
-% yline(double(climb_constraint_oei(landing_constraint_wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd_0)))
-% yline(double(climb_constraint_oei(landing_constraint_wing_loading, 2.1/100, sizing.landing.second.q, k_func(sizing.landing.second.e), sizing.landing.first.cd_0)))
+% pls tell me i did the dumb dumb
+optimum_w_over_s = 0.5*sizing.cruise.rho*((sizing.cruise.v_inf/3^0.25)^2)*sqrt(pi*sizing.AR*sizing.cd_0/sizing.k)
+% i think u did?
+% that aint gonna change anything :(
+% who knows lol
+% nah it's so high cus v_inf^2 is like 40k...
+% I dont think we can cruise at Vmd...
+% hmmmmm yeah maybe we are curising too quickly
+% lemme read a bit more of the notes...
+%%  can we relate t/w to vinf?
+% ive asked tanvi to jsut check we arent being dumb
+% yeah cool, thanks
+
+%ok so.. if we want max range, we don't cruise at Vmd, but at ~1.3*Vmd, so that should be our cruise speed
+
+yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 1.2/100, sizing.takeoff.initial_climb.q, k_func(sizing.takeoff.initial_climb.e), sizing.takeoff.initial_climb.cd_0)), 'r--')
+yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 0, sizing.takeoff.transition.q, k_func(sizing.takeoff.transition.e), sizing.takeoff.transition.cd_0)), 'b--')
+yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 2.4/100, sizing.takeoff.second_segment.q, k_func(sizing.takeoff.second_segment.e), sizing.takeoff.second_segment.cd_0)), 'g--')
+yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 1.2/100, sizing.takeoff.en_route_climb.q, k_func(sizing.takeoff.en_route_climb.e), sizing.takeoff.en_route_climb.cd_0)), 'c--')
+yline(0.5*double(climb_constraint_oei(landing_constraint_wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd_0)), 'm--')
+yline(double(climb_constraint_oei(landing_constraint_wing_loading, 2.1/100, sizing.landing.second.q, k_func(sizing.landing.second.e), sizing.landing.second.cd_0)), 'k--')
 
 ylim([0 1]);
-xlim([0,10000]);
+xlim([0,8000]);
+xlabel('Wing Loading [Nm^{-2}]');
+ylabel('Thrust to Weight ratio (errikos had smt dif here, CHECK!!!!)', 'color', 'red');
 grid on;
 legend(...%'Climb',...
        'Cruise',... 
@@ -270,6 +285,8 @@ legend(...%'Climb',...
        'OEI en-route climb',...
        'OEI first landing',...
 	   'OEI second landing');
+
+xline(optimum_w_over_s);
 
 hold off;
 
