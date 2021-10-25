@@ -83,9 +83,11 @@ landing_constraint_wing_loading_roskam = sizing.runway_length*sizing.landing.rho
 landing_constraint_wing_loading = (sizing.runway_length - sizing.landing.obstacle_height)*sizing.landing.cl_max/0.51;
 landing_constraint_wing_loading_trev = (sizing.runway_length - sizing.landing.obstacle_height)*sizing.landing.cl_max/(0.51*0.66);
 
+takeoff_constraint_wing_loading = landing_constraint_wing_loading / 0.72;
+
 % sizing.takeoff.v_stall = sqrt((sizing.maxTakeoffWeight/sizing.sref) * 2/(sizing.takeoff.rho * sizing.takeoff.cl_max));
 sizing.landing.v_stall = sqrt((2*landing_constraint_wing_loading)/(sizing.landing.rho*sizing.landing.cl_max));
-sizing.takeoff.v_stall = sqrt((2*landing_constraint_wing_loading)/(0.72*sizing.takeoff.rho*sizing.takeoff.cl_max));
+sizing.takeoff.v_stall = sqrt((2*takeoff_constraint_wing_loading)/(sizing.takeoff.rho*sizing.takeoff.cl_max));
 sizing.v_stall = sizing.takeoff.v_stall*sqrt(sizing.takeoff.cl_max/sizing.cl_max);
 sizing.takeoff.v_inf = 1.3*sizing.takeoff.v_stall; % we should check if this is reasonable... Errikos did it in his excel but idk -> from FAR25
 sizing.takeoff.q = q(sizing.takeoff.v_inf, sizing.takeoff.rho);
@@ -109,19 +111,19 @@ sizing.takeoff.en_route_climb.q = q(1.25*sizing.v_stall, sizing.takeoff.rho);
 sizing.takeoff.en_route_climb.e = sizing.e;
 sizing.takeoff.en_route_climb.cd_0 = sizing.cd_0;
 
-sizing.landing.first.q = q(1.3*sizing.v_stall, sizing.takeoff.rho);
+sizing.landing.first.q = q(1.3*sizing.takeoff.v_stall, sizing.takeoff.rho);
 sizing.landing.first.e = sizing.e + sizing.landing_flaps_e + sizing.undercarriage_e;
 sizing.landing.first.cd_0 = sizing.cd_0 + sizing.landing_flaps_cd0 + sizing.undercarriage_cd0;
 
 
-sizing.landing.second.q = q(1.5*sizing.landing.v_stall, sizing.takeoff.rho);
+sizing.landing.second.q = q(1.5*1.1*sizing.landing.v_stall, sizing.takeoff.rho);
 sizing.landing.second.e = sizing.e + sizing.t_o_flaps_e + sizing.undercarriage_e;
 sizing.landing.second.cd_0 = sizing.cd_0 + sizing.t_o_flaps_cd0 + sizing.undercarriage_cd0;
 
 
 %% climb
 sizing.climb.rho = sizing.takeoff.rho;
-sizing.climb.v_inf= sizing.takeoff.v_inf*1.5; % we should check if this is reasonable... Errikos did it in his excel but idk
+sizing.climb.v_inf= sizing.takeoff.v_inf*1.5;
 sizing.climb.q = q(sizing.climb.v_inf, sizing.climb.rho);
 sizing.climb.dh_dt = double(separateUnits(unitConvert(2500*u.ft/u.min, u.m/u.s))); % TODO
 
@@ -221,7 +223,7 @@ climb_constraint_oei(wing_loading, climb_grad, q_var, k, cd_0) = 2*(climb_grad +
 hold on
 
 weight_loading_interval = [1, 12000];
-fplot(@(wing_loading) climb_constraint(wing_loading, 3.2/100), weight_loading_interval);
+% fplot(@(wing_loading) climb_constraint(wing_loading, 3.2/100), weight_loading_interval);
 fplot(@(wing_loading) cruise_constraint(wing_loading, 0.8296, 0.24), weight_loading_interval);
 fplot(take_off_constraint, weight_loading_interval);
 % fplot(service_ceiling_constraint, weight_loading_interval);
@@ -240,17 +242,22 @@ fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff
 fplot(@(wing_loading) climb_constraint_oei(wing_loading, 0, sizing.takeoff.transition.q, k_func(sizing.takeoff.transition.e), sizing.takeoff.transition.cd_0))
 fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.4/100, sizing.takeoff.second_segment.q, k_func(sizing.takeoff.second_segment.e), sizing.takeoff.second_segment.cd_0))
 fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff.en_route_climb.q, k_func(sizing.takeoff.en_route_climb.e), sizing.takeoff.en_route_climb.cd_0))
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd_0))
+fplot(@(wing_loading) 0.5*climb_constraint_oei(wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd_0))
 fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.1/100, sizing.landing.second.q, k_func(sizing.landing.second.e), sizing.landing.first.cd_0))
 
+% yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 1.2/100, sizing.takeoff.initial_climb.q, k_func(sizing.takeoff.initial_climb.e), sizing.takeoff.initial_climb.cd_0)))
+% yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 0, sizing.takeoff.transition.q, k_func(sizing.takeoff.transition.e), sizing.takeoff.transition.cd_0)))
+% yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 2.4/100, sizing.takeoff.second_segment.q, k_func(sizing.takeoff.second_segment.e), sizing.takeoff.second_segment.cd_0)))
+% yline(double(climb_constraint_oei(takeoff_constraint_wing_loading, 1.2/100, sizing.takeoff.en_route_climb.q, k_func(sizing.takeoff.en_route_climb.e), sizing.takeoff.en_route_climb.cd_0)))
+% yline(double(climb_constraint_oei(landing_constraint_wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd_0)))
+% yline(double(climb_constraint_oei(landing_constraint_wing_loading, 2.1/100, sizing.landing.second.q, k_func(sizing.landing.second.e), sizing.landing.first.cd_0)))
 
 ylim([0 1]);
 xlim([0,10000]);
 grid on;
-legend('Climb',...
+legend(...%'Climb',...
        'Cruise',... 
-       'Take-Off',... 
-       'Service Ceiling',...
+       'Take-Off',... %    'Service Ceiling',...
        'Absolute Ceiling',... 
        'Turn',...
        'Landing Raymer',...
