@@ -7,11 +7,11 @@ r = open('roskamdata.mat');
 sizing.AR = 7.8;
 sizing.lambdaLE = 20; %ish? used t/c of abt 0.12-0.14
 sizing.e = 4.61 * (1 - 0.045 * sizing.AR ^ 0.68) * ((cosd(sizing.lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud
-sizing.CD0 = 0.02;
+sizing.CD0 = 0.02; 
 sizing.L_Dmax = 0.5 * sqrt((pi * sizing.AR * sizing.e) / sizing.CD0); %LoverDmax
 
 roskam.c_1=0.6197; %cruise
-roskam.c_2=0.7; %alternate cruise
+roskam.c_2=0.6197; %alternate cruise
 roskam.c_3=0.5191; %loiter
 roskam.LoverD_cruise(1) = 11; %ish?
 roskam.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
@@ -23,7 +23,7 @@ roskam.A = 0.2678;
 roskam.B = 0.9979;
 
 raymer.c_1=0.6197; %cruise
-raymer.c_2=0.7; %alternate
+raymer.c_2=0.6197; %alternate
 raymer.c_3=0.5194; %loiter
 raymer.LoverD_cruise(1) = 11; %ish?
 raymer.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
@@ -99,7 +99,7 @@ for j = 1:2
         hold off
 
         roskam.We_W0(j) = We_W0_roskam_regress; 
-        roskam.W0(j) = roskam.W0(j) * 0.2248; %N to ib force
+        roskam.W0(j) = roskam.W0(j) / 9.81; %N to Kg
 
         %Raymer W0
 
@@ -112,7 +112,7 @@ for j = 1:2
         hold on
         error = 10; 
 
-        while abs(error) > 1e-10
+        while abs(error) > 1e-8
             raymer.W0prev = raymer.W0(j); 
             We_W0_raymer_regress = raymer.A * (raymer.W0(j) ^ raymer.C) * raymer.Kvs;   %Raymer regression method
             raymer.W0(j) = (W_crew + W_pld) / (1 - raymer.Wf_W0(j) - (We_W0_raymer_regress));    %W0 calculation 
@@ -125,26 +125,26 @@ for j = 1:2
         hold off
 
         raymer.We_W0(j) = We_W0_raymer_regress; 
-        raymer.W0(j) = raymer.W0(j) * 0.2248; %N to ib force
+        raymer.W0(j) = raymer.W0(j) / 9.81; %N to Kg
 end
 
-Roskam_fit = fit(r.roskamdata.W0',r.roskamdata.We_W0','poly1');
+%Roskam_fit = fit(r.roskamdata.W0',r.roskamdata.We_W0','poly1');
 
 figure
-plot(roskam.W0(1), roskam.We_W0(1),'r*')
+plot(roskam.W0(1), roskam.We_W0(1),'bo')
 hold on
-plot(roskam.W0(2), roskam.We_W0(2),'ro')
+plot(roskam.W0(2), roskam.We_W0(2),'r*')
 hold on
-plot(raymer.W0(1), raymer.We_W0(1),'b*')
+plot(raymer.W0(1), raymer.We_W0(1),'bo')
 hold on
-plot(raymer.W0(2), raymer.We_W0(2),'bo')
+plot(raymer.W0(2), raymer.We_W0(2),'b*')
 hold on
-plot(Roskam_fit,r.roskamdata.W0, r.roskamdata.We_W0,'x')
+plot(r.roskamdata.W0, r.roskamdata.We_W0,'x')
 hold off
 grid on
-xlabel("$W_{0}$ Ibs", 'interpreter', 'Latex','FontSize', 15)
-ylabel("$\frac{W_{e}}{W_{0}}$ Ibs", 'interpreter', 'Latex','FontSize', 15)
-title("Comparison to Roskam data",'interpreter', 'Latex','FontSize', 15)
-legend("Roskam reg w Roskam L/D","Roskam reg w sweep method L/D","Raymer reg w Roskam L/D","Raymer reg w sweep method L/D","Data from Roskam")
+xlabel("$W_{0}$ Kg", 'interpreter', 'Latex','FontSize', 15)
+ylabel("$\frac{W_{e}}{W_{0}}$", 'interpreter', 'Latex','FontSize', 15)
+%title("Comparison to Roskam data",'interpreter', 'Latex','FontSize', 15)
+legend("Roskam regression, Roskam L/D","Roskam regression, sweep method for L/D","Raymer regression, Roskam L/D","Raymer regression, sweep method for L/D","Roskam data for Business jets")
 %% save sizing to 
 save('sizing','sizing');
