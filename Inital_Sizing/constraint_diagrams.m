@@ -38,14 +38,15 @@ sizing.cl_max = 1.6; % TODO:
 sizing.e = 0.6364; %% e will change with the addition of hld 
 sizing.cd_0 = 0.02; % TODO:
 
+%% cd 0 taken from errikos' slides
 sizing.undercarriage_e = -0.05;
 sizing.undercarriage_cd0 = 0.02;
 
 sizing.t_o_flaps_e = -0.05;
 sizing.t_o_flaps_cd0 = 0.02;
 
-sizing.landing_flaps = -0.1;
-sizing.landing_flaps = 0.07;
+sizing.landing_flaps_e = -0.1;
+sizing.landing_flaps_cd0 = 0.07;
 
 sizing.k = 1/(sizing.AR*pi*sizing.e); % This eq. is used in Gudmundsson p. 64 -> idk if this is valid 
 
@@ -92,7 +93,7 @@ sizing.takeoff.q = q(sizing.takeoff.v_inf, sizing.takeoff.rho);
 
 sizing.takeoff.initial_climb.q = q(1.2*sizing.takeoff.v_stall, sizing.takeoff.rho);
 sizing.takeoff.initial_climb.e = sizing.e + sizing.t_o_flaps_e;
-sizing.takeoff.initial_climb.cd_0 = sizing.cd_0 + sizing.t_o_flaps.cd_0;
+sizing.takeoff.initial_climb.cd_0 = sizing.cd_0 + sizing.t_o_flaps_cd0;
 
 sizing.takeoff.transition.q = sizing.takeoff.initial_climb.q;
 sizing.takeoff.transition.e = sizing.e + sizing.t_o_flaps_e + sizing.undercarriage_e;
@@ -104,14 +105,18 @@ sizing.takeoff.second_segment.e = sizing.e + sizing.t_o_flaps_e;
 sizing.takeoff.second_segment.cd_0 = sizing.cd_0 + sizing.t_o_flaps_cd0;
 
 
-sizing.takeoff.en_route_climb.q = q(1.25*sizing.v_stall, sizing.takoeff.rho);
+sizing.takeoff.en_route_climb.q = q(1.25*sizing.v_stall, sizing.takeoff.rho);
 sizing.takeoff.en_route_climb.e = sizing.e;
 sizing.takeoff.en_route_climb.cd_0 = sizing.cd_0;
 
 sizing.landing.first.q = q(1.3*sizing.v_stall, sizing.takeoff.rho);
+sizing.landing.first.e = sizing.e + sizing.landing_flaps_e + sizing.undercarriage_e;
+sizing.landing.first.cd_0 = sizing.cd_0 + sizing.landing_flaps_cd0 + sizing.undercarriage_cd0;
+
 
 sizing.landing.second.q = q(1.5*sizing.landing.v_stall, sizing.takeoff.rho);
-
+sizing.landing.second.e = sizing.e + sizing.t_o_flaps_e + sizing.undercarriage_e;
+sizing.landing.second.cd_0 = sizing.cd_0 + sizing.t_o_flaps_cd0 + sizing.undercarriage_cd0;
 
 
 %% climb
@@ -153,7 +158,7 @@ sizing.loiter.q = q(sizing.loiter.v_inf, sizing.loiter.rho);
 %% take off speed = 1.1* stall speed
 
 
-syms wing_loading thrust_to_weight V_inf rho turn_height_m  climb_grad % use syms for constraints
+syms wing_loading thrust_to_weight V_inf rho turn_height_m  climb_grad k cd_0 q_var % use syms for constraints
 syms alpha beta % alpha -> scales weight to initial weight, beta -> scales thrust to sea level thrust
 
 %% Computing climb constraint
@@ -211,7 +216,7 @@ turn_constraint = @(wing_loading, turn_height_m, V_inf) q(V_inf, atmos(turn_heig
 stall_constraint = @(cl_max,q_stall) q_stall*cl_max;
 
 %% Climb OEI
-climb_constraint_oei(wing_loading, climb_grad, q, k, cd_0) = climb_grad + q/wing_loading*cd_0 + k/q*wing_loading;
+climb_constraint_oei(wing_loading, climb_grad, q_var, k, cd_0) = 2*(climb_grad + q_var/wing_loading*cd_0 + k/q_var*wing_loading);
 
 hold on
 
@@ -230,19 +235,34 @@ xline(landing_constraint_wing_loading_roskam, 'color', 'magenta');
 
 fplot(@(wing_loading) max_velocity_constraint(wing_loading, 0.8296, 0.25), weight_loading_interval);
 
-k_f
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff.initial_climb.q, sizing.takeoff.initial_climb.q, sizing.takeoff.initial_climb.q))
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 0, sizing.takeoff.transition.q))
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.4/100, sizing.takeoff.second_segment.q))
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff.en_route_climb.q))
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 3.2/100, sizing.landing.first.q))
-fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.1/100, sizing.landing.second.q))
+k_func = @(e) 1/(pi*sizing.AR*e);
+fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff.initial_climb.q, k_func(sizing.takeoff.initial_climb.e), sizing.takeoff.initial_climb.cd_0))
+fplot(@(wing_loading) climb_constraint_oei(wing_loading, 0, sizing.takeoff.transition.q, k_func(sizing.takeoff.transition.e), sizing.takeoff.transition.cd_0))
+fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.4/100, sizing.takeoff.second_segment.q, k_func(sizing.takeoff.second_segment.e), sizing.takeoff.second_segment.cd_0))
+fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff.en_route_climb.q, k_func(sizing.takeoff.en_route_climb.e), sizing.takeoff.en_route_climb.cd_0))
+fplot(@(wing_loading) climb_constraint_oei(wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd_0))
+fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.1/100, sizing.landing.second.q, k_func(sizing.landing.second.e), sizing.landing.first.cd_0))
 
 
 ylim([0 1]);
 xlim([0,10000]);
 grid on;
-legend('Climb', 'Cruise', 'Take-Off', 'Service Ceiling', 'Absolute Ceiling', 'Turn', 'Landing Raymer','Landing Raymer Trev', 'Landing Roskam', 'Max Velocity');
+legend('Climb',...
+       'Cruise',... 
+       'Take-Off',... 
+       'Service Ceiling',...
+       'Absolute Ceiling',... 
+       'Turn',...
+       'Landing Raymer',...
+       'Landing Raymer Trev',... 
+       'Landing Roskam',... 
+       'Max Velocity',...
+       'OEI initial climb',...
+       'OEI transition',...
+       'OEI second segement',...
+       'OEI en-route climb',...
+       'OEI first landing',...
+	   'OEI second landing');
 
 hold off;
 
