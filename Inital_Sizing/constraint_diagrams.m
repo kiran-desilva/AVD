@@ -137,10 +137,16 @@ service_ceiling_constraint(wing_loading) = sizing.service_climb_velocity_at_ceil
 
 [~, ~, ~, sizing.absolute_ceiling_rho] = atmosisa(distdim(sizing.absolute_ceiling,'ft','km'));
 
-sizing.absolute_climb_velocity_at_ceiling = 0; % at absolute ceiling, climb rate should be zero
+% sizing.absolute_climb_velocity_at_ceiling = 0; % at absolute ceiling, climb rate should be zero
 
-thing = sqrt(sizing.k/(3*sizing.cd_min));
-absolute_ceiling_constraint(wing_loading) = sizing.absolute_climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.service_ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_min/3);
+% thing = sqrt(sizing.k/(3*sizing.cd_min));
+% absolute_ceiling_constraint(wing_loading,alpha,beta) = sizing.absolute_climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.service_ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_min/3);
+
+Vx(wing_loading) = sqrt( (2/sizing.absolute_ceiling_rho) * (wing_loading) * sqrt(sizing.k/sizing.cd_min) * 1);
+
+absolute_ceiling_constraint(wing_loading,alpha,beta) = simplify((alpha/beta) * ( ( (0.5*sizing.absolute_ceiling_rho*(Vx^2)*sizing.cd_min)/(wing_loading) ) + ( ((1^2)*(wing_loading))/(0.5*sizing.absolute_ceiling_rho*(Vx^2)*pi*sizing.AR*sizing.e) ) ));
+
+
 
 %% turn constraint
 
@@ -153,6 +159,7 @@ turn_constraint = @(wing_loading, turn_height_m, V_inf) q(V_inf, atmos(turn_heig
 % TODO: Add constraint with thrust reversals?
 landing_constraint_wing_loading_roskam = sizing.runway_length*sizing.landing.rho*sizing.landing.cl_max/((0.6*1.3)^2*double(separateUnits(unitConvert(u.ft/u.kts^2, u.m/(u.m/u.s)^2))));
 landing_constraint_wing_loading = (sizing.runway_length - sizing.landing.obstacle_height)*sizing.landing.cl_max/0.51;
+landing_constraint_wing_loading_trev = (sizing.runway_length - sizing.landing.obstacle_height)*sizing.landing.cl_max/(0.51*0.66);
 
 %% stall constraint
 
@@ -166,17 +173,21 @@ weight_loading_interval = [1, 12000];
 fplot(@(wing_loading) cruise_constraint(wing_loading, 0.8296, 0.24), weight_loading_interval);
 fplot(take_off_constraint, weight_loading_interval);
 fplot(service_ceiling_constraint, weight_loading_interval);
-fplot(absolute_ceiling_constraint, weight_loading_interval);
+%fplot(absolute_ceiling_constraint, weight_loading_interval);
+fplot(@(wing_loading) absolute_ceiling_constraint(wing_loading,0.8296, 0.25))
 fplot(@(wing_loading) turn_constraint(wing_loading, distdim(40000, 'ft', 'm'), sizing.cruise.v_inf), weight_loading_interval);
 xline(landing_constraint_wing_loading,'color','red');
+xline(landing_constraint_wing_loading_trev,'color','cyan');
 % xline(sizing.maxTakeoffWeight/sizing.sref);
 xline(landing_constraint_wing_loading_roskam, 'color', 'magenta');
+
 fplot(@(wing_loading) max_velocity_constraint(wing_loading, 0.8296, 0.25), weight_loading_interval);
 
 
 ylim([0 1]);
+xlim([0,10000]);
 grid on;
-legend('Cruise', 'Take-Off', 'Service Ceiling', 'Absolute Ceiling', 'Turn', 'Landing Raymer', 'Landing Roskam', 'Max Velocity');
+legend('Cruise', 'Take-Off', 'Service Ceiling', 'Absolute Ceiling', 'Turn', 'Landing Raymer','Landing Raymer Trev', 'Landing Roskam', 'Max Velocity');
 % legend('Climb', 'Cruise', 'Take-Off', 'Service Ceiling', 'Absolute Ceiling', 'Turn', 'Landing','Stall', 'Landing Roskam');
 
 hold off;
