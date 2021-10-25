@@ -290,5 +290,5 @@ xline(optimum_w_over_s);
 
 hold off;
 
-improveplot(gcf)
+improvePlot(gcf)
 
