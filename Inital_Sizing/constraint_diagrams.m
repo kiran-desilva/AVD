@@ -141,7 +141,9 @@ climb_constraint(wing_loading, climb_grad) = climb_grad + sizing.climb.q/wing_lo
 %% Cruise constraint
 
 cruise_constraint(wing_loading, alpha, beta) = alpha/beta*(sizing.cruise.q*sizing.cd_0/(alpha*wing_loading) + alpha*sizing.k*wing_loading/sizing.cruise.q);
+
 loiter_constraint(wing_loading, alpha, beta) = alpha/beta*(sizing.loiter.q*sizing.cd_0/(alpha*wing_loading) + alpha*sizing.k*wing_loading/sizing.loiter.q);
+
 diversion_constraint(wing_loading, alpha, beta) = alpha/beta*(sizing.diversion.q*sizing.cd_0/(alpha*wing_loading) + alpha*sizing.k*wing_loading/sizing.diversion.q);
 
 %% Take-off distance constraint
@@ -173,13 +175,20 @@ service_ceiling_constraint(wing_loading) = sizing.service_climb_velocity_at_ceil
 % thing = sqrt(sizing.k/(3*sizing.cd_0));
 % absolute_ceiling_constraint(wing_loading,alpha,beta) = sizing.absolute_climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.service_ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_0/3);
 
-Vx(wing_loading) = sqrt( (2/sizing.absolute_ceiling_rho) * (wing_loading) * sqrt(sizing.k/sizing.cd_0) * 1);
+% Vx(wing_loading) = sqrt( (2/sizing.absolute_ceiling_rho) * (wing_loading) * sqrt(sizing.k/sizing.cd_0) * 1);
 
-% Vimd(wing_loading) = sqrt((2/1.225) * wing_loading) * ((sizing.k / (pi*sizing.AR * sizing.cd_0))^(1/4));
-% Vx = Vimd;
+Vimd(wing_loading) = sqrt((2/1.225) * wing_loading) * ((sizing.k / (pi*sizing.AR * sizing.cd_0))^(1/4)) * .8296
+
+Vx = EquivalentToTrue(Vimd,sizing.absolute_ceiling)
 
 absolute_ceiling_constraint(wing_loading,alpha,beta) = simplify((alpha/beta) * ( ( (0.5*sizing.absolute_ceiling_rho*(Vx^2)*sizing.cd_0)/(wing_loading) ) + ( ((1^2)*(wing_loading))/(0.5*sizing.absolute_ceiling_rho*(Vx^2)*pi*sizing.AR*sizing.e) ) ));
 
+figure
+hold on
+fplot(Vimd,[1 10000])
+fplot(Vx,[1 10000])
+legend('Vimd','Vx')
+figure
 %% turn constraint
 
 turn_constraint = @(wing_loading, turn_height_m, V_inf) q(V_inf, atmos(turn_height_m, 4))*(sizing.cd_0/wing_loading + sizing.k*wing_loading*(sizing.n/q(V_inf, atmos(turn_height_m, 4)))^2);
