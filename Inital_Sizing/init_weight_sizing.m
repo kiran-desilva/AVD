@@ -139,7 +139,7 @@ plot(raymer.W0(1), raymer.We_W0(1),'bo')
 hold on
 plot(raymer.W0(2), raymer.We_W0(2),'b*')
 hold on
-plot(r.roskamdata.W0, r.roskamdata.We_W0,'x')
+plot(r.roskamdata.W0, r.roskamdata.We_W0,'kx')
 hold off
 grid on
 xlabel("$W_{0}$ [N]", 'interpreter', 'Latex','FontSize', 15)
