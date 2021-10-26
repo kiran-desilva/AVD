@@ -34,9 +34,9 @@ raymer.Wx_W0(2) = 1; %initialize
 raymer.A = 1.51;
 raymer.C = -0.1;
 
-W_crew = 94 * 6 * 9.81; %
-W_pld = 20 * 6 * 9.81; %
-initialW0 = 80000;
+W_crew = 94 * 6 * 2.20462; % ibs
+W_pld = 20 * 6 * 2.20462; % ibs
+initialW0 = 200000;
 
 %fuel mass fractions
 
@@ -82,7 +82,7 @@ for j = 1:2
         roskam.W0(j) = initialW0; %initial W0 guess (N)
         roskam.W0prev = 0; %initialise
         count = 0; 
-       % figure 
+        figure 
         hold on
         error = 10; 
 
@@ -92,14 +92,14 @@ for j = 1:2
             roskam.W0(j) = (W_crew + W_pld) / (1 - roskam.Wf_W0(j) - (We_W0_roskam_regress));    %W0 calculation 
             count = count + 1;  %count number of iterations
             error = roskam.W0(j) - roskam.W0prev;    %Calculate difference between consecutive W0 values
-            %plot(count, error, 'r*') %plot error 
+            plot(count, error, 'r*') %plot error 
             grid on
             pause(0.05)
         end  
         hold off
 
         roskam.We_W0(j) = We_W0_roskam_regress; 
-        roskam.W0(j) = roskam.W0(j) / 9.81; %N to Kg
+        roskam.W0(j) = roskam.W0(j) * 0.453592; %ibs to kg;
 
         %Raymer W0
 
@@ -108,7 +108,7 @@ for j = 1:2
         raymer.Kvs = 1; %fixed sweep
 
         count = 0; 
-       % figure 
+        figure 
         hold on
         error = 10; 
 
@@ -118,14 +118,14 @@ for j = 1:2
             raymer.W0(j) = (W_crew + W_pld) / (1 - raymer.Wf_W0(j) - (We_W0_raymer_regress));    %W0 calculation 
             count = count + 1;  %count number of iterations
             error = raymer.W0(j) - raymer.W0prev;    %Calculate difference between consecutive W0 values
-            %plot(count, error, 'b*') %plot error 
+            plot(count, error, 'b*') %plot error 
             grid on
-            pause(0.05)
+            %pause(0.05)
         end  
         hold off
 
         raymer.We_W0(j) = We_W0_raymer_regress; 
-        raymer.W0(j) = raymer.W0(j) / 9.81; %N to Kg
+        raymer.W0(j) = raymer.W0(j) * 0.453592; %ibs to kg
 end
 
 %Roskam_fit = fit(r.roskamdata.W0',r.roskamdata.We_W0','poly1');
