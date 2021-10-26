@@ -175,20 +175,15 @@ service_ceiling_constraint(wing_loading) = sizing.service_climb_velocity_at_ceil
 % thing = sqrt(sizing.k/(3*sizing.cd_0));
 % absolute_ceiling_constraint(wing_loading,alpha,beta) = sizing.absolute_climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.service_ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_0/3);
 
-% Vx(wing_loading) = sqrt( (2/sizing.absolute_ceiling_rho) * (wing_loading) * sqrt(sizing.k/sizing.cd_0) * 1);
+Vx(wing_loading) = sqrt( (2/sizing.absolute_ceiling_rho) * (wing_loading) * sqrt(sizing.k/sizing.cd_0) * 1);
 
-Vimd(wing_loading) = sqrt((2/1.225) * wing_loading) * ((sizing.k / (pi*sizing.AR * sizing.cd_0))^(1/4)) * .8296
+% Vimd(wing_loading) = sqrt((2/1.225) * wing_loading) * ((sizing.k / (pi*sizing.AR * sizing.cd_0))^(1/4))
 
-Vx = EquivalentToTrue(Vimd,sizing.absolute_ceiling)
+% Vx = EquivalentToTrue(Vimd,sizing.absolute_ceiling)
 
 absolute_ceiling_constraint(wing_loading,alpha,beta) = simplify((alpha/beta) * ( ( (0.5*sizing.absolute_ceiling_rho*(Vx^2)*sizing.cd_0)/(wing_loading) ) + ( ((1^2)*(wing_loading))/(0.5*sizing.absolute_ceiling_rho*(Vx^2)*pi*sizing.AR*sizing.e) ) ));
 
-figure
-hold on
-fplot(Vimd,[1 10000])
-fplot(Vx,[1 10000])
-legend('Vimd','Vx')
-figure
+
 %% turn constraint
 
 turn_constraint = @(wing_loading, turn_height_m, V_inf) q(V_inf, atmos(turn_height_m, 4))*(sizing.cd_0/wing_loading + sizing.k*wing_loading*(sizing.n/q(V_inf, atmos(turn_height_m, 4)))^2);
@@ -225,7 +220,7 @@ fplot(@(wing_loading) max_velocity_constraint(wing_loading, 0.8296, 0.25), weigh
 k_func = @(e) 1/(pi*sizing.AR*e);
 
 % pls tell me i did the dumb dumb
-optimum_w_over_s = 0.5*sizing.cruise.rho*((sizing.cruise.v_inf/3^0.25)^2)*sqrt(pi*sizing.AR*sizing.cd_0/sizing.k)
+optimum_w_over_s = 0.5*sizing.cruise.rho*((sizing.cruise.v_inf/(3^0.25))^2)*sqrt(pi*sizing.AR*sizing.cd_0/sizing.k)
 % i think u did?
 % that aint gonna change anything :(
 % who knows lol
