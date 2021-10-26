@@ -34,8 +34,8 @@ raymer.Wx_W0(2) = 1; %initialize
 raymer.A = 1.51;
 raymer.C = -0.1;
 
-W_crew = 94 * 6 * 2.20462; % ibs
-W_pld = 20 * 6 * 2.20462; % ibs
+W_crew = 94 * 6 * 2.20462; % lbs
+W_pld = 20 * 6 * 2.20462; % lbs
 initialW0 = 200000;
 
 %fuel mass fractions
