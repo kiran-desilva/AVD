@@ -5,7 +5,7 @@ function [] = improvePlot(figure)
     plot_height_in_px = 600;
     
     marker_size=10;
-    marker_line_width=1;
+    marker_line_width=2;
     marker_outline = 'matching'; % could be 'black' or 'matching'
     box_thickness = 1;
     axis_tick_font_size = 15;
@@ -77,12 +77,12 @@ function [] = improvePlot(figure)
     end
 
     % Find the legend, and if there is one, change it  
-    h = get(hFig,'children');
-    for k = 1:length(h)
-        if strcmpi(get(h(k),'Tag'),'legend')
-            set(h(k), 'FontSize', legend_font_size, 'location', 'best');
-            break;
-        end
-    end
+    % h = get(hFig,'children');
+    % for k = 1:length(h)
+    %     if strcmpi(get(h(k),'Tag'),'legend')
+    %         set(h(k), 'FontSize', legend_font_size, 'location', 'best');
+    %         break;
+    %     end
+    % end
 
 end

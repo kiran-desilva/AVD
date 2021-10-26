@@ -8,26 +8,6 @@ subindex = @(A, idx) A(idx); %% function for anonymous indexing
 open("parameters.mat");
 open("sizing.mat");
 
-%% shit we want
-%% l/d max - l_dmax
-%% specific fuel consumption - sfc
-%% gross weight - w0
-%% operating empty weight - we
-%% fuel weight - wf
-
-
-%{
-
-We don't seem to be using any of these??
-
-sizing.ld_max = 10;
-sizing.ld_cruise = 0.866*sizing.ld_max;
-sizing.sfc = 10;
-
-sizing.service_ceiling = 40000; % ft
-
-sizing.w_landing_w_total_max = 0.8;
-%}
 
 sizing.absolute_ceiling = 45000; % ft
 sizing.AR = 7.8;
@@ -35,7 +15,9 @@ sizing.maxTakeoffWeight = 5000*9.81; % TODO: -> from chorley are we sure this is
 
 %% clean
 sizing.cl_max = 1.6; % TODO: 
-sizing.e = 0.6364; %% e will change with the addition of hld 
+sizing.e = 0.6364; 
+sizing.k = 1/(sizing.AR*pi*sizing.e); % This eq. is used in Gudmundsson p. 64 -> idk if this is valid 
+
 sizing.cd_0 = 0.02; % TODO:
 
 %% cd 0 taken from errikos' slides
@@ -48,10 +30,6 @@ sizing.t_o_flaps_cd0 = 0.02;
 sizing.landing_flaps_e = -0.1;
 sizing.landing_flaps_cd0 = 0.07;
 
-sizing.k = 1/(sizing.AR*pi*sizing.e); % This eq. is used in Gudmundsson p. 64 -> idk if this is valid 
-
-
-sizing.sref = 73.73; % TODO:
 sizing.n = 1/cosd(40); % max load factor as defined by far
 sizing.runway_length = 1200; %% in meters
 sizing.engine_number = 2;
@@ -137,24 +115,16 @@ sizing.cruise.q = q(sizing.cruise.v_inf, sizing.cruise.rho);
 
 %% loiter
 [~, ~, ~, sizing.loiter.rho] = atmosisa(distdim(5000, 'ft', 'm'));
-sizing.loiter.v_inf = sizing.cruise.v_inf*(1/3)^(0.25); %TODO: this would be the exact equation for VminD, we need the loiter weight for that tho sqrt(1.225/sizing.loiter.rho)*pow((4*sizing.k*sizing.loiter.w^2)/(pi*sizing.cd_0*sizing.AR), 0.25);
+%sizing.loiter.v_inf = sizing.cruise.v_inf*(1/3)^(0.25); %TODO: this would be the exact equation for VminD, we need the loiter weight for that tho sqrt(1.225/sizing.loiter.rho)*pow((4*sizing.k*sizing.loiter.w^2)/(pi*sizing.cd_0*sizing.AR), 0.25);
+sizing.loiter.v_inf = 110;
 sizing.loiter.q = q(sizing.loiter.v_inf, sizing.loiter.rho);
 
+%%diversion
 
+[~, ~, ~, sizing.diversion.rho] = atmosisa(distdim(40000, 'ft', 'm'));
+sizing.diversion.v_inf = sizing.cruise.v_inf; %TODO: this would be the exact equation for VminD, we need the loiter weight for that tho sqrt(1.225/sizing.loiter.rho)*pow((4*sizing.k*sizing.loiter.w^2)/(pi*sizing.cd_0*sizing.AR), 0.25);
+sizing.diversion.q = q(sizing.diversion.v_inf, sizing.diversion.rho);
 
-
-
-%% What's next?
-%% Make sure aircraft can complete the stipulated design mission profile
-%% Make sure aircraft capable of achieving performance targets like
-%% Ceilings (absolute, service, combat) -> T/W at height, v has to be bigger than 1/(L/D)_max
-%% Maximum speed
-%% Time to climb / Rates of climb
-%% Sustained turn rates / radii
-%% Level (axial) acceleration
-%% Takeoff and Landing distances (TODA & LDA) -> T/W, stall speed 
-%% Stall speed -> function of Cl_max (Cl_max changes in takeoff and clean config) and wing loading (W/ S)
-%% Make sure aircraft meets airworthiness requirements
 
 %% FAR25 - https://www.engineerstoolkit.com/Airworthiness%20Standards%20%20FAA%20FAR%20Part%2025.pdf
 %% take off speed = 1.1* stall speed
@@ -171,6 +141,8 @@ climb_constraint(wing_loading, climb_grad) = climb_grad + sizing.climb.q/wing_lo
 %% Cruise constraint
 
 cruise_constraint(wing_loading, alpha, beta) = alpha/beta*(sizing.cruise.q*sizing.cd_0/(alpha*wing_loading) + alpha*sizing.k*wing_loading/sizing.cruise.q);
+loiter_constraint(wing_loading, alpha, beta) = alpha/beta*(sizing.loiter.q*sizing.cd_0/(alpha*wing_loading) + alpha*sizing.k*wing_loading/sizing.loiter.q);
+diversion_constraint(wing_loading, alpha, beta) = alpha/beta*(sizing.diversion.q*sizing.cd_0/(alpha*wing_loading) + alpha*sizing.k*wing_loading/sizing.diversion.q);
 
 %% Take-off distance constraint
 
@@ -203,6 +175,9 @@ service_ceiling_constraint(wing_loading) = sizing.service_climb_velocity_at_ceil
 
 Vx(wing_loading) = sqrt( (2/sizing.absolute_ceiling_rho) * (wing_loading) * sqrt(sizing.k/sizing.cd_0) * 1);
 
+% Vimd(wing_loading) = sqrt((2/1.225) * wing_loading) * ((sizing.k / (pi*sizing.AR * sizing.cd_0))^(1/4));
+% Vx = Vimd;
+
 absolute_ceiling_constraint(wing_loading,alpha,beta) = simplify((alpha/beta) * ( ( (0.5*sizing.absolute_ceiling_rho*(Vx^2)*sizing.cd_0)/(wing_loading) ) + ( ((1^2)*(wing_loading))/(0.5*sizing.absolute_ceiling_rho*(Vx^2)*pi*sizing.AR*sizing.e) ) ));
 
 %% turn constraint
@@ -218,30 +193,27 @@ stall_constraint = @(cl_max,q_stall) q_stall*cl_max;
 %% Climb OEI
 climb_constraint_oei(wing_loading, climb_grad, q_var, k, cd_0) = 2*(climb_grad + q_var/wing_loading*cd_0 + k/q_var*wing_loading);
 
+
 hold on
 
 weight_loading_interval = [1, 12000];
-% fplot(@(wing_loading) climb_constraint(wing_loading, 3.2/100), weight_loading_interval);
-fplot(@(wing_loading) cruise_constraint(wing_loading, 0.8296, 0.24), weight_loading_interval);
+
+fplot(@(wing_loading) cruise_constraint(wing_loading, 0.8296, 0.25), weight_loading_interval);
+fplot(@(wing_loading) loiter_constraint(wing_loading, 0.8296, 0.25), weight_loading_interval);
+fplot(@(wing_loading) diversion_constraint(wing_loading, 0.8296, 0.25), weight_loading_interval);
+
 fplot(take_off_constraint, weight_loading_interval);
-% fplot(service_ceiling_constraint, weight_loading_interval);
-%fplot(absolute_ceiling_constraint, weight_loading_interval);
+
 fplot(@(wing_loading) absolute_ceiling_constraint(wing_loading,0.8296, 0.25))
 fplot(@(wing_loading) turn_constraint(wing_loading, distdim(40000, 'ft', 'm'), sizing.cruise.v_inf), weight_loading_interval);
 xline(landing_constraint_wing_loading,'color','red');
 xline(landing_constraint_wing_loading_trev,'color','cyan');
-% xline(sizing.maxTakeoffWeight/sizing.sref);
+
 xline(landing_constraint_wing_loading_roskam, 'color', 'magenta');
 
 fplot(@(wing_loading) max_velocity_constraint(wing_loading, 0.8296, 0.25), weight_loading_interval);
 
 k_func = @(e) 1/(pi*sizing.AR*e);
-% fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff.initial_climb.q, k_func(sizing.takeoff.initial_climb.e), sizing.takeoff.initial_climb.cd_0))
-% fplot(@(wing_loading) climb_constraint_oei(wing_loading, 0, sizing.takeoff.transition.q, k_func(sizing.takeoff.transition.e), sizing.takeoff.transition.cd_0))
-% fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.4/100, sizing.takeoff.second_segment.q, k_func(sizing.takeoff.second_segment.e), sizing.takeoff.second_segment.cd_0))
-% fplot(@(wing_loading) climb_constraint_oei(wing_loading, 1.2/100, sizing.takeoff.en_route_climb.q, k_func(sizing.takeoff.en_route_climb.e), sizing.takeoff.en_route_climb.cd_0))
-% fplot(@(wing_loading) 0.5*climb_constraint_oei(wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd_0))
-% fplot(@(wing_loading) climb_constraint_oei(wing_loading, 2.1/100, sizing.landing.second.q, k_func(sizing.landing.second.e), sizing.landing.second.cd_0))
 
 % pls tell me i did the dumb dumb
 optimum_w_over_s = 0.5*sizing.cruise.rho*((sizing.cruise.v_inf/3^0.25)^2)*sqrt(pi*sizing.AR*sizing.cd_0/sizing.k)
@@ -270,9 +242,10 @@ xlim([0,8000]);
 xlabel('Wing Loading [Nm^{-2}]');
 ylabel('Thrust to Weight ratio (errikos had smt dif here, CHECK!!!!)', 'color', 'red');
 grid on;
-legend(...%'Climb',...
-       'Cruise',... 
-       'Take-Off',... %    'Service Ceiling',...
+legend('Cruise',...
+       'Loiter',...
+       'Diversion',...
+       'Take-Off',...
        'Absolute Ceiling',... 
        'Turn',...
        'Landing Raymer',...
@@ -284,11 +257,12 @@ legend(...%'Climb',...
        'OEI second segement',...
        'OEI en-route climb',...
        'OEI first landing',...
-	   'OEI second landing');
+	'OEI second landing');
 
-xline(optimum_w_over_s);
-
-hold off;
-
+% xline(optimum_w_over_s);
 improvePlot(gcf)
+
+hold off
+
+
 
