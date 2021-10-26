@@ -146,15 +146,15 @@ xlabel("$W_{0}$ [N]", 'interpreter', 'Latex','FontSize', 15)
 ylabel("$\frac{W_{e}}{W_{0}}$", 'interpreter', 'Latex','FontSize', 15)
 %title("Comparison to Roskam data",'interpreter', 'Latex','FontSize', 15)
 legend("Roskam regression, Roskam L/D","Roskam regression, calculated L/D","Raymer regression, Roskam L/D","Raymer regression, calculated L/D","Roskam data for Business jets", 'interpreter', 'Latex')
-%% save sizing to 
-save('sizing','sizing');
 
 %% Constraint diagram
 %Fractions 
 
-fraction.before_take_off=0.99*0.995;
-fraction.before_cruise=fraction.before_take_off*roskam.fuelfrac(2);
-fraction.before_alternate_cruise=fraction.before_cruise*roskam.fuelfrac(4)*roskam.fuelfrac(5);
-fraction.before_loiter=fraction.before_alternate_cruise*roskam.fuelfrac(6);
-fraction.end=roskam.Wx_W0(2);
+sizing.fraction.before_take_off=0.99*0.995;
+sizing.fraction.before_cruise=fraction.before_take_off*roskam.fuelfrac(2);
+sizing.fraction.before_alternate_cruise=fraction.before_cruise*roskam.fuelfrac(4)*roskam.fuelfrac(5);
+sizing.fraction.before_loiter=fraction.before_alternate_cruise*roskam.fuelfrac(6);
+sizing.fraction.end=roskam.Wx_W0(2);
 
+%% save sizing to 
+save('sizing','sizing');
