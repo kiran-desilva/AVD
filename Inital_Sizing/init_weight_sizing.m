@@ -99,7 +99,7 @@ for j = 1:2
         hold off
 
         roskam.We_W0(j) = We_W0_roskam_regress; 
-        roskam.W0(j) = roskam.W0(j) * 0.453592; %ibs to kg;
+        roskam.W0(j) = roskam.W0(j) * 0.453592 * 9.81; %ibs to kg to N;
 
         %Raymer W0
 
@@ -125,7 +125,7 @@ for j = 1:2
         hold off
 
         raymer.We_W0(j) = We_W0_raymer_regress; 
-        raymer.W0(j) = raymer.W0(j) * 0.453592; %ibs to kg
+        raymer.W0(j) = raymer.W0(j) * 0.453592 * 9.81; %ibs to kg to N
 end
 
 %Roskam_fit = fit(r.roskamdata.W0',r.roskamdata.We_W0','poly1');
@@ -142,7 +142,7 @@ hold on
 plot(r.roskamdata.W0, r.roskamdata.We_W0,'x')
 hold off
 grid on
-xlabel("$W_{0}$ [kg]", 'interpreter', 'Latex','FontSize', 15)
+xlabel("$W_{0}$ [N]", 'interpreter', 'Latex','FontSize', 15)
 ylabel("$\frac{W_{e}}{W_{0}}$", 'interpreter', 'Latex','FontSize', 15)
 %title("Comparison to Roskam data",'interpreter', 'Latex','FontSize', 15)
 legend("Roskam regression, Roskam L/D","Roskam regression, calculated L/D","Raymer regression, Roskam L/D","Raymer regression, calculated L/D","Roskam data for Business jets", 'interpreter', 'Latex')
