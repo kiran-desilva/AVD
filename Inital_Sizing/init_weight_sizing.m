@@ -152,7 +152,7 @@ legend("Roskam regression, Roskam L/D","Roskam regression, calculated L/D","Raym
 
 sizing.fraction.before_take_off=0.99*0.995;
 sizing.fraction.before_cruise=sizing.fraction.before_take_off*roskam.fuelfrac(2);
-sizing.fraction.before_alternate_cruise=sizing.fraction.before_cruise*roskam.fuelfrac(4)*roskam.fuelfrac(5);
+sizing.fraction.before_alternate_cruise=sizing.fraction.before_cruise*roskam.fuelfrac(3)*roskam.fuelfrac(4)*roskam.fuelfrac(5);
 sizing.fraction.before_loiter=sizing.fraction.before_alternate_cruise*roskam.fuelfrac(6);
 sizing.fraction.end=roskam.Wx_W0(2);
 
