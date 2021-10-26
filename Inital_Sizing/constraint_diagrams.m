@@ -57,9 +57,9 @@ sizing.landing.kr = 0.66; % with thrust reversers
 %% 
 %% landing_distance_thrust_reversal_constraint = sizing.runway_length - 
 % TODO: Add constraint with thrust reversals?
-landing_constraint_wing_loading_roskam = sizing.runway_length*sizing.landing.rho*sizing.landing.cl_max/((0.6*1.3)^2*double(separateUnits(unitConvert(u.ft/u.kts^2, u.m/(u.m/u.s)^2))));
-landing_constraint_wing_loading = (sizing.runway_length - sizing.landing.obstacle_height)*sizing.landing.cl_max/0.51;
-landing_constraint_wing_loading_trev = (sizing.runway_length - sizing.landing.obstacle_height)*sizing.landing.cl_max/(0.51*0.66);
+landing_constraint_wing_loading_roskam = sizing.fraction.end/0.85*sizing.runway_length*sizing.landing.rho*sizing.landing.cl_max/((0.6*1.3)^2*double(separateUnits(unitConvert(u.ft/u.kts^2, u.m/(u.m/u.s)^2))));
+landing_constraint_wing_loading = sizing.fraction.end/0.85*(sizing.runway_length - sizing.landing.obstacle_height)*sizing.landing.cl_max/0.51;
+landing_constraint_wing_loading_trev = sizing.fraction.end/0.85*(sizing.runway_length - sizing.landing.obstacle_height)*sizing.landing.cl_max/(0.51*0.66);
 
 takeoff_constraint_wing_loading = landing_constraint_wing_loading / 0.72;
 
@@ -159,13 +159,6 @@ max_velocity_q = q(sizing.cruise.a*0.78, sizing.cruise.rho);
 max_velocity_constraint(wing_loading, alpha, beta) =alpha/beta*(max_velocity_q*sizing.cd_0/(alpha*wing_loading) + alpha*sizing.k*wing_loading/max_velocity_q);
 %  max_velocity_q/wing_loading*sizing.cd_0 + sizing.k/max_velocity_q*wing_loading;
 
-%% service ceiling constraint
-sizing.service_ceiling_rho = sizing.cruise.rho;
-sizing.service_climb_velocity_at_ceiling = 6; % TODO: what is the rate of climb at the ceiling alt we want? Look at far mby...
-
-thing = sqrt(sizing.k/(3*sizing.cd_0));
-service_ceiling_constraint(wing_loading) = sizing.service_climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.service_ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_0/3);
-
 %% absolute ceiling constraint
 
 [~, ~, ~, sizing.absolute_ceiling_rho] = atmosisa(distdim(sizing.absolute_ceiling,'ft','km'));
@@ -175,13 +168,13 @@ service_ceiling_constraint(wing_loading) = sizing.service_climb_velocity_at_ceil
 % thing = sqrt(sizing.k/(3*sizing.cd_0));
 % absolute_ceiling_constraint(wing_loading,alpha,beta) = sizing.absolute_climb_velocity_at_ceiling / sqrt(wing_loading*2*thing/sizing.service_ceiling_rho) + 4*sqrt(sizing.k*sizing.cd_0/3);
 
-Vx(wing_loading) = sqrt( (2/sizing.absolute_ceiling_rho) * (wing_loading) * sqrt(sizing.k/sizing.cd_0) * 1);
+Vx(wing_loading) = sqrt( (2/sizing.absolute_ceiling_rho) * (wing_loading) * sqrt(sizing.k/sizing.cd_0) * 1)
 
 % Vimd(wing_loading) = sqrt((2/1.225) * wing_loading) * ((sizing.k / (pi*sizing.AR * sizing.cd_0))^(1/4))
 
 % Vx = EquivalentToTrue(Vimd,sizing.absolute_ceiling)
 
-absolute_ceiling_constraint(wing_loading,alpha,beta) = simplify((alpha/beta) * ( ( (0.5*sizing.absolute_ceiling_rho*(Vx^2)*sizing.cd_0)/(wing_loading) ) + ( ((1^2)*(wing_loading))/(0.5*sizing.absolute_ceiling_rho*(Vx^2)*pi*sizing.AR*sizing.e) ) ));
+absolute_ceiling_constraint(wing_loading,alpha,beta) = simplify((alpha/beta) * ( ( (0.5*sizing.absolute_ceiling_rho*(Vx^2)*sizing.cd_0)/(alpha*wing_loading) ) + ( ((1^2)*(alpha*wing_loading))/(0.5*sizing.absolute_ceiling_rho*(Vx^2)*pi*sizing.AR*sizing.e) ) ));
 
 
 %% turn constraint
@@ -208,8 +201,8 @@ fplot(@(wing_loading) diversion_constraint(wing_loading, sizing.fraction.before_
 
 fplot(take_off_constraint, weight_loading_interval);
 
-fplot(@(wing_loading) absolute_ceiling_constraint(wing_loading, sizing.fraction.before_cruise, 0.25))
-fplot(@(wing_loading) sizing.fraction.before_criuse*turn_constraint(wing_loading, distdim(40000, 'ft', 'm'), sizing.cruise.v_inf), weight_loading_interval);
+fplot(@(wing_loading) absolute_ceiling_constraint(wing_loading, sizing.fraction.before_cruise, 0.18))
+fplot(@(wing_loading) sizing.fraction.before_cruise*turn_constraint(wing_loading, distdim(40000, 'ft', 'm'), sizing.cruise.v_inf), weight_loading_interval);
 xline(landing_constraint_wing_loading,'color','red');
 xline(landing_constraint_wing_loading_trev,'color','cyan');
 
@@ -220,7 +213,8 @@ fplot(@(wing_loading) max_velocity_constraint(wing_loading, sizing.fraction.befo
 k_func = @(e) 1/(pi*sizing.AR*e);
 
 % pls tell me i did the dumb dumb
-optimum_w_over_s = 0.5*sizing.cruise.rho*((sizing.cruise.v_inf/(3^0.25))^2)*sqrt(pi*sizing.AR*sizing.cd_0/sizing.k)
+% optimum_w_over_s = 0.5*sizing.cruise.rho*((sizing.cruise.v_inf/(3^0.25))^2)*sqrt(pi*sizing.AR*sizing.cd_0/sizing.k)
+optimum_w_over_s = 0.5*sizing.cruise.rho*((109.8/(3^0.25))^2)*sqrt(pi*sizing.AR*sizing.cd_0/sizing.k)
 % i think u did?
 % that aint gonna change anything :(
 % who knows lol
@@ -241,31 +235,40 @@ yline(sizing.fraction.before_take_off*double(climb_constraint_oei(takeoff_constr
 yline(sizing.fraction.end*0.5*double(climb_constraint_oei(landing_constraint_wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd_0)), 'm--')
 yline(sizing.fraction.end*double(climb_constraint_oei(landing_constraint_wing_loading, 2.1/100, sizing.landing.second.q, k_func(sizing.landing.second.e), sizing.landing.second.cd_0)), 'k--')
 
+design_w_s = 2923.2;
+design_t_w = double(max_velocity_constraint(design_w_s, sizing.fraction.before_cruise, 0.25))
+design_S_ref = 36.7e3 /design_w_s
+t0 = design_t_w * 36.7e3
+
 ylim([0 1]);
-xlim([0,8000]);
+xlim([0,11000]);
 xlabel('Wing Loading [Nm^{-2}]');
-ylabel('Thrust to Weight ratio (errikos had smt dif here, CHECK!!!!)', 'color', 'red');
+ylabel('T_0/W_0');
 grid on;
+
+
+plot(design_w_s, design_t_w, 'x', 'MarkerSize', 20, 'color','black');
+% plot(design_w_s, max_velocity_constraint(design_w_s, sizing.fraction.before_cruise, 0.25), 'o', 'MarkerSize', 20, 'color','black');
+
 legend('Cruise',...
        'Loiter',...
        'Diversion',...
        'Take-Off',...
        'Absolute Ceiling',... 
        'Turn',...
-       'Landing Raymer',...
+       'Landing Raymer w/o Trev',...
        'Landing Raymer Trev',... 
-       'Landing Roskam',... 
+       'Landing Roskam w/o Trev',... 
        'Max Velocity',...
        'OEI initial climb',...
        'OEI transition',...
        'OEI second segement',...
        'OEI en-route climb',...
        'OEI first landing',...
-	'OEI second landing');
+	'OEI second landing',...
+       'Design Point');
 
-% xline(optimum_w_over_s);
 improvePlot(gcf)
-
 hold off
 
 
