@@ -6,7 +6,7 @@ r = open('roskamdata.mat');
 
 sizing.AR = 7.8;
 sizing.lambdaLE = 20; %ish? used t/c of abt 0.12-0.14
-sizing.e = 4.61 * (1 - 0.045 * sizing.AR ^ 0.68) * ((cosd(sizing.lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud 
+sizing.e = 0.85; %4.61 * (1 - 0.045 * sizing.AR ^ 0.68) * ((cosd(sizing.lambdaLE))^0.15) - 3.1; %Raymer eqn from Gud 
 %sizing.L_Dmax = 0.5 * sqrt((pi * sizing.AR * sizing.e) / sizing.CD0); %LoverDmax
 sizing.swet_sref = 6; 
 sizing.A_wetted = sizing.AR / sizing.swet_sref; 
