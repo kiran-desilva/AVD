@@ -15,10 +15,9 @@ sizing.AR = 7.8;
 
 %% clean
 sizing.cl_max = 1.6; % TODO: 
-sizing.e = 0.6364; 
+
 sizing.k = 1/(sizing.AR*pi*sizing.e); % This eq. is used in Gudmundsson p. 64 -> idk if this is valid 
 
-sizing.cd_0 = 0.02; % TODO:
 
 %% cd 0 taken from errikos' slides
 sizing.undercarriage_e = -0.05;
