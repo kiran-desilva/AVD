@@ -43,7 +43,7 @@ W_crew = 94 * 6 * 2.20462; % lbs
 W_pld = 20 * 6 * 2.20462; % lbs
 initialW0 = 200000;
 
-%fuel mass fractions
+%% fuel mass fractions
 
 
 for j = 1:2
