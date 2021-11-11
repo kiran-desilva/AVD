@@ -16,4 +16,7 @@ perf.Kt = T / sizing.W0 - mu;
 perf.Sg = (1 / (2 * 9.81 * perf.Ka)) * log(abs((perf.Kt + perf.Ka * V_TO^2) / (perf.Kt + perf.Ka * Vinit^2));
 
 perf.Sr = 3 * V_TO; 
+
+R = (1.15 * sizing.takeoff.v_stall)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
+perf.Str = sqrt(R^2 - (R - H_obs)^2); 
 %%
