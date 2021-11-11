@@ -12,7 +12,7 @@ sizing.swet_sref = 6;
 sizing.A_wetted = sizing.AR / sizing.swet_sref; 
 sizing.Kld = 15;
 sizing.L_Dmax = sizing.Kld * sqrt(sizing.AR / sizing.swet_sref); 
-sizing.cd0 = (pi * sizing.AR * sizing.e) / (4 * sizing.L_Dmax^2);
+sizing.cd_0 = (pi * sizing.AR * sizing.e) / (4 * sizing.L_Dmax^2);
 
 
 roskam.c_1=0.6197; %cruise
@@ -152,6 +152,7 @@ ylabel("$\frac{W_{e}}{W_{0}}$", 'interpreter', 'Latex','FontSize', 15)
 %title("Comparison to Roskam data",'interpreter', 'Latex','FontSize', 15)
 legend("Roskam regression, Roskam L/D","Roskam regression, calculated L/D","Raymer regression, Roskam L/D","Raymer regression, calculated L/D","Roskam data for Business jets", 'interpreter', 'Latex')
 
+sizing.W0 = roskam.W0(2);
 %% Constraint diagram
 %Fractions 
 

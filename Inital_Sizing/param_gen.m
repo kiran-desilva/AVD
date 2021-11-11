@@ -8,9 +8,15 @@ parameters.alternate_range_km = 370;%km
 parameters.loiter_alt_ft = 5000;
 parameters.loiter_duration = 45; %minutes
 
-parameters.min_runway = 1.2; 
+parameters.runway_length = 1200; 
 parameters.max_mach = 0.78;
-parameters.max_alt_ft = 45000; %amsl
+parameters.absolute_Ceiling = 45000; %amsl
 parameters.max_cabin_press = 8000;
+
+parameters.engine_number = 2;
+parameters.rho_0 = 1.225;
+parameters.target_landing_weight = 0.8;
+
+
 
 save("parameters","parameters");
