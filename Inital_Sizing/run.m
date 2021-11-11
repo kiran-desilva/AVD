@@ -1,0 +1,7 @@
+clear
+clc
+close all
+
+param_gen
+init_weight_sizing
+constraint_diagrams
