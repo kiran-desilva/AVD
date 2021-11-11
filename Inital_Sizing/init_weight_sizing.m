@@ -12,7 +12,7 @@ sizing.swet_sref = 6;
 sizing.A_wetted = sizing.AR / sizing.swet_sref; 
 sizing.Kld = 15;
 sizing.L_Dmax = sizing.Kld * sqrt(sizing.AR / sizing.swet_sref); 
-sizing.cd_0 = (pi * sizing.AR * sizing.e) / (4 * sizing.L_Dmax^2);
+sizing.cd0 = (pi * sizing.AR * sizing.e) / (4 * sizing.L_Dmax^2);
 
 
 roskam.c_1=0.6197; %cruise

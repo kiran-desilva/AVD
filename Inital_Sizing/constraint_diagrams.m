@@ -275,3 +275,6 @@ design.sref = design_S_ref;
 design.t0 = t0;
 
 save('design','design')
+%% save sizing to 
+save('sizing','sizing');
+
