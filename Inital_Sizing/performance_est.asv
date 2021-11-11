@@ -24,5 +24,9 @@ LoverD_TR = sizing.takeoff.cl_max / sizing.takeoff.cd;
 gamma_climb = asin(design_t_w - 1 / LoverD_TR);
 H_TR = R * (1 - cos(gamma_climb)); 
 
-perf.Sto = 1.15 * (perf.Sg + perf.Sr + perf.Str 
+perf.Sto = 1.15 * (perf.Sg + perf.Sr + perf.Str); %FAR25 15% safety factor
+
+gamma_climb_1eng =  asin(0.5 * design_t_w - 1 / LoverD_TR); %one engine operative
+T_av = 0.75 * 0.5 * design_t_w * sizing.W0 * ((5 + parameters.BPR) / (4 + parameters.BPR));
+perf.BFL = 
 %%
