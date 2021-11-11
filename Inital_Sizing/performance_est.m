@@ -27,6 +27,10 @@ H_TR = R * (1 - cos(gamma_climb));
 perf.Sto = 1.15 * (perf.Sg + perf.Sr + perf.Str); %FAR25 15% safety factor
 
 gamma_climb_1eng =  asin(0.5 * design_t_w - 1 / LoverD_TR); %one engine operative
+gamma_min = 0.024; %FAR25 minimum climb for 2-engine a/c
+G = gamma_climb_1eng - gamma_min;
+CL_climb = 1.2 * 
 T_av = 0.75 * 0.5 * design_t_w * sizing.W0 * ((5 + parameters.BPR) / (4 + parameters.BPR)); %one engine operative
-perf.BFL = 
+U = 0.01 * sizing.cl_max + 0.02; 
+perf.BFL = (0.863 / (1 + 2.3 * G)) * ((design_w_s / (1.225 * 9.81 * CL_climb)) + H_obs) * (1 / (T_av / sizing.W0 - U) + 2.7) + 655;
 %%
