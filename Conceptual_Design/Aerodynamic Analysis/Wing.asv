@@ -47,16 +47,13 @@ aero_analysis.wing.Cl_max_wing=0.9*cl_max_airfoil*cos(lambda_quarter);
 aero_analysis.wing.supersonic_Mach=1/cos(sweep_LE);
 
 %% HLD
-% inputs from other scripts
 aero_analysis.wing.HLD.c=1;
 aero_analysis.wing.HLD.c_dash=1.2;
 aero_analysis.wing.HLD.s_ref=1;
 aero_analysis.wing.HLD.s_flapped=1.2;
-aero_analysis.wing.HLD.delta_hl=20*pi/180; %hinge lift surface
-
-
+aero_analysis.wing.HLD.
 aero_analysis.wing.HLD.delta_cl_device=1.3*(aero_analysis.wing.HLD.c_dash/aero_analysis.wing.HLD.c); %assumed Fowler. Can change - pg 415 Raymer
-aero_analysis.wing.HLD.delta_cl_max=0.9*aero_analysis.wing.HLD.delta_cl_device*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
+aero_analysis.wing.HLD.delta_cl_max
 
 
 
