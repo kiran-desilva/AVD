@@ -269,5 +269,6 @@ legend('Cruise',...
 improvePlot(gcf)
 hold off
 
-
+%% save sizing to 
+save('sizing','sizing');
 
