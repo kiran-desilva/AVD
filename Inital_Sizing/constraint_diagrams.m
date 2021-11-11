@@ -10,11 +10,10 @@ load("sizing.mat");
 
 
 parameters.absolute_ceiling = 45000; % ft
-sizing.AR = 7.8;
 
 
 %% clean
-sizing.cl_max = 1.6; % TODO: 
+sizing.cl_max = 1.6;
 
 sizing.k = 1/(sizing.AR*pi*sizing.e); % This eq. is used in Gudmundsson p. 64 -> idk if this is valid 
 
@@ -200,7 +199,7 @@ fplot(@(wing_loading) diversion_constraint(wing_loading, sizing.fraction.before_
 
 fplot(take_off_constraint, weight_loading_interval,'LineWidth',linewidth);
 
-fplot(@(wing_loading) absolute_ceiling_constraint(wing_loading, sizing.fraction.before_cruise, 0.18),'LineWidth',linewidth)
+fplot(@(wing_loading) absolute_ceiling_constraint(wing_loading, sizing.fraction.before_cruise, 0.2),'LineWidth',linewidth)
 fplot(@(wing_loading) sizing.fraction.before_cruise*turn_constraint(wing_loading, distdim(40000, 'ft', 'm'), sizing.cruise.v_inf), weight_loading_interval,'LineWidth',linewidth);
 xline(landing_constraint_wing_loading,'color','red','LineWidth',linewidth);
 xline(landing_constraint_wing_loading_trev,'LineWidth',linewidth);

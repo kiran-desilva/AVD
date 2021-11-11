@@ -15,7 +15,7 @@ parameters.max_cabin_press = 8000;
 
 parameters.engine_number = 2;
 parameters.rho_0 = 1.225;
-parameters.target_landing_weight = 0.8;
+parameters.target_landing_weight = 0.9;
 
 
 
