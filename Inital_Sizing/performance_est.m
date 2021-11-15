@@ -36,5 +36,15 @@ perf.BFL = (0.863 / (1 + 2.3 * G)) * ((design_w_s / (1.225 * 9.81 * CL_climb)) +
 
 %% Landing 
 theta_apprch = 3; %deg from gudm.
-H_f = 
-perf.Sa = (H_obs - 
+V_a = 1.3 * sizing.landing.v_stall;
+V_f = 1.23 * sizing.landing.v_stall;
+V_td = 1.15 * sizing.landing.v_stall;
+tfr = 2; % mid sized ac?
+n_land = 1.2; 
+R_land = V_f^2 / ((n_land - 1) * 9.81);
+H_f = R_land * (1 - cosd(theta_apprch)); %errikos slides
+perf.Sa = (H_obs - H_f) / tand(theta_apprch);
+perf.Sf = 0.1512 * sizing.landing.v_stall^2 * sind(theta_apprch); 
+perf.Sfr = tfr * V_td; 
+perf.Ka_l = (1.225 / (2 * sizing.W0 / design_S_ref)) * (mu * sizing.landing.cl_max - sizing.landing.cd0 - (sizing.landing.cl_max^2) / (pi * sizing.AR *sizing.landing.e));
+perf.Sb = (1 / 2 * 9.81 * perf.Ka_l) * log((perf.Kt + perf.Ka_l * 0) / (perf.Kt + perf.Ka_l * Vtd^2)); 
