@@ -21,8 +21,8 @@ S_ratio=6; %=S_wet/S_ref
 rho=[1,1,1,1,1];
 u=[1,1,1,1,1];
 visc=[1,1,1,1,1];
-l=[1,1,1,1,1];
-Re=rho.*u.*l./visc;
+l=[1,1,1,1,1]; %characteristic component lengths
+aero_analysis.drag.Re=rho.*u.*l./visc; %array with all the Re numbers
 
 
 %% M_dd
@@ -34,3 +34,5 @@ Re=rho.*u.*l./visc;
 aero_analysis.drag.C_d0_estimate=0.0045*S_ratio;
 
 %% Parasite Drag: Component buildup
+
+%% Save outputs
