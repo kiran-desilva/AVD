@@ -1,3 +1,4 @@
+
 clear 
 clc
 
@@ -152,6 +153,7 @@ ylabel("$\frac{W_{e}}{W_{0}}$", 'interpreter', 'Latex','FontSize', 15)
 %title("Comparison to Roskam data",'interpreter', 'Latex','FontSize', 15)
 legend("Roskam regression, Roskam L/D","Roskam regression, calculated L/D","Raymer regression, Roskam L/D","Raymer regression, calculated L/D","Roskam data for Business jets", 'interpreter', 'Latex')
 
+sizing.W0 = roskam.W0(2);
 %% Constraint diagram
 %Fractions 
 
@@ -163,3 +165,4 @@ sizing.fraction.end=roskam.Wx_W0(2);
 
 %% save sizing to 
 save('sizing','sizing');
+

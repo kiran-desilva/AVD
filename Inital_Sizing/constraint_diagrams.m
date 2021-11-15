@@ -199,7 +199,7 @@ fplot(@(wing_loading) diversion_constraint(wing_loading, sizing.fraction.before_
 
 fplot(take_off_constraint, weight_loading_interval,'LineWidth',linewidth);
 
-fplot(@(wing_loading) absolute_ceiling_constraint(wing_loading, sizing.fraction.before_cruise, 0.2),'LineWidth',linewidth)
+fplot(@(wing_loading) absolute_ceiling_constraint(wing_loading, sizing.fraction.before_cruise, 0.20),'LineWidth',linewidth)
 fplot(@(wing_loading) sizing.fraction.before_cruise*turn_constraint(wing_loading, distdim(40000, 'ft', 'm'), sizing.cruise.v_inf), weight_loading_interval,'LineWidth',linewidth);
 xline(landing_constraint_wing_loading,'color','red','LineWidth',linewidth);
 xline(landing_constraint_wing_loading_trev,'LineWidth',linewidth);
@@ -233,10 +233,10 @@ yline(sizing.fraction.before_take_off*double(climb_constraint_oei(takeoff_constr
 yline(sizing.fraction.end*0.5*double(climb_constraint_oei(landing_constraint_wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd0)), 'm--','LineWidth',linewidth)
 yline(sizing.fraction.end*double(climb_constraint_oei(landing_constraint_wing_loading, 2.1/100, sizing.landing.second.q, k_func(sizing.landing.second.e), sizing.landing.second.cd0)), 'k--','LineWidth',linewidth)
 
-design_w_s = 2973
-design_t_w = .3845
-design_S_ref = 36.7e3 /design_w_s
-t0 = design_t_w * 36.7e3
+design_w_s = 2973;
+design_t_w = .3845;
+design_S_ref = 36.7e3 /design_w_s;
+t0 = design_t_w * 36.7e3;
 
 ylim([0 1]);
 xlim([0,11000]);
@@ -269,5 +269,12 @@ legend('Cruise',...
 improvePlot(gcf)
 hold off
 
+design.t_w = design_t_w;
+design.w_s = design_w_s;
+design.sref = design_S_ref;
+design.t0 = t0;
 
+save('design','design')
+%% save sizing to 
+save('sizing','sizing');
 
