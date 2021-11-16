@@ -193,9 +193,9 @@ linewidth = 2;
 
 weight_loading_interval = [1, 12000];
 
-fplot(@(wing_loading) cruise_constraint(wing_loading, sizing.fraction.before_cruise, 0.25), weight_loading_interval,'LineWidth',linewidth);
+fplot(@(wing_loading) cruise_constraint(wing_loading, sizing.fraction.before_cruise, 0.2), weight_loading_interval,'LineWidth',linewidth);
 fplot(@(wing_loading) loiter_constraint(wing_loading, sizing.fraction.before_loiter, 0.7), weight_loading_interval,'LineWidth',linewidth);
-fplot(@(wing_loading) diversion_constraint(wing_loading, sizing.fraction.before_alternate_cruise, 0.25), weight_loading_interval,'LineWidth',linewidth);
+fplot(@(wing_loading) diversion_constraint(wing_loading, sizing.fraction.before_alternate_cruise, 0.2), weight_loading_interval,'LineWidth',linewidth);
 
 fplot(take_off_constraint, weight_loading_interval,'LineWidth',linewidth);
 
@@ -206,7 +206,7 @@ xline(landing_constraint_wing_loading_trev,'LineWidth',linewidth);
 
 xline(landing_constraint_wing_loading_roskam, 'color', 'magenta','LineWidth',linewidth);
 
-fplot(@(wing_loading) max_velocity_constraint(wing_loading, sizing.fraction.before_cruise, 0.25), weight_loading_interval,'LineWidth',linewidth);
+fplot(@(wing_loading) max_velocity_constraint(wing_loading, sizing.fraction.before_cruise, 0.2), weight_loading_interval,'LineWidth',linewidth);
 
 k_func = @(e) 1/(pi*sizing.AR*e);
 
@@ -233,10 +233,10 @@ yline(sizing.fraction.before_take_off*double(climb_constraint_oei(takeoff_constr
 yline(sizing.fraction.end*0.5*double(climb_constraint_oei(landing_constraint_wing_loading, 3.2/100, sizing.landing.first.q, k_func(sizing.landing.first.e), sizing.landing.first.cd0)), 'm--','LineWidth',linewidth)
 yline(sizing.fraction.end*double(climb_constraint_oei(landing_constraint_wing_loading, 2.1/100, sizing.landing.second.q, k_func(sizing.landing.second.e), sizing.landing.second.cd0)), 'k--','LineWidth',linewidth)
 
-design_w_s = 2973;
-design_t_w = .3845;
-design_S_ref = 36.7e3 /design_w_s;
-t0 = design_t_w * 36.7e3;
+design_w_s = landing_constraint_wing_loading
+design_t_w = double(max_velocity_constraint(landing_constraint_wing_loading, sizing.fraction.before_cruise, 0.2))
+design_S_ref = sizing.W0/design_w_s
+t0 = double(design_t_w * sizing.W0)
 
 ylim([0 1]);
 xlim([0,11000]);
