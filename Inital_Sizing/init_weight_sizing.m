@@ -48,15 +48,15 @@ initialW0 = 200000;
 
 
 for j = 1:2
-        roskam.fuelfrac(1) = 0.99 * 0.995 * 0.995; %engine start + taxi + takeoff
-        roskam.fuelfrac(2) = 0.98;    %climb
-        roskam.fuelfrac(3) = exp(-(p.parameters.cruise_range_km * 1000 * roskam.c_1 / 3600) / (p.parameters.cruise_mach * 295.07 * roskam.LoverD_cruise(j)));  %cruise 1 using breguet range
-        roskam.fuelfrac(4) = 0.99;  %descent 1
-        roskam.fuelfrac(5) = 0.98;  %climb and accelerate note assumed same as prev climb
-        roskam.fuelfrac(6) = exp(-(p.parameters.alternate_range_km * 1000 * roskam.c_2 / 3600) / (p.parameters.cruise_mach * 295.07 * roskam.LoverD_cruise(j)));  %cruise 2
-        roskam.fuelfrac(7) = exp(-(p.parameters.loiter_duration * 60 * roskam.c_3 / 3600) / (roskam.LoverD_loiter(j))); % loiter using endurance eqn
-        roskam.fuelfrac(8) = 0.99; %descent 2
-        roskam.fuelfrac(9) = 0.992;    %landing + taxi
+        sizing.roskam.fuelfrac(1) = 0.99 * 0.995 * 0.995; %engine start + taxi + takeoff
+        sizing.roskam.fuelfrac(2) = 0.98;    %climb
+        sizing.roskam.fuelfrac(3) = exp(-(p.parameters.cruise_range_km * 1000 * roskam.c_1 / 3600) / (p.parameters.cruise_mach * 295.07 * roskam.LoverD_cruise(j)));  %cruise 1 using breguet range
+        sizing.roskam.fuelfrac(4) = 0.99;  %descent 1
+        sizing.roskam.fuelfrac(5) = 0.98;  %climb and accelerate note assumed same as prev climb
+        sizing.roskam.fuelfrac(6) = exp(-(p.parameters.alternate_range_km * 1000 * roskam.c_2 / 3600) / (p.parameters.cruise_mach * 295.07 * roskam.LoverD_cruise(j)));  %cruise 2
+        sizing.roskam.fuelfrac(7) = exp(-(p.parameters.loiter_duration * 60 * roskam.c_3 / 3600) / (roskam.LoverD_loiter(j))); % loiter using endurance eqn
+        sizing.roskam.fuelfrac(8) = 0.99; %descent 2
+        sizing.roskam.fuelfrac(9) = 0.992;    %landing + taxi
 
         raymer.fuelfrac(1) = 0.97; %engine start + taxi + takeoff
         raymer.fuelfrac(2) = 0.985;    %climb
@@ -72,8 +72,8 @@ for j = 1:2
             roskam.Wx_W0(j) = roskam.Wx_W0(j) * roskam.fuelfrac(i); %multiply fuel mass fractions 
         end
 
-        roskam.Wf_W0(j) = 1.03 * (1 - roskam.Wx_W0(j));   %calculate total fuel mass fraction for mission
-                                                          %2% fuel reserve
+        roskam.Wf_W0(j) = 1.01 * (1 - roskam.Wx_W0(j));   %calculate total fuel mass fraction for mission
+                                                          
                                                           % + 1% unuseable
 
         for i = 1:length(raymer.fuelfrac)
@@ -154,6 +154,7 @@ ylabel("$\frac{W_{e}}{W_{0}}$", 'interpreter', 'Latex','FontSize', 15)
 legend("Roskam regression, Roskam L/D","Roskam regression, calculated L/D","Raymer regression, Roskam L/D","Raymer regression, calculated L/D","Roskam data for Business jets", 'interpreter', 'Latex')
 
 sizing.W0 = roskam.W0(2);
+%sizing.Wf_W0 = roskam.Wf_W0(2);
 %% Constraint diagram
 %Fractions 
 
