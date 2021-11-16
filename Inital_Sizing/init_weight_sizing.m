@@ -68,8 +68,8 @@ for j = 1:2
         raymer.fuelfrac(8) = 0.99; %descent 2
         raymer.fuelfrac(9) = 0.995;    %landing + taxi
 
-        for i = 1:length(roskam.fuelfrac)
-            roskam.Wx_W0(j) = roskam.Wx_W0(j) * roskam.fuelfrac(i); %multiply fuel mass fractions 
+        for i = 1:length(sizing.roskam.fuelfrac)
+            roskam.Wx_W0(j) = roskam.Wx_W0(j) * sizing.roskam.fuelfrac(i); %multiply fuel mass fractions 
         end
 
         roskam.Wf_W0(j) = 1.01 * (1 - roskam.Wx_W0(j));   %calculate total fuel mass fraction for mission
@@ -154,14 +154,14 @@ ylabel("$\frac{W_{e}}{W_{0}}$", 'interpreter', 'Latex','FontSize', 15)
 legend("Roskam regression, Roskam L/D","Roskam regression, calculated L/D","Raymer regression, Roskam L/D","Raymer regression, calculated L/D","Roskam data for Business jets", 'interpreter', 'Latex')
 
 sizing.W0 = roskam.W0(2);
-%sizing.Wf_W0 = roskam.Wf_W0(2);
+sizing.Wf = roskam.Wf_W0(2) * sizing.W0;
 %% Constraint diagram
 %Fractions 
 
 sizing.fraction.before_take_off=0.99*0.995;
-sizing.fraction.before_cruise=sizing.fraction.before_take_off*roskam.fuelfrac(2);
-sizing.fraction.before_alternate_cruise=sizing.fraction.before_cruise*roskam.fuelfrac(3)*roskam.fuelfrac(4)*roskam.fuelfrac(5);
-sizing.fraction.before_loiter=sizing.fraction.before_alternate_cruise*roskam.fuelfrac(6);
+sizing.fraction.before_cruise=sizing.fraction.before_take_off*sizing.roskam.fuelfrac(2);
+sizing.fraction.before_alternate_cruise=sizing.fraction.before_cruise*sizing.roskam.fuelfrac(3)*sizing.roskam.fuelfrac(4)*sizing.roskam.fuelfrac(5);
+sizing.fraction.before_loiter=sizing.fraction.before_alternate_cruise*sizing.roskam.fuelfrac(6);
 sizing.fraction.end=roskam.Wx_W0(2);
 
 %% save sizing to 
