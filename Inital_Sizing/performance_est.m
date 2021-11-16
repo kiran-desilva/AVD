@@ -43,8 +43,17 @@ tfr = 2; % mid sized ac?
 n_land = 1.2; 
 R_land = V_f^2 / ((n_land - 1) * 9.81);
 H_f = R_land * (1 - cosd(theta_apprch)); %errikos slides
+mul = 0.3; %errikos
+
 perf.Sa = (H_obs - H_f) / tand(theta_apprch);
 perf.Sf = 0.1512 * sizing.landing.v_stall^2 * sind(theta_apprch); 
 perf.Sfr = tfr * V_td; 
-perf.Ka_l = (1.225 / (2 * sizing.W0 / design_S_ref)) * (mu * sizing.landing.cl_max - sizing.landing.cd0 - (sizing.landing.cl_max^2) / (pi * sizing.AR *sizing.landing.e));
-perf.Sb = (1 / 2 * 9.81 * perf.Ka_l) * log((perf.Kt + perf.Ka_l * 0) / (perf.Kt + perf.Ka_l * Vtd^2)); 
+perf.Ktl = design_t_w - mul; %t/w need to change?
+perf.Ka_l = (1.225 / (2 * sizing.W0 / design_S_ref)) * (mul * sizing.landing.cl_max - sizing.landing.cd0 - (sizing.landing.cl_max^2) / (pi * sizing.AR *sizing.landing.e));
+perf.Sb = (1 / 2 * 9.81 * perf.Ka_l) * log((perf.Ktl + perf.Ka_l * 0) / (perf.Ktl + perf.Ka_l * Vtd^2)); 
+
+perf.SL  = 1.666 * (perf.Sa + perf.Sf + perf.Sfr + perf.Sb); %FAR25
+
+%% Range and Endurance
+
+
