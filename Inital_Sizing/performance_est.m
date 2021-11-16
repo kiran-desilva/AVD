@@ -55,5 +55,7 @@ perf.Sb = (1 / 2 * 9.81 * perf.Ka_l) * log((perf.Ktl + perf.Ka_l * 0) / (perf.Kt
 perf.SL  = 1.666 * (perf.Sa + perf.Sf + perf.Sfr + perf.Sb); %FAR25
 
 %% Range and Endurance
-
-
+%calculate new weight fractions for cruise and loiter segments
+perf.frac_cruise1 = exp(-(p.parameters.cruise_range_km * 1000 * cruise1_c / 3600) / (p.parameters.cruise_mach * 295.07 * cruise_LoverD));  %cruise 1 using breguet range
+perf.frac_cruise2 = exp(-(p.parameters.alternate_range_km * 1000 * cruise2_c / 3600) / (p.parameters.cruise_mach * 295.07 * cruise_LoverD));  %cruise 2
+perf.frac_loiter = exp(-(p.parameters.loiter_duration * 60 * loiter_c / 3600) / (loiter_LoverD)); % loiter using endurance eqn
