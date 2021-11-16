@@ -75,3 +75,4 @@ perf.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * cruise_Love
 %extended range
 %check this
 
+%% 
