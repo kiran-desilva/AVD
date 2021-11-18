@@ -37,6 +37,12 @@ tailplane.initial.taperh = 0.35; % obert -> looked good to me idk
 tailplane.initial.taperv = 0.7; %obert -> cant be too small as the vertical stabilizer has to support horizotnal tailplane
 
 tailplane.initial.sweepLEh = wing_sweepLE + 5; 
+tailplane.initial.sweepLEv = 40; 
+
+tailplane.initial.tch = 0.12; %64012
+tailplane.initial.tcv = 0.12;
+
+
 
 save("tailplane","tailplane")
 
