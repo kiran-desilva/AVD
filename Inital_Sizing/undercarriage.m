@@ -9,7 +9,9 @@ newtons_to_lbs = 0.2248089431;
 load('sizing.mat')
 try
 	load('wandb.mat')
+	load('fuselage_design')
 catch e
+	% TODO: CHECK ALL THE VARS HERE
 	wandb.z_cg = 1;
 	wandb.x_cg_front = 2.4;
 	wandb.x_cg_aft = 2.5;
@@ -72,8 +74,6 @@ N_a = wandb.x_cg_aft - uc.nose_wheel.x;
 % Checks
 non_blocking_assert(M_a/B > 0.05, 'M_a/B not in valid range');
 non_blocking_assert(M_f/B < 0.2, 'M_f/B not in valid range');
-
-non_blocking_assert(false, 'lol')
 
 main_wheel_load = (1 - uc.percent_weight_nose) * sizing.W0 * newtons_to_lbs / 2;
 nose_wheel_load = uc.percent_weight_nose*sizing.W0 * newtons_to_lbs / 2;
