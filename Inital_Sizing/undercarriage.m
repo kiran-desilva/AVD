@@ -75,8 +75,8 @@ N_a = wandb.x_cg_aft - uc.nose_wheel.x;
 non_blocking_assert(M_a/B > 0.05, 'M_a/B not in valid range');
 non_blocking_assert(M_f/B < 0.2, 'M_f/B not in valid range');
 
-main_wheel_load = (1 - uc.percent_weight_nose) * sizing.W0 * newtons_to_lbs / 2;
-nose_wheel_load = uc.percent_weight_nose*sizing.W0 * newtons_to_lbs / 2;
+%main_wheel_load = (1 - uc.percent_weight_nose) * sizing.W0 * newtons_to_lbs / 2;
+%nose_wheel_load = uc.percent_weight_nose*sizing.W0 * newtons_to_lbs / 2;
 
 far25_safety_margin = 1.07;
 max_static_load = @(W) far25_safety_margin*W*N_a/B;
@@ -84,35 +84,71 @@ max_static_load_nose = @(W) far25_safety_margin*W*M_f/B;
 min_static_load_nose = @(W) far25_safety_margin*W*M_a/B;
 dynamic_breaking_load_nose = @(W) 10*far25_safety_margin*wandb.z_cg*W/(g*B);
 
-max_main_wheel_load = max_static_load(main_wheel_load)
-max_nose_wheel_load = max_static_load_nose(nose_wheel_load)
-min_nose_wheel_load = min_static_load_nose(nose_wheel_load)
-dynamic_nose_load = dynamic_breaking_load_nose(nose_wheel_load)
+W0_lbs = sizing.W0*newtons_to_lbs;
+max_main_wheel_load_lbs = max_static_load(W0_lbs) / 2;
+max_nose_wheel_load_lbs = max_static_load_nose(W0_lbs) / 2;
+min_nose_wheel_load_lbs = min_static_load_nose(W0_lbs) / 2;
+dynamic_nose_load_lbs = dynamic_breaking_load_nose(W0_lbs) / 2;
+%{
+max_main_wheel_load_lbs = max_static_load(main_wheel_load)
+max_nose_wheel_load_lbs = max_static_load_nose(nose_wheel_load);
+min_nose_wheel_load_lbs = min_static_load_nose(nose_wheel_load)
+dynamic_nose_load_lbs = dynamic_breaking_load_nose(nose_wheel_load);
+%}
+
+max_nose_wheel_load_lbs = max_nose_wheel_load_lbs + dynamic_nose_load_lbs
+
+uc.main_wheel.tyres.name = "Type III - 8.50-10"
+uc.nose_wheel.tyres.name = "Type III - 5.00-4"
 
 % Initial wheel size from Raymer pg. 344
 %% Calculate main wheel diamater based on Raymer regression
+%{
 uc.main_wheel.diameter_cm = 8.3*main_wheel_load^0.251;
 uc.main_wheel.width_cm = 3.5*main_wheel_load^0.216;
 
 % in inches
 wheel_diam_in = uc.main_wheel.diameter_cm/2.54
 wheel_width_in = uc.main_wheel.width_cm/2.54
+%}
+
+uc.main_wheel.diameter_cm = 26.3*2.54;
+uc.main_wheel.rolling_radius_cm = 10.4*2.54;
+uc.nose_wheel.diameter_cm = 13.25*2.54;
+uc.nose_wheel.rolling_radius_cm = 5.2*2.54;
 
 % Oleo sizing
 landing_speed_ms = 10*0.3048;
 shock_absorber_efficiency = 0.85; % TODO:
 tire_efficiency = 0.47 % TODO:
 gear_load_factor = 3; % TODO:
-tire_rolling_radius = nan;
-tire_stroke = 0.5*(tire_rolling_radius - uc.main_wheel.diameter_cm);
-oleo_stroke = (landing_speed_ms^2/(2*g*shock_absorber_efficiency*gear_load_factor)) - tire_efficiency/ shock_absorber_efficiency * tire_stroke + 0.0254
-non_blocking_assert(oleo_stroke < 0.2, 'Min oleo stroke should be 20cm');
 
-static_oleo_deflection = 2/3*oleo_stroke
-min_overall_oleo_length = 2.5*oleo_stroke
+uc.main_wheel.oleo.stroke_m = calc_oleo_stroke(landing_speed_ms, shock_absorber_efficiency, gear_load_factor, tire_efficiency, uc.main_wheel.diameter_cm, uc.main_wheel.rolling_radius_cm)
+uc.nose_wheel.oleo.stroke_m = calc_oleo_stroke(landing_speed_ms, shock_absorber_efficiency, gear_load_factor, tire_efficiency, uc.nose_wheel.diameter_cm, uc.nose_wheel.rolling_radius_cm)
 
-uc.nose_wheel.oleo.diameter_in = 0.04*sqrt((max_nose_wheel_load + dynamic_nose_load)/newtons_to_lbs)
-uc.main_wheel.oleo.diameter_in = 0.04*sqrt(max_main_wheel_load/newtons_to_lbs);
+uc.main_wheel.oleo.static_deflection = 2/3*uc.main_wheel.oleo.stroke_m;
+uc.nose_wheel.oleo.static_deflection = 2/3*uc.nose_wheel.oleo.stroke_m;
+
+uc.main_wheel.oleo.min_overall_length = 2.5*uc.main_wheel.oleo.stroke_m;
+uc.nose_wheel.oleo.min_overall_length = 2.5*uc.nose_wheel.oleo.stroke_m;
+
+uc.nose_wheel.oleo.diameter_in = 0.04*sqrt((max_nose_wheel_load_lbs + dynamic_nose_load_lbs));
+uc.main_wheel.oleo.diameter_in = 0.04*sqrt(max_main_wheel_load_lbs);
+
+uc.main_wheel.oleo
+uc.nose_wheel.oleo
+
+uc.main_gear_length_in = uc.main_wheel.diameter_cm*0.5/2.54 + uc.main_wheel.oleo.min_overall_length*39.37;
+uc.nose_gear_length_in = uc.nose_wheel.diameter_cm*0.5/2.54 + uc.nose_wheel.oleo.min_overall_length*39.37;
+
+save('uc', 'uc')
+
+function oleo_stroke_m = calc_oleo_stroke(landing_speed_ms, shock_absorber_efficiency, gear_load_factor, tire_efficiency, wheel_diam_cm, wheel_rolling_rad_cm)
+	tire_stroke_m = (0.5*(wheel_diam_cm) - wheel_rolling_rad_cm)/100;
+	oleo_stroke_m = (landing_speed_ms^2/(2*9.81*shock_absorber_efficiency*gear_load_factor)) - tire_efficiency/ shock_absorber_efficiency * tire_stroke_m + 0.0254;
+	non_blocking_assert(oleo_stroke_m > 0.2, 'Oleo stroke should be at least 20cm, will proceed with 20cm');
+	oleo_stroke_m = max(oleo_stroke_m, 0.2);
+end
 
 function non_blocking_assert(cond, msg)
 	if ~cond
