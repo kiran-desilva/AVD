@@ -98,6 +98,22 @@ uc.main_wheel.width_cm = 3.5*main_wheel_load^0.216;
 wheel_diam_in = uc.main_wheel.diameter_cm/2.54
 wheel_width_in = uc.main_wheel.width_cm/2.54
 
+% Oleo sizing
+landing_speed_ms = 10*0.3048;
+shock_absorber_efficiency = 0.85; % TODO:
+tire_efficiency = 0.47 % TODO:
+gear_load_factor = 3; % TODO:
+tire_rolling_radius = nan;
+tire_stroke = 0.5*(tire_rolling_radius - uc.main_wheel.diameter_cm);
+oleo_stroke = (landing_speed_ms^2/(2*g*shock_absorber_efficiency*gear_load_factor)) - tire_efficiency/ shock_absorber_efficiency * tire_stroke + 0.0254
+non_blocking_assert(oleo_stroke < 0.2, 'Min oleo stroke should be 20cm');
+
+static_oleo_deflection = 2/3*oleo_stroke
+min_overall_oleo_length = 2.5*oleo_stroke
+
+uc.nose_wheel.oleo.diameter_in = 0.04*sqrt((max_nose_wheel_load + dynamic_nose_load)/newtons_to_lbs)
+uc.main_wheel.oleo.diameter_in = 0.04*sqrt(max_main_wheel_load/newtons_to_lbs);
+
 function non_blocking_assert(cond, msg)
 	if ~cond
 		disp("WARNING!!!!")
