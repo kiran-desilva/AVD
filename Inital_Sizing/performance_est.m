@@ -56,9 +56,9 @@ perf.SL  = 1.666 * (perf.Sa + perf.Sf + perf.Sfr + perf.Sb); %FAR25
 
 %% Range and Endurance
 %calculate new weight fractions for cruise and loiter segments
-%perf.frac_cruise1 = exp(-(p.parameters.cruise_range_km * 1000 * cruise1_c / 3600) / (p.parameters.cruise_mach * 295.07 * cruise_LoverD));  %cruise 1 using breguet range
-perf.frac_cruise2 = exp(-(p.parameters.alternate_range_km * 1000 * cruise2_c / 3600) / (p.parameters.cruise_mach * 295.07 * cruise_LoverD));  %cruise 2
-perf.frac_loiter = exp(-(p.parameters.loiter_duration * 60 * loiter_c / 3600) / (loiter_LoverD)); % loiter using endurance eqn
+%perf.frac_cruise1 = exp(-(parameters.cruise_range_km * 1000 * cruise1_c / 3600) / (parameters.cruise_mach * 295.07 * cruise_LoverD));  %cruise 1 using breguet range
+perf.frac_cruise2 = exp(-(parameters.alternate_range_km * 1000 * cruise2_c / 3600) / (parameters.cruise_mach * 295.07 * cruise_LoverD));  %cruise 2
+perf.frac_loiter = exp(-(parameters.loiter_duration * 60 * loiter_c / 3600) / (loiter_LoverD)); % loiter using endurance eqn
 new_Wx_W0 = 1; %initialise 
 
 for i = 1:9
@@ -67,6 +67,17 @@ for i = 1:9
     end
 end
 
-new_Wx_W0 = new_Wx_W0 * perf.frac_cruise2 * perf.frac_loiter; %calculate new fraction based on new fractions for cruise 2 and loiter (must be met)
-Wf = 1.01 * (1 - new_Wx_W0);
-        
+new_Wx_W0_ext = new_Wx_W0;
+
+Wx_W0 = (sizing.W0 - sizing.Wf) / sizing.W0; %use original W0 and Wf to calculate Wx/W0
+new_Wx_W0 = new_Wx_W0 * perf.frac_cruise2 * perf.frac_loiter; % not including cruise 1 segment
+perf.frac_cruise1 = Wx_W0 / (new_Wx_W0); % calculate new cruise fuel frac using original wx/w0 and the new loiter and crusie 2 fractions
+perf.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * cruise_LoverD * log(perf.frac_cruise1);
+
+%extended range
+Wx_W0_ext = (sizing.W0 - (sizing.Wf + W_pld * 0.453592 * 9.81)) / sizing.W0; %extended range replacing all pld weight with fuel
+new_Wx_W0_ext = new_Wx_W0_ext * perf.frac_cruise2 * perf.frac_loiter; % not including cruise 1 segment
+perf.frac_cruise1_ext = Wx_W0_ext / (new_Wx_W0_ext); % calculate new cruise fuel frac using original wx/w0 and the new loiter and crusie 2 fractions
+perf.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * cruise_LoverD * log(perf.frac_cruise1_ext);
+
+%% Point performance
