@@ -8,7 +8,7 @@
 
 %% Inputs from other scripts
 d=1; %will come from another script
-b=1; %will come from another script
+%b=1; %will come from another script
 AR=6;
 S_exp=0.5;
 S_ref=1;

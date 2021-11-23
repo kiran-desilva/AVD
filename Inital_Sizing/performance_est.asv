@@ -81,3 +81,5 @@ perf.frac_cruise1_ext = Wx_W0_ext / (new_Wx_W0_ext); % calculate new cruise fuel
 perf.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * cruise_LoverD * log(perf.frac_cruise1_ext);
 
 %% Point performance
+
+perf.sigma_maxalt = (2 * sizing.fraction.before_cruise / (
