@@ -5,12 +5,13 @@ load("parameters.mat");
 %% Takeoff 
 
 Vinit = 0;
-V_TO = 1.1 * sizing.takeoff.v_stall; %FAR-25
-mu = 0.03; % raymer dry asphalt runway
+takeoff.v_stall = sqrt(2 * wandb.W0 / (1.225 * Sref * high_lift_design.Clmax_takeoff)); %need clmax takeoff
+V_TO = 1.1 * takeoff.v_stall; %FAR-25  
+mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
 
-perf.Ka = (1.225 / (2 * sizing.W0 / design_S_ref)) * (mu * sizing.takeoff.cl_max - sizing.takeoff.cd0 - (sizing.takeoff.cl_max^2) / (pi * sizing.AR *sizing.takeoff.e));
-perf.Kt = design_t_w - mu;
+perf.Ka = (1.225 / (2 * wandb.W0 / design_S_ref)) * (mu * sizing.takeoff.cl_max - sizing.takeoff.cd0 - (sizing.takeoff.cl_max^2) / (pi * sizing.AR *sizing.takeoff.e));
+perf.Kt = (Thrust_max_takeoff / W0) - mu;
 perf.Sg = (1 / (2 * 9.81 * perf.Ka)) * log(abs((perf.Kt + perf.Ka * V_TO^2) / (perf.Kt + perf.Ka * Vinit^2)));
 
 perf.Sr = 3 * V_TO; 
@@ -82,4 +83,8 @@ perf.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * cruise_Love
 
 %% Point performance
 
-perf.sigma_maxalt = (2 * sizing.fraction.before_cruise / (
+perf.sigma_maxalt = (2 * sizing.fraction.before_cruise / (beta * T0)) * sqrt(
+
+Trust_lapse = @(V,h) ; %Thrust lapse model
+Drag = @(V,h,W) ; 
+
