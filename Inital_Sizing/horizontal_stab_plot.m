@@ -4,14 +4,14 @@ function [fig] = horizontal_stab_plot(struct)
     % x y
     rhs_wing = [0,0;
               0,struct.Croot;
-              struct.b/2,struct.Croot - (struct.b * tand(struct.sweepLE));
-              struct.b/2,(struct.Croot - (struct.b * tand(struct.sweepLE)) - struct.Ctip);
+              struct.b/2,struct.Croot - (0.5*struct.b * tand(struct.sweepLE));
+              struct.b/2,(struct.Croot - (0.5*struct.b * tand(struct.sweepLE)) - struct.Ctip);
               0,0;
     ]
     lhs_wing = [0,0;
               0,struct.Croot;
-              -struct.b/2,struct.Croot - (struct.b * tand(struct.sweepLE));
-              -struct.b/2,(struct.Croot - (struct.b * tand(struct.sweepLE)) - struct.Ctip);
+              -struct.b/2,struct.Croot - (0.5*struct.b * tand(struct.sweepLE));
+              -struct.b/2,(struct.Croot - (0.5*struct.b * tand(struct.sweepLE)) - struct.Ctip);
               0,0;
     ]
 
