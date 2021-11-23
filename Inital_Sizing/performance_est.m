@@ -83,3 +83,7 @@ perf.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * cruise_Love
 %% Point performance
 
 perf.sigma_maxalt = (2 * sizing.fraction.before_cruise / (beta * T0)) * sqrt(
+
+Trust_lapse = @(V,h) ; %Thrust lapse model
+Drag = @(V,h,W) ; 
+
