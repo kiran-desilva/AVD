@@ -12,20 +12,20 @@ try
 	load('fuselage_design')
 catch e
 	% TODO: CHECK ALL THE VARS HERE
-	wandb.z_cg = 1;
-	wandb.x_cg_front = 2.4;
-	wandb.x_cg_aft = 2.5;
+	wandb.z_cg = 1.5;
+	wandb.x_cg_front = 5.5;
+	wandb.x_cg_aft = 6;
 
 	lowest_spanwise_point.y = 6;
 	lowest_spanwise_point.z = 0;
 
 	tailstrike_point.x = 10;
-	tailstrike_point.z = 1;
+	tailstrike_point.z = 1.3;
 end
 
 uc.nose_wheel.x = 0.8; % TODO:
-uc.main_wheel.y = 1;
-uc.main_wheel.x = 2.8; % TODO:
+uc.main_wheel.y = 3;
+uc.main_wheel.x = 6.6; % TODO:
 uc.main_wheel.z = 1;
 
 
