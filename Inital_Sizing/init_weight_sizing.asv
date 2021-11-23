@@ -16,12 +16,12 @@ sizing.L_Dmax = sizing.Kld * sqrt(sizing.AR / sizing.swet_sref);
 sizing.cd0 = (pi * sizing.AR * sizing.e) / (4 * sizing.L_Dmax^2);
 
 
-roskam.c_1=0.77; %cruise
-roskam.c_2=0.77; %alternate cruise
-roskam.c_3=0.5191; %loiter
-%roskam.c_1=14.7/10^6; %cruise
-%roskam.c_2=14.7/10^6; %alternate
-%roskam.c_3=17.55/10^6; %loDesciter
+%roskam.c_1=0.6197; %cruise
+%roskam.c_2=0.6197; %alternate cruise
+%roskam.c_3=0.5191; %loiter
+roskam.c_1=0.7; %cruise
+roskam.c_2=0.7; %alternate
+roskam.c_3=0; %loDesciter
 roskam.LoverD_cruise(1) = 11; %ish?
 roskam.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
 roskam.LoverD_loiter(1) = 13; %ish?
