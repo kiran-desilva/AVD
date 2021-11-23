@@ -67,7 +67,7 @@ tail_sref = [tailplane.initial.vertical.s;tailplane.initial.horizontal.s];
 AR = [tailplane.initial.vertical.Ar;tailplane.initial.horizontal.Ar];
 taper = [tailplane.initial.vertical.lambda;tailplane.initial.horizontal.lambda];
 initial_sizing_table = table(names,lever,initial_volume_coefficent,volume_coefficent_corrected,tail_sref,AR,taper)
-table2latex(initial_sizing_table,'../Report/6183c717de362886b48b32c4/Media/initial_sizing_table.tex')
+table2latex(initial_sizing_table,'initial_sizing_table.tex')
 
 
 horizontal_stab_plot(tailplane.initial.horizontal)
