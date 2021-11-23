@@ -13,6 +13,7 @@ sref = design.sref;
 b = sqrt(sizing.AR * sref);
 ar = sizing.AR;
 % wing_lambdaLE = sizing.sweepLE;
+
 wing_sweepLE = 27.4549;
 
 
@@ -31,11 +32,8 @@ tailplane.initial.horizontal.s = ( tailplane.initial.horizontal.v * cmac * sref 
 tailplane.initial.vertical.s = ( tailplane.initial.vertical.v * b * sref ) / (tailplane.initial.vertical.l);
 
 %from Obert
-tailplane.initial.horizontal.Ar = 3.7; %this is probably too big
-tailplane.initial.vertical.Ar = 1.1; 
-
-% tailplane.initial.bh = sqrt(tailplane.initial.arh * tailplane.initial.sh);
-% tailplane.initial.bv = sqrt(tailplane.inital.arv * tailplane.initial.sv);
+tailplane.initial.horizontal.Ar = 3.9; %this is probably too big
+tailplane.initial.vertical.Ar = 1.2; 
 
 %taper
 tailplane.initial.horizontal.lambda = 0.35; % obert -> looked good to me idk
@@ -61,7 +59,7 @@ tailplane.initial.horizontal.l_bar = tailplane.initial.horizontal.l / cmac;
 
 names = {'Vertical';'Horizontal'};
 lever = [tailplane.initial.vertical.l;tailplane.initial.horizontal.l];
-initial_volume_coefficent = [0.7; 0.065];
+initial_volume_coefficent = [0.065; 0.7];
 volume_coefficent_corrected = [tailplane.initial.vertical.v;tailplane.initial.horizontal.v];
 tail_sref = [tailplane.initial.vertical.s;tailplane.initial.horizontal.s];
 AR = [tailplane.initial.vertical.Ar;tailplane.initial.horizontal.Ar];
