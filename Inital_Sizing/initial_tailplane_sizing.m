@@ -42,6 +42,8 @@ tailplane.initial.vertical.lambda = .7; %obert -> cant be too small as the verti
 tailplane.initial.horizontal.sweepLE = wing_sweepLE + 5; 
 tailplane.initial.vertical.sweepLE = 40; 
 
+
+
 tailplane.initial.horizontal.sweep_25 = sweep_angle(tailplane.initial.horizontal.sweepLE,25,0,tailplane.initial.horizontal.Ar,tailplane.initial.horizontal.lambda)
 tailplane.initial.vertical.sweep_25 = sweep_angle(tailplane.initial.vertical.sweepLE,25,0,tailplane.initial.vertical.Ar,tailplane.initial.vertical.lambda)
 
