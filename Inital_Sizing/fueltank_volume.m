@@ -57,7 +57,7 @@ airfoilcoords.bottom = [ 0 0;
 x_frontspar = 0.15;
 x_rearspar = 0.65;
 
-k = b_bar - a_bar;
+k = x_rearspar - x_frontspar;
 
 
 figure
@@ -77,3 +77,16 @@ t_c_rearspar = topfit(x_rearspar) - bottomfit(x_rearspar)
 
 plot([x_frontspar, x_frontspar],[topfit(x_frontspar),bottomfit(x_frontspar)]);
 plot([x_rearspar, x_rearspar],[topfit(x_rearspar),bottomfit(x_rearspar)]);
+
+span = 9.8062;
+
+syms y
+
+c(y) = -1.4044*y + 1.9556;
+a = t_c_frontspar ;
+b = t_c_rearspar;
+
+rib1 = span * 0.35;
+rib2 = span * 0.95;
+
+vol = int(k*c^2*(a+b)/2, rib1, rib2)
