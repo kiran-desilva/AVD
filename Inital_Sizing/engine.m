@@ -46,12 +46,25 @@ aDvANCed_MaTeRiaLs_FuDgE_fACtoR = 0.08;
 powerplant.sfc = 0.88*(1 - aDvANCed_MaTeRiaLs_FuDgE_fACtoR)*exp(-0.05*powerplant.BPR);
 powerplant
 
+%% Capture area calculation
+M_engine_front_face = 0.4; % To avoid supersonic blade tips --> losses
+M_freestream = 0.78;
+M_inlet_front_face = (M_freestream + M_engine_front_face) / 2;
+
+A_over_A_star_engine = ((1 + 0.2*M_engine_front_face^2)/1.2)^3/M_engine_front_face;
+A_over_A_star_throat = ((1 + 0.2*M_inlet_front_face^2)/1.2)^3/M_inlet_front_face;
+
+area_ratio = A_over_A_star_throat / A_over_A_star_engine;
+A_throat = area_ratio * (pi * powerplant.basic_diam_m^2 / 4);
+
 %% Nacelle design
 % http://aerodesign.stanford.edu/aircraftdesign/propulsion/nacelledesign.html
+powerplant.inlet_width_ft = 2 * sqrt(A_throat / pi) * metres_to_ft;
 powerplant.nacelle_width_ft = 1.1*powerplant.basic_diam_m*metres_to_ft;
 powerplant.nacelle_length_ft = (0.6*powerplant.basic_diam_m + powerplant.length_m)*metres_to_ft;
-powerplant.nacelle_wetted_area_ft_sq = pi*powerplant.nacelle_width_ft^2/4*powerplant.nacelle_length_ft;
+fudge_factor = 1.1;
+powerplant.nacelle_wetted_area_ft_sq = fudge_factor*pi*powerplant.nacelle_width_ft^2/4*powerplant.nacelle_length_ft;
+
+
 
 save('powerplant', 'powerplant')
-
-
