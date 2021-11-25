@@ -5,6 +5,7 @@ load('design.mat')
 load('sizing.mat')
 
 newtons_to_lbf = 0.224808943;
+metres_to_ft = 3.2808399;
 installed_thrust_lbf = design.t_w * sizing.W0 * newtons_to_lbf / 2
 
 
@@ -44,6 +45,12 @@ powerplant.engine_weight_lb = PW615F.dry_weight_kg*(SF)^1.1*2.20462262;
 aDvANCed_MaTeRiaLs_FuDgE_fACtoR = 0.08;
 powerplant.sfc = 0.88*(1 - aDvANCed_MaTeRiaLs_FuDgE_fACtoR)*exp(-0.05*powerplant.BPR);
 powerplant
+
+%% Nacelle design
+% http://aerodesign.stanford.edu/aircraftdesign/propulsion/nacelledesign.html
+powerplant.nacelle_width_ft = 1.1*powerplant.basic_diam_m*metres_to_ft;
+powerplant.nacelle_length_ft = (0.6*powerplant.basic_diam_m + powerplant.length_m)*metres_to_ft;
+powerplant.nacelle_wetted_area_ft_sq = pi*powerplant.nacelle_width_ft^2/4*powerplant.nacelle_length_ft;
 
 save('powerplant', 'powerplant')
 

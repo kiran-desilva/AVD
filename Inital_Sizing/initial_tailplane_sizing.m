@@ -14,7 +14,7 @@ b = sqrt(sizing.AR * sref);
 ar = sizing.AR;
 % wing_lambdaLE = sizing.sweepLE;
 
-wing_sweepLE = 27.4549;
+wing_sweepLE = 22;
 
 
 tailplane.initial.horizontal.l = 0.45*fuselage_length;
@@ -40,7 +40,9 @@ tailplane.initial.horizontal.lambda = 0.35; % obert -> looked good to me idk
 tailplane.initial.vertical.lambda = .7; %obert -> cant be too small as the vertical stabilizer has to support horizotnal tailplane
 
 tailplane.initial.horizontal.sweepLE = wing_sweepLE + 5; 
-tailplane.initial.vertical.sweepLE = 40; 
+tailplane.initial.vertical.sweepLE = 35; 
+
+
 
 tailplane.initial.horizontal.sweep_25 = sweep_angle(tailplane.initial.horizontal.sweepLE,25,0,tailplane.initial.horizontal.Ar,tailplane.initial.horizontal.lambda)
 tailplane.initial.vertical.sweep_25 = sweep_angle(tailplane.initial.vertical.sweepLE,25,0,tailplane.initial.vertical.Ar,tailplane.initial.vertical.lambda)
