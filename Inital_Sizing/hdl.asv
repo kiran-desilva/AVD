@@ -1,5 +1,5 @@
 function [fig] = hdl(struct)
- function [fig] = horizontal_stab_plot(struct)
+
     fig = figure
     hold on
     % x y
@@ -19,38 +19,55 @@ function [fig] = hdl(struct)
     plot(rhs_wing(:,1),rhs_wing(:,2));
     plot(lhs_wing(:,1),lhs_wing(:,2));
     % plot(lhs_wing,'x');
-    xlabel('x coordinate (m)')
-    ylabel('y coordinate (m)')
-    title("Horizontal Tailplane")
-    grid on
-    axis equal
-   
-
-
-
-fig = figure
+ 
+  
     hold on
     % x y
-    rhs_wing = [0,0;
+    HDL_start=1.52/2 + 0.1*mainwing.b
+    aileron_start=0.7*struct.b/2
+    
+    
+    rhs_wing_hdl = [0,0;
               0,struct.HDL_Croot;
-              struct.b/2,(struct.HDL_Croot) - (0.5*struct.b * tand(struct.sweepHDL));
-              struct.b/2,(struct.HDL_Croot - (0.5*struct.b * tand(struct.sweepHDL)) - struct.HDL_Ctip);
+              aileron_start,(-aileron_start*tand(struct.sweepTE))+struct.aileron_Croot;
+              aileron_start,-aileron_start*tand(struct.sweepTE); 
               0,0;
     ]
-    lhs_wing = [0,0;
+    lhs_wing_hdl = [0,0;
               0,struct.HDL_Croot;
-              -struct.b/2,struct.HDL_Croot - (0.5*struct.b * tand(struct.sweepHDL));
-              -struct.b/2,(struct.HDL_Croot - (0.5*struct.b * tand(struct.sweepHDL)) - struct.HDL_Ctip);
+              -aileron_start,(-aileron_start*tand(struct.sweepTE))+struct.aileron_Croot;
+              -aileron_start,-aileron_start*tand(struct.sweepTE); 
               0,0;
     ]
 
-    plot(rhs_wing(:,1),rhs_wing(:,2));
-    plot(lhs_wing(:,1),lhs_wing(:,2));
+    plot(rhs_wing_hdl(:,1),rhs_wing_hdl(:,2));
+    plot(lhs_wing_hdl(:,1),lhs_wing_hdl(:,2));
+    % plot(lhs_wing,'x');
+    
+    
+    
+     hold on
+    % x y
+    
+    
+    rhs_wing_aileron = [aileron_start,-aileron_start*tand(struct.sweepTE); aileron_start,(-aileron_start*tand(struct.sweepTE))+struct.aileron_Croot; struct.b/2,(-aileron_start*tand(struct.sweepTE))+struct.aileron_Croot-(0.5*(struct.b-0.7*struct.b)*tand(struct.sweepHDL));
+                        struct.b/2,(-aileron_start*tand(struct.sweepTE))+struct.aileron_Croot-(0.5*(struct.b-0.7*struct.b)*tand(struct.sweepHDL))-struct.HDL_Ctip;
+                        aileron_start,-aileron_start*tand(struct.sweepTE)
+              
+    ]
+    lhs_wing_aileron = [-aileron_start,-aileron_start*tand(struct.sweepTE); -aileron_start,(-aileron_start*tand(struct.sweepTE))+struct.aileron_Croot;-struct.b/2,(-aileron_start*tand(struct.sweepTE))+struct.aileron_Croot-(0.5*(struct.b-0.7*struct.b)*tand(struct.sweepHDL));
+                        -struct.b/2,(-aileron_start*tand(struct.sweepTE))+struct.aileron_Croot-(0.5*(struct.b-0.7*struct.b)*tand(struct.sweepHDL))-struct.HDL_Ctip;
+                        -aileron_start,-aileron_start*tand(struct.sweepTE)
+    ]
+
+    plot(rhs_wing_aileron(:,1),rhs_wing_aileron(:,2));
+    plot(lhs_wing_aileron(:,1),lhs_wing_aileron(:,2));
     % plot(lhs_wing,'x');
     xlabel('x coordinate (m)')
     ylabel('y coordinate (m)')
-    title("Horizontal Tailplane")
+    title("Wing")
     grid on
     axis equal
     hold off
+   
 end
