@@ -5,9 +5,9 @@ load('tailplane.mat')
 load('sizing.mat')
 
 AR = sizing.AR;                                 % Wing aspect ratio
-AR_h = tailplane.initial.horizontal.Ar;                 % Horizontal tailplane aspect ratio
-AR_v = tailplane.initial.vertical.Ar;                   % Vertical tailplane aspect ratio
-B_h = tailplane.initial.horizontal.b;      % Horizontal tailplane span (ft)
+AR_h = tailplane.horizontal.Ar;                 % Horizontal tailplane aspect ratio
+AR_v = tailplane.vertical.Ar;                   % Vertical tailplane aspect ratio
+B_h = tailplane.horizontal.b;                   % Horizontal tailplane span (ft)
 B_w = wing_design.wing_span_ft;                 % Wing span (ft)
 F_w = 0;                  % Fuselage width at horizontal tail intersection (ft)
 
@@ -69,10 +69,10 @@ W_enc = 2.231*(W_en^0.901);              % Weight of engine and contents (lb); �
 W_l = uc.landing_design_gross_weight_lb;      % Landing design gross weight (lb)
 W_seat = 40;            % Weight of single seat (lb); ≈ 60 for flight deck seats, 32 for passenger seats, and 11 for troop seats
 W_uav = 191.61;         % Uninstalled avionics weight; typically 800 − 1400 (lb)
-lambda = wing_design.taper_ratio;                                % Wing taper ratio
-cap_lambda = wing_design.wing_quarter_chord_sweep;               % Wing quarter chord sweep
-cap_lambda_ht = tailplane.initial.horizontal.sweep_25;        % Horizontal tailplane quarter chord sweep
-cap_lambda_vt = tailplane.initial.vertical.sweep_25;          % Vertical tailplane quarter chord sweep
+lambda = wing_design.taper_ratio;                             % Wing taper ratio
+cap_lambda = wing_design.wing_quarter_chord_sweep;            % Wing quarter chord sweep
+cap_lambda_ht = tailplane.horizontal.sweep_25;        % Horizontal tailplane quarter chord sweep
+cap_lambda_vt = tailplane.vertical.sweep_25;          % Vertical tailplane quarter chord sweep
 
 K_ws = 0.75*((1+2*lambda)/(1+lambda)) * B_w * tan(cap_lambda/L);    % 0.75[(1 + 2λ)/(1 + λ)]Bw tan Λ/L
 K_y = 0.3*L_ht;          % Aircraft pitching radius of gyration; ≈ 0.3Lht (ft)
