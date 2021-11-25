@@ -7,13 +7,13 @@ function [fig] = horizontal_stab_plot(struct)
               struct.b/2,struct.Croot - (0.5*struct.b * tand(struct.sweepLE));
               struct.b/2,(struct.Croot - (0.5*struct.b * tand(struct.sweepLE)) - struct.Ctip);
               0,0;
-    ]
+    ];
     lhs_wing = [0,0;
               0,struct.Croot;
               -struct.b/2,struct.Croot - (0.5*struct.b * tand(struct.sweepLE));
               -struct.b/2,(struct.Croot - (0.5*struct.b * tand(struct.sweepLE)) - struct.Ctip);
               0,0;
-    ]
+    ];
 
     plot(rhs_wing(:,1),rhs_wing(:,2));
     plot(lhs_wing(:,1),lhs_wing(:,2));
