@@ -54,10 +54,10 @@ airfoilcoords.bottom = [ 0 0;
 1.00000     0.00000];
 
 
-x_frontspar = 0.15;
-x_rearspar = 0.65;
+x_frontspar = 0.1;
+x_rearspar = 0.75;
 
-k = b_bar - a_bar;
+k = x_rearspar - x_frontspar;
 
 
 figure
@@ -77,3 +77,26 @@ t_c_rearspar = topfit(x_rearspar) - bottomfit(x_rearspar)
 
 plot([x_frontspar, x_frontspar],[topfit(x_frontspar),bottomfit(x_frontspar)]);
 plot([x_rearspar, x_rearspar],[topfit(x_rearspar),bottomfit(x_rearspar)]);
+
+span = 9.8062;
+
+syms y
+croot = 1.9556;
+ctip = 0.5601;
+c(y) = (((2*(ctip-croot))/(span))*y) + croot;
+
+% c(y) = -1.4044*y + 1.9556;
+a = t_c_frontspar ;
+b = t_c_rearspar;
+midpoint = .12;
+
+rib1 = span * 0.3/2;  
+rib2 = span * 0.95/2;
+
+area = trapz(a,midpoint,abs(0.5 - x_frontspar)) + trapz(b,midpoint,abs(0.5 - x_rearspar))
+
+vol = double(2*int(c^2*area, rib1, rib2))
+
+function [area] = trapz(a,b,h)
+    area = h*((a+b)/2);
+end
