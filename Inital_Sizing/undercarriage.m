@@ -60,7 +60,7 @@ cg_main_wheel_angle_max = atand((uc.main_wheel.x - wandb.x_cg_front)/wandb.z_cg)
 
 non_blocking_assert(min(cg_main_wheel_angle_max, cg_main_wheel_angle_min) > max(15, tipback_angle), 'angle between cg and main wheel not sufficiently large')
 
-uc.tyres.psi = 60; % TODO:
+uc.tyres.psi = 90; % TODO:
 uc.percent_weight_nose = 0.1;
 
 B = uc.main_wheel.x - uc.nose_wheel.x;

@@ -1,12 +1,12 @@
 clear 
 clc
 
-load("tailpane.mat");
+load("tailplane.mat");
 
-tailplaneC_elevatoredge = tailplane.Croot + 0.9 * (tailplane.Ctip - tailplane.Croot);
-control_surface.elevator_area = 0.32 * (tailplane.Croot  + tailplaneC_elevatoredge) * 0.9 * 0.5 * tailplane.b; %note 2 elevators
+tailplaneC_elevatoredge = tailplane.initial.horizontal.Croot + 0.9 * (tailplane.initial.horizontal.Ctip - tailplane.initial.horizontal.Croot);
+control_surface.elevator_area = 0.32 * (tailplane.initial.horizontal.Croot  + tailplaneC_elevatoredge) * 0.9 * 0.5 * tailplane.initial.horizontal.b; %note 2 elevators
 
+rudderC_rudderedge = tailplane.initial.vertical.Croot + 0.9 * (tailplane.initial.vertical.Ctip - tailplane.initial.vertical.Croot);
+control_surface.rudder_area =  0.5 * 3 * (tailplane.initial.vertical.Croot  + tailplaneC_elevatoredge) * 0.9 * 0.5 * tailplane.initial.vertical.b; 
 
-rudderC_rudderedge = tailplane.Croot + 0.9 * (tailplane.Ctip - tailplane.Croot);
-control_surface.elevator_area = 0.32 * (tailplane.Croot  + tailplaneC_elevatoredge) * 0.9 * 0.5 * tailplane.b; %note 2 elevators
-
+control_surface.aileron_area = (high_lift_design.Cflap * 2) * 0.25 * 0.5 * wing_design.b; %note 2 ailerons
