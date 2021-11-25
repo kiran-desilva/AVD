@@ -3,6 +3,9 @@ clc
 
 load("tailpane.mat");
 
-tailplaneC_elevatoredge = tailplane.Croot + 0.9 * (tailplane.Ctip - tailplane.Croot);
-controlelevator_area = 0.5 * 0.32 * (tailplane.Croot  + tailplaneC_elevatoredge) * 0.9 * 0.5 * tailplane.b;
+tailplaneC_elevatoredge = tailplane.horizontal.Croot + 0.9 * (tailplane.horizontal.Ctip - tailplane.horizontal.Croot);
+control_surface.elevator_area = 0.32 * (tailplane.horizontal.Croot  + tailplaneC_elevatoredge) * 0.9 * 0.5 * tailplane.horizontal.b; %note 2 elevators
+
+rudderC_rudderedge = tailplane.vertical.Croot + 0.9 * (tailplane.vertical.Ctip - tailplane.vertical.Croot);
+control_surface.elevator_area = 0.32 * (tailplane.vertical.Croot  + tailplaneC_elevatoredge) * 0.9 * 0.5 * tailplane.b; %note 2 elevators
 
