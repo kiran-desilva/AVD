@@ -9,3 +9,4 @@ control_surface.elevator_area = 0.32 * (tailplane.initial.horizontal.Croot  + ta
 rudderC_rudderedge = tailplane.initial.vertical.Croot + 0.9 * (tailplane.initial.vertical.Ctip - tailplane.initial.vertical.Croot);
 control_surface.rudder_area =  0.5 * 3 * (tailplane.initial.vertical.Croot  + tailplaneC_elevatoredge) * 0.9 * 0.5 * tailplane.initial.vertical.b; 
 
+control_surface.aileron_area = (high_lift_design.Cflap * 2) * 0.25 * 0.5 * wing_design.b; %note 2 ailerons
