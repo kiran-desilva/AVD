@@ -5,26 +5,27 @@ load("parameters.mat");
 %% Takeoff 
 
 Vinit = 0;
-V_TO = 1.1 * sizing.takeoff.v_stall; %FAR-25
-mu = 0.03; % raymer dry asphalt runway
+v_stall_takeoff = sqrt(2 * wandb.W0 / (1.225 * Sref * high_lift_design.Clmax_takeoff)); %need clmax takeoff
+V_TO = 1.1 * v_stall_takeoff; %FAR-25  
+mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
 
-perf.Ka = (1.225 / (2 * sizing.W0 / design_S_ref)) * (mu * sizing.takeoff.cl_max - sizing.takeoff.cd0 - (sizing.takeoff.cl_max^2) / (pi * sizing.AR *sizing.takeoff.e));
-perf.Kt = design_t_w - mu;
-perf.Sg = (1 / (2 * 9.81 * perf.Ka)) * log(abs((perf.Kt + perf.Ka * V_TO^2) / (perf.Kt + perf.Ka * Vinit^2)));
+performance.Ka = (1.225 / (2 * wandb.W0 / wing_design.S_ref)) * (mu * high_lift_design.Clmax_takeoff - aero_analysis.drag.Cd0_takeoff - (high_lift_design.Clmax_takeoff^2) / (pi * wing_design.AR * aero_analyis.drag.e_takeoff));
+performance.Kt = (powerplant.Thrust_max_takeoff / wandb.W0) - mu;
+performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + performance.Ka * V_TO^2) / (performance.Kt + performance.Ka * Vinit^2)));
 
-perf.Sr = 3 * V_TO; 
+performance.Sr = 3 * V_TO; 
 
-H_obs = 35 / 3.2808;
-R = (1.15 * sizing.takeoff.v_stall)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
-perf.Str = sqrt(R^2 - (R - H_obs)^2); 
+H_obs = 35 / 3.2808; %meters
+R = (1.15 * v_stall_takeoff)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
+performance.Str = sqrt(R^2 - (R - H_obs)^2); 
 
 sizing.takeoff.cd = sizing.takeoff.cd0 + (sizing.takeoff.cl_max^2) /  (pi * sizing.AR * sizing.takeoff.e); 
 LoverD_TR = sizing.takeoff.cl_max / sizing.takeoff.cd; 
 gamma_climb = asin(design_t_w - 1 / LoverD_TR);
 H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed 
 
-perf.Sto = 1.15 * (perf.Sg + perf.Sr + perf.Str); %FAR25 15% safety factor all engines operative
+performance.Sto = 1.15 * (performance.Sg + performance.Sr + performance.Str); %FAR25 15% safety factor all engines operative
 
 gamma_climb_1eng =  asin(0.5 * design_t_w - 1 / LoverD_TR); %one engine operative
 gamma_min = 0.024; %FAR25 minimum climb for 2-engine a/c
@@ -81,3 +82,9 @@ perf.frac_cruise1_ext = Wx_W0_ext / (new_Wx_W0_ext); % calculate new cruise fuel
 perf.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * cruise_LoverD * log(perf.frac_cruise1_ext);
 
 %% Point performance
+
+perf.sigma_maxalt = (2 * sizing.fraction.before_cruise / (beta * T0)) * sqrt(
+
+Trust_lapse = @(V,h) ; %Thrust lapse model
+Drag = @(V,h,W) ; 
+

@@ -12,20 +12,20 @@ try
 	load('fuselage_design')
 catch e
 	% TODO: CHECK ALL THE VARS HERE
-	wandb.z_cg = 1;
-	wandb.x_cg_front = 2.4;
-	wandb.x_cg_aft = 2.5;
+	wandb.z_cg = 1.5;
+	wandb.x_cg_front = 5.5;
+	wandb.x_cg_aft = 6;
 
 	lowest_spanwise_point.y = 6;
 	lowest_spanwise_point.z = 0;
 
 	tailstrike_point.x = 10;
-	tailstrike_point.z = 1;
+	tailstrike_point.z = 1.3;
 end
 
 uc.nose_wheel.x = 0.8; % TODO:
-uc.main_wheel.y = 1;
-uc.main_wheel.x = 2.8; % TODO:
+uc.main_wheel.y = 3;
+uc.main_wheel.x = 6.6; % TODO:
 uc.main_wheel.z = 1;
 
 
@@ -60,7 +60,7 @@ cg_main_wheel_angle_max = atand((uc.main_wheel.x - wandb.x_cg_front)/wandb.z_cg)
 
 non_blocking_assert(min(cg_main_wheel_angle_max, cg_main_wheel_angle_min) > max(15, tipback_angle), 'angle between cg and main wheel not sufficiently large')
 
-uc.tyres.psi = 60; % TODO:
+uc.tyres.psi = 90; % TODO:
 uc.percent_weight_nose = 0.1;
 
 B = uc.main_wheel.x - uc.nose_wheel.x;

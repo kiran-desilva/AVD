@@ -16,9 +16,12 @@ sizing.L_Dmax = sizing.Kld * sqrt(sizing.AR / sizing.swet_sref);
 sizing.cd0 = (pi * sizing.AR * sizing.e) / (4 * sizing.L_Dmax^2);
 
 
-roskam.c_1=0.6197; %cruise
-roskam.c_2=0.6197; %alternate cruise
-roskam.c_3=0.5191; %loiter
+%roskam.c_1=0.6197; %cruise
+%roskam.c_2=0.6197; %alternate cruise
+%roskam.c_3=0.5191; %loiter
+roskam.c_1=0.7; %cruise
+roskam.c_2=0.7; %alternate
+roskam.c_3=0.7; %loDesciter
 roskam.LoverD_cruise(1) = 11; %ish?
 roskam.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
 roskam.LoverD_loiter(1) = 13; %ish?
@@ -31,6 +34,9 @@ roskam.B = 0.9979;
 raymer.c_1=0.6197; %cruise
 raymer.c_2=0.6197; %alternate
 raymer.c_3=0.5194; %loDesciter
+%raymer.c_1=14.7/10^6; %cruise
+%raymer.c_2=14.7/10^6; %alternate
+%raymer.c_3=17.55/10^6; %loDesciter
 raymer.LoverD_cruise(1) = 11; %ish?
 raymer.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
 raymer.LoverD_loiter(1) = 13; %ish?
@@ -53,7 +59,7 @@ for j = 1:2
         sizing.roskam.fuelfrac(3) = exp(-(p.parameters.cruise_range_km * 1000 * roskam.c_1 / 3600) / (p.parameters.cruise_mach * 295.07 * roskam.LoverD_cruise(j)));  %cruise 1 using breguet range
         sizing.roskam.fuelfrac(4) = 0.99;  %descent 1
         sizing.roskam.fuelfrac(5) = 0.98;  %climb and accelerate note assumed same as prev climb
-        sizing.roskam.fuelfrac(6) = exp(-(p.parameters.alternate_range_km * 1000 * roskam.c_2 / 3600) / (p.parameters.cruise_mach * 295.07 * roskam.LoverD_cruise(j)));  %cruise 2
+        sizing.roskam.fuelfrac(6) = exp(-(p.parameters.alternate_range_km * 1000 * roskam.c_2 / 3600) / (p.parameters.cruise_mach * 309.6199 * roskam.LoverD_cruise(j)));  %cruise 2
         sizing.roskam.fuelfrac(7) = exp(-(p.parameters.loiter_duration * 60 * roskam.c_3 / 3600) / (roskam.LoverD_loiter(j))); % loiter using endurance eqn
         sizing.roskam.fuelfrac(8) = 0.99; %descent 2
         sizing.roskam.fuelfrac(9) = 0.992;    %landing + taxi
@@ -63,7 +69,7 @@ for j = 1:2
         raymer.fuelfrac(3) = exp(-(p.parameters.cruise_range_km * 1000 * raymer.c_1 / 3600) / (p.parameters.cruise_mach * 295.07 * raymer.LoverD_cruise(j)));  %cruise 1 using breguet range
         raymer.fuelfrac(4) = 0.99;  %descent 1
         raymer.fuelfrac(5) = 0.985;  %climb and accelerate note assumed same as prev climb
-        raymer.fuelfrac(6) = exp(-(p.parameters.alternate_range_km * 1000 * raymer.c_2 / 3600) / (p.parameters.cruise_mach * 295.07 * raymer.LoverD_cruise(j)));  %cruise 2
+        raymer.fuelfrac(6) = exp(-(p.parameters.alternate_range_km * 1000 * raymer.c_2 / 3600) / (p.parameters.cruise_mach * 309.6199 * raymer.LoverD_cruise(j)));  %cruise 2
         raymer.fuelfrac(7) = exp(-(p.parameters.loiter_duration * 60 * raymer.c_3 / 3600) / (raymer.LoverD_loiter(j))); % loiter using endurance eqn
         raymer.fuelfrac(8) = 0.99; %descent 2
         raymer.fuelfrac(9) = 0.995;    %landing + taxi
@@ -166,4 +172,5 @@ sizing.fraction.end=roskam.Wx_W0(2);
 
 %% save sizing to 
 save('sizing','sizing');
+
 
