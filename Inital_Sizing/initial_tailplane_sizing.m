@@ -64,22 +64,29 @@ h_tail_constraint_fig;
 df = 1.52/2;
 
 current_horizontal_position_bar = tailplane.horizontal.z_above_fuselage_bar + (df/cmac);
-
 plot(tailplane.horizontal.l_bar,current_horizontal_position_bar,'o','color','green');
 improvePlot(h_tail_constraint_fig)
 
 min_vertical_span_bar = h_tail_constraint_fit(tailplane.horizontal.l_bar);
 if (min_vertical_span_bar > current_horizontal_position_bar)
     disp("Bad Vertical Position -> fixing span")
-    tailplane.vertical.Ar = ((min_vertical_span_bar * Cmac)^2)/
+    tailplane.vertical.Ar = ((min_vertical_span_bar * cmac)^2)/tailplane.vertical.s;
+    tailplane.vertical = wing_geometry_calc_struct(tailplane.vertical,2);
 end
+
+current_horizontal_position_bar = (tailplane.vertical.b + df)/ cmac;
+
+plot(tailplane.horizontal.l_bar,current_horizontal_position_bar,'o','color','orange');
+improvePlot(h_tail_constraint_fig)
+
+
 %ensure horizontal tailplane can fit on vertical tailplane
 min_vertical_Ctip = tailplane.horizontal.Croot;
 if tailplane.vertical.Ctip < min_vertical_Ctip
     % correct taper ratio to fix this issue
     disp("Initial vertical stablizer Ctip too small -> fixing taper")
     tailplane.vertical.lambda = tailplane.horizontal.Croot/tailplane.vertical.Croot;
-    tailplane.vertical = wing_geometry_calc_struct(tailplane.initial.vertical,2); % recalculate paramters
+    tailplane.vertical = wing_geometry_calc_struct(tailplane.vertical,2); % recalculate paramters
 end
 
 
