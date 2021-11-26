@@ -5,23 +5,23 @@ load("parameters.mat");
 %% Takeoff 
 
 Vinit = 0;
-takeoff.v_stall = sqrt(2 * wandb.W0 / (1.225 * Sref * high_lift_design.Clmax_takeoff)); %need clmax takeoff
-V_TO = 1.1 * takeoff.v_stall; %FAR-25  
+v_stall_takeoff = sqrt(2 * wandb.W0 / (1.225 * Sref * high_lift_design.Clmax_takeoff)); %need clmax takeoff
+V_TO = 1.1 * v_stall_takeoff; %FAR-25  
 mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
 
-performance.Ka = (1.225 / (2 * wandb.W0 / wing_design.S_ref)) * (mu * high_lift_design.Clmax_takeoff - aer0_analysis.drag.Cd0_takeoff - (high_lift_design.Clmax_takeoff^2) / (pi * wing_design.AR * aero_analyis.drag.e_takeoff));
+performance.Ka = (1.225 / (2 * wandb.W0 / wing_design.S_ref)) * (mu * high_lift_design.Clmax_takeoff - aero_analysis.drag.Cd0_takeoff - (high_lift_design.Clmax_takeoff^2) / (pi * wing_design.AR * aero_analyis.drag.e_takeoff));
 performance.Kt = (powerplant.Thrust_max_takeoff / wandb.W0) - mu;
 performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + performance.Ka * V_TO^2) / (performance.Kt + performance.Ka * Vinit^2)));
 
 performance.Sr = 3 * V_TO; 
 
 H_obs = 35 / 3.2808; %meters
-R = (1.15 * sizing.takeoff.v_stall)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
+R = (1.15 * v_stall_takeoff)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
 performance.Str = sqrt(R^2 - (R - H_obs)^2); 
 
-sizing.takeoff.cd = sizing.takeoff.cd0 + (sizing.takeoff.cl_max^2) /  (pi * sizing.AR * sizing.takeoff.e); 
-LoverD_TR = sizing.takeoff.cl_max / sizing.takeoff.cd; 
+takeoff_CD = aero_analysis.drag.Cd0_takeoff + (aero_analysis.wing.takeoff_CLmax^2) /  (pi * sizing.AR *  aero_analysis.drag.e_takeoff); 
+LoverD_TR = aero_analysis.wing.takeoff_CLmax / takeoff_CD; 
 gamma_climb = asin(design_t_w - 1 / LoverD_TR);
 H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed 
 
