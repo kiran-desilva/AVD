@@ -20,8 +20,8 @@ H_obs = 35 / 3.2808; %meters
 R = (1.15 * v_stall_takeoff)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
 performance.Str = sqrt(R^2 - (R - H_obs)^2); 
 
-sizing.takeoff.cd = sizing.takeoff.cd0 + (sizing.takeoff.cl_max^2) /  (pi * sizing.AR * sizing.takeoff.e); 
-LoverD_TR = sizing.takeoff.cl_max / sizing.takeoff.cd; 
+takeoff_CD = aero_analysis.drag.Cd0_takeoff + (aero_analysis.wing.takeoff_CLmax^2) /  (pi * sizing.AR *  aero_analysis.drag.e_takeoff); 
+LoverD_TR = aero_analysis.wing.takeoff_CLmax / takeoff_CD; 
 gamma_climb = asin(design_t_w - 1 / LoverD_TR);
 H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed 
 
