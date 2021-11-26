@@ -11,6 +11,7 @@ clc
 load('sizing.mat')
 load('Wing.mat')
 load('uc.mat')
+load("aero_analysis.mat")
 %% Drag Analysis
 %Parasite drag (zero-lift) & lift-induced
 
@@ -39,6 +40,7 @@ delta=[0,15,45]*pi/180; %angle of deflection of HLD [rad]
 %delta(2):TO
 %delta(3):Landing
 
+uc_frontal_area_m_sq=5;
 %uc_frontal_area_m_sq comes from P's script
 A_UC_front=[0, uc_frontal_area_m_sq, uc_frontal_area_m_sq]; %Area of the UC [m^2]
 %(1): cruise
@@ -211,3 +213,4 @@ for j=1:length(U)
     aero_analysis.induced_drag.wing.cd_0(j)=cl^2/(pi*wing_A*aero_analysis.induced_drag.wing.e(j));
     aero_analysis.induced_drag.wing.cd_0_V2(j)=cl^2/(pi*wing_A*aero_analysis.induced_drag.wing.e_V2(j));
 end
+save("aero_analysis")
