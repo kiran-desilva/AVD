@@ -4,6 +4,9 @@
 %AVD
 % clear
 % clc
+
+%% Load files
+load('sizing.mat')
 %% Wing Lift Estimation
 
 %% Inputs from other scripts
@@ -21,6 +24,12 @@ aero_analysis.wing.t_c=0.12;
 aero_analysis.wing.te_angle=15; %degrees
 
 %% Mach number definition, wing
+aero_analysis.wing.stall_landing=sqrt(2*sizing.W0/(1.225*12.3283*2.3));
+aero_analysis.wing.v_landing_ms=1.3*aero_analysis.wing.stall_landing; %units:m/s
+aero_analysis.wing.v_landing_fts=3.2808*aero_analysis.wing.v_landing_ms; %units: ft/s
+aero_analysis.wing.v_takeoff_ms=1.2*aero_analysis.wing.stall_landing; %units:m/s
+aero_analysis.wing.v_takeoff_fts=3.2808*aero_analysis.wing.v_takeoff_ms; %units: ft/s 
+
 aero_analysis.wing.Mach=[0.75,0.78,0.4,0.5]; %Mach numbers of interest
 %aero_analysis.tail.Mach=[1,1,1,1]; %Mach numbers of tail plane at different configurations
 %(1): cruise
@@ -72,5 +81,5 @@ aero_analysis.wing.HLD.cl_alpha_flaps=aero_analysis.wing.Cl_alpha.*(1+(aero_anal
 %==> ignore the first 2 terms of the cl_alpha_flaps
 aero_analysis.wing.HLD.alpha=[-10,-15]; %change in flap angle [degrees]
 aero_analysis.wing.HLD.delta_alpha=aero_analysis.wing.HLD.alpha.*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
-
+save("aero_analysis")
 
