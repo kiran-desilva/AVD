@@ -7,7 +7,7 @@ load('design.mat')
 
 
 %cessana citation mustang currently
-fuselage_length = 12;
+fuselage_length = 14.22;
 cmac = 1.369;
 sref = design.sref;
 b = sqrt(sizing.AR * sref);
@@ -61,10 +61,18 @@ tailplane.vertical = tailplane.initial.vertical;
 [h_tail_constraint_fit,h_tail_constraint_fig] = horizontal_placement_graph;
 h_tail_constraint_fig;
 % currently assuming wing is on the bottom of the fueslage
-df = 1.52;
-plot(tailplane.horizontal.l_bar,tailplane.horizontal.z_above_fuselage_bar + (df/cmac),'o','color','green');
+df = 1.52/2;
+
+current_horizontal_position_bar = tailplane.horizontal.z_above_fuselage_bar + (df/cmac);
+
+plot(tailplane.horizontal.l_bar,current_horizontal_position_bar,'o','color','green');
 improvePlot(h_tail_constraint_fig)
 
+min_vertical_span_bar = h_tail_constraint_fit(tailplane.horizontal.l_bar);
+if (min_vertical_span_bar > current_horizontal_position_bar)
+    disp("Bad Vertical Position -> fixing span")
+    tailplane.vertical.Ar = ((min_vertical_span_bar * Cmac)^2)/
+end
 %ensure horizontal tailplane can fit on vertical tailplane
 min_vertical_Ctip = tailplane.horizontal.Croot;
 if tailplane.vertical.Ctip < min_vertical_Ctip
@@ -73,6 +81,7 @@ if tailplane.vertical.Ctip < min_vertical_Ctip
     tailplane.vertical.lambda = tailplane.horizontal.Croot/tailplane.vertical.Croot;
     tailplane.vertical = wing_geometry_calc_struct(tailplane.initial.vertical,2); % recalculate paramters
 end
+
 
 
 

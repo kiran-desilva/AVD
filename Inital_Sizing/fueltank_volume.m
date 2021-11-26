@@ -54,6 +54,8 @@ airfoilcoords.bottom = [ 0 0;
 1.00000     0.00000];
 
 
+
+
 x_frontspar = 0.1;
 x_rearspar = 0.75;
 
@@ -102,4 +104,4 @@ area = fuel_tank.area;
 
 raw_vol = double(2*int(c^2*area, rib1, rib2))
 
-corrected_vol = raw_vol*0.8 %need reference
+corrected_vol = raw_vol*0.975*0.975 %raymer -> fire and leak protection using foam
