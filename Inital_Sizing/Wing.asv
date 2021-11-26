@@ -2,38 +2,54 @@
 %ieo18
 %10th Nov 21 -
 %AVD
-% clear
-% clc
+clear
+clc
 
 %% Load files
 load('sizing.mat')
+load('design.mat')
+load('wing.mat')
+load('tailplane.mat')
 %% Wing Lift Estimation
 
 %% Inputs from other scripts
 d=1.524; %diameter of the fuselage [m] from Camille 26/11
 AR=8;
 S_exp=0.5;
-S_ref=1;
-h=0.3; %winglet height (m)
-b=5; %wing span (m)
+S_ref=design.sref; %[m^2]
+%h=0.3; %winglet height (m)
+b=wing.b; %wing span (m)
 max_sweep_t=20*pi/180; %sweep of wing at the chord location where the airfoil is thickest
-sweep_LE=20*pi/180;
+sweep_LE=wing.sweepLE*pi/180;
 cl_max_airfoil=2.4; %maximum lift of airfoil, at similar Reynolds number (Raymer)
 lambda_quarter=20*pi/180; %quarter-chord sweep
 aero_analysis.wing.t_c=0.12;
-aero_analysis.wing.te_angle=15; %degrees
+aero_analysis.wing.te_angle=wing.sweepTE; %degrees
 
 %% Mach number definition, wing
-aero_analysis.wing.stall_landing=sqrt(2*sizing.W0/(1.225*12.3283*2.3))
-aero_analysis.wing.v_landing=
+aero_analysis.wing.stall_landing=sqrt(2*sizing.W0/(1.225*12.3283*2.3));
+aero_analysis.wing.v_landing_ms=1.3*aero_analysis.wing.stall_landing; %units:m/s
+aero_analysis.wing.v_landing_fts=3.2808*aero_analysis.wing.v_landing_ms; %units: ft/s
+aero_analysis.wing.v_takeoff_ms=1.2*aero_analysis.wing.stall_landing; %units:m/s
+aero_analysis.wing.v_takeoff_fts=3.2808*aero_analysis.wing.v_takeoff_ms; %units: ft/s 
 
-aero_analysis.wing.Mach=[0.75,0.78,0.4,0.5]; %Mach numbers of interest
+dyn_visc=1;
+MAC=3;
+rho=[1,1,1.225,1.225];
+air_velc=[200,200,330,330];
+aero_analysis.wing.Mach=[0.75,0.78,aero_analysis.wing.v_takeoff_ms/air_velc(3),aero_analysis.wing.v_landing_ms/air_velc(4)]; %Mach numbers of interest
+aero_analysis.wing.Re=[0,0,0,0]; %Reynolds number at each aspect of flight for the wing (accounts for the characteristic lengths)
+aero_analysis.wing.Re(1)=rho(1)*aero_analysis.wing.Mach(1)*air_velc(1)*MAC/dyn_visc;
+aero_analysis.wing.Re(2)=rho(2)*aero_analysis.wing.Mach(1)*air_velc(1)*MAC/dyn_visc;
+aero_analysis.wing.Re(3)=rho(3)*aero_analysis.wing.v_takeoff_ms*MAC/dyn_visc;
+aero_analysis.wing.Re(4)=rho(4)*aero_analysis.wing.v_landing_ms*MAC/dyn_visc;
+
 %aero_analysis.tail.Mach=[1,1,1,1]; %Mach numbers of tail plane at different configurations
 %(1): cruise
 %(2): max
 %(3): take-off
 %(4): approach
-aero_analysis.wing.Re=[1e+03,4e+05,6e+07,1e+09]; %Reynolds number at each aspect of flight for the wing (accounts for the characteristic lengths)
+
 
 %% Correction factors, wing
 aero_analysis.wing.beta=sqrt(1-aero_analysis.wing.Mach.^2); %compressibility effects
@@ -45,8 +61,8 @@ aero_analysis.wing.F=1.07*(1+d/b)^2;
 
 %% winglet
 %changes AR
-aero_analysis.wing.A_effective=AR*(1+h/b)^2;
-aero_analysis.wing.updated_AR=5; %need to establish the equation for this
+%aero_analysis.wing.A_effective=AR*(1+h/b)^2;
+%aero_analysis.wing.updated_AR=5; %need to establish the equation for this
 %use the updated AR for induced drag calculations
 %% CL
 %lift curve slope per radian, accurate up to Mdd and reasonably accurate almost to M=1
@@ -78,5 +94,5 @@ aero_analysis.wing.HLD.cl_alpha_flaps=aero_analysis.wing.Cl_alpha.*(1+(aero_anal
 %==> ignore the first 2 terms of the cl_alpha_flaps
 aero_analysis.wing.HLD.alpha=[-10,-15]; %change in flap angle [degrees]
 aero_analysis.wing.HLD.delta_alpha=aero_analysis.wing.HLD.alpha.*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
-
+save("aero_analysis")
 
