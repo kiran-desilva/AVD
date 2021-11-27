@@ -5,7 +5,7 @@ load("parameters.mat");
 %% Takeoff 
 
 Vinit = 0;
-v_stall_takeoff = sqrt(2 * wandb.W0 / (1.225 * Sref * high_lift_design.Clmax_takeoff)); %need clmax takeoff
+v_stall_takeoff = sqrt(2 * wandb.W0 / (1.225 * Sref * aero_analysis.wing.takeoff_CLmax)); %need clmax takeoff
 V_TO = 1.1 * v_stall_takeoff; %FAR-25  
 mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
@@ -37,9 +37,10 @@ perf.BFL = (0.863 / (1 + 2.3 * G)) * (((powerplant.Thrust_max_takeoff / wandb.W0
 
 %% Landing 
 theta_apprch = 3; %deg from gudm.
-V_a = 1.3 * sizing.landing.v_stall;
-V_f = 1.23 * sizing.landing.v_stall;
-V_td = 1.15 * sizing.landing.v_stall;
+v_stall_landing = sqrt(2 * wandb.Wland / (1.225 * Sref * aero_analysis.wing.takeoff_CLmax));
+V_a = 1.3 * v_stall_landing;
+V_f = 1.23 * v_stall_landing;
+V_td = 1.15 * v_stall_landing; %errikos slides
 tfr = 2; % mid sized ac?
 n_land = 1.2; 
 R_land = V_f^2 / ((n_land - 1) * 9.81);
