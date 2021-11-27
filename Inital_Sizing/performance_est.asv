@@ -71,16 +71,16 @@ end
 
 new_Wx_W0_ext = new_Wx_W0;
 
-Wx_W0 = (sizing.W0 - sizing.Wf) / sizing.W0; %use original W0 and Wf to calculate Wx/W0
+Wx_W0 = (wandb.W0 - wandb.Wf) / wandb.W0; 
 new_Wx_W0 = new_Wx_W0 * performance.frac_cruise2 * performance.frac_loiter; % not including cruise 1 segment
-performance.frac_cruise1 = Wx_W0 / (new_Wx_W0); % calculate new cruise fuel frac using original wx/w0 and the new loiter and crusie 2 fractions
+performance.frac_cruise1 = Wx_W0 / (new_Wx_W0); 
 performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * aero_analysis.wing.cruise_LoverD * log(performance.frac_cruise1);
 
 %extended range
-Wx_W0_ext = (sizing.W0 - (sizing.Wf + W_pld * 0.453592 * 9.81)) / sizing.W0; %extended range replacing all pld weight with fuel
+Wx_W0_ext = (wandb.W0 - (wandb.Wf + W_pld * 0.453592 * 9.81)) / wandb.W0; %extended range replacing all pld weight with fuel
 new_Wx_W0_ext = new_Wx_W0_ext * performance.frac_cruise2 * performance.frac_loiter; % not including cruise 1 segment
 performance.frac_cruise1_ext = Wx_W0_ext / (new_Wx_W0_ext); % calculate new cruise fuel frac using original wx/w0 and the new loiter and crusie 2 fractions
-performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * cruise_LoverD * log(performance.frac_cruise1_ext);
+performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * aero_analysis.wing.cruise_LoverD * log(performance.frac_cruise1_ext);
 
 %% Point performance
 
