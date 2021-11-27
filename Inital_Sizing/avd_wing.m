@@ -1,19 +1,16 @@
 clear
 clc
 
-load('parameters')
 load('sizing')
-load('design')
 
 %parameters from poster
-W_S= design.w_s;%
-% C_cruise=295.1 %m/s
-[~,C_cruise,~,rho_cruise] = atmosisa(distdim(parameters.cruise_alt_ft,'ft','m'));
-M_cruise=parameters.cruise_mach;
+W_S= 2973 %
+C_cruise=295.1 %m/s
+M_cruise=0.75
 V_cruise=C_cruise*M_cruise %m/s
-% rho_cruise= 0.302748958
-W_cruise_W_total=0.842 % -> needs to be changed
-Max_takeoff_weight=sizing.W0; %kg
+rho_cruise= 0.302748958
+W_cruise_W_total=0.842
+Max_takeoff_weight=3740 %kg
 %mu_cruise=2.969*10^(-7)
 mu_cruise=1.45*10^(-5)
 character_c=0.6096
@@ -53,7 +50,7 @@ mainwing.b = sqrt(AR*SP)
 
 lambda=lambda_min
 
-mainwing.Croot= (2*SP)/(mainwing.b*(1+lambda));
+mainwing.Croot= (2*12.34086)/(9.811*(1+lambda));
 mainwing.Ctip=lambda*mainwing.Croot;
 C_mean=(2/3) * mainwing.Croot* ((1+lambda+lambda^2)/(1+lambda))
 
@@ -166,7 +163,24 @@ perc_chord=(mainwing.Croot-cf)/mainwing.Croot
 %s_exposed=
 %s_wet=s_exposed*(1.977+0.52(t_c))
 
+wing.b = mainwing.b;
+wing.Croot = mainwing.Croot;
+wing.Ctip = mainwing.Ctip ;
+wing.Cmac = C_mean;
+wing.sweepLE = mainwing.sweepLE;
+wing.sweepTE = mainwing.sweepTE;
+wing.HDL_PERC = mainwing.HDL_PERC;
+wing.HDL_Croot = mainwing.HDL_Croot;
+wing.HDL_Ctip = mainwing.HDL_Ctip;
+wing.sweepHDL = mainwing.sweepHDL;
+wing.aileron_start_top = mainwing.aileron_start_top;
+wing.aileron_ypos_top = mainwing.aileron_ypos_top;
+wing.aileron_Croot = mainwing.aileron_Croot;
+wing.aileron_start_TE = mainwing.aileron_start_TE;
+wing.aileron_ypos_TE = mainwing.aileron_ypos_TE;
+wing.HDL_start = mainwing.HDL_start;
+wing.C_HDL_root = mainwing.C_HDL_root;
 
 
 
-% save('wing','wing.mat')
+save('wing','wing')
