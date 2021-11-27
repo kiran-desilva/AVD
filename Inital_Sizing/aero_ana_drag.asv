@@ -12,13 +12,13 @@ load('sizing.mat')
 load('wing.mat')
 load('uc.mat')
 load("aero_analysis.mat")
-load("tailplane.mat")
+
 %% Drag Analysis
 %Parasite drag (zero-lift) & lift-induced
 
 %% Inputs from other scripts
 S_ratio=6; %=S_wet/S_ref
-S=[11.4246,100,5];
+S=[500,100,5];
 %S(1):S_ref
 %S(2):A_eff
 %S(3):S_exposed_wing
@@ -104,7 +104,7 @@ end
 %(3): horizontal stabiliser
 %(4): vertical stabiliser
 %(5): nacelle - note, there are 2 to consider (2 engines!)
-d_components=[d_fuselage,b,tailplane.horizontal.Cmac,tailplane.vertical.Cmac,1];
+d_components=[d_fuselage,b,1,1,1];
 
 aero_analysis.drag.l_components=[20,2,3,4,5]; %define characteristic length of each component
 aero_analysis.drag.fineness=zeros(1,length(d_components));
@@ -194,7 +194,7 @@ a_e=-0.001521;
 b_e=10.82;
 cl=2.1; %define later
 
-aero_analysis.induced_drag.wing.taper=wing.Ctip/wing.Croot;; %from Nadia
+aero_analysis.induced_drag.wing.taper=0.2648; %from Nadia
 aero_analysis.induced_drag.wing.lambda_delta=-0.357+0.45*exp(0.0375*sweep_25);
 aero_analysis.induced_drag.wing.taper_and_delta=aero_analysis.induced_drag.wing.taper-aero_analysis.induced_drag.wing.lambda_delta;
 aero_analysis.induced_drag.wing.fourth_order_lambda=0.0524*aero_analysis.induced_drag.wing.taper_and_delta^4-0.15*aero_analysis.induced_drag.wing.taper_and_delta^3+0.1659*aero_analysis.induced_drag.wing.taper_and_delta^2-0.0706*aero_analysis.induced_drag.wing.taper_and_delta+0.0119;

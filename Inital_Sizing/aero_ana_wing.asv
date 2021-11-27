@@ -22,8 +22,8 @@ S_ref=design.sref; %[m^2]
 b=wing.b; %wing span (m)
 max_sweep_t=20*pi/180; %sweep of wing at the chord location where the airfoil is thickest
 sweep_LE=wing.sweepLE*pi/180;
-cl_max_airfoil=1.6; %maximum lift of airfoil
-lambda_quarter=18.1692*pi/180; %quarter-chord sweep
+cl_max_airfoil=2.4; %maximum lift of airfoil, at similar Reynolds number (Raymer)
+lambda_quarter=15*pi/180; %quarter-chord sweep
 aero_analysis.wing.t_c=0.12;
 aero_analysis.wing.te_angle=wing.sweepTE; %degrees
 
@@ -34,24 +34,23 @@ aero_analysis.wing.v_landing_fts=3.2808*aero_analysis.wing.v_landing_ms; %units:
 aero_analysis.wing.v_takeoff_ms=1.2*aero_analysis.wing.stall_landing; %units:m/s
 aero_analysis.wing.v_takeoff_fts=3.2808*aero_analysis.wing.v_takeoff_ms; %units: ft/s 
 
-aero_analysis.wing.dyn_visc=[0.0000143226,0.0000143226,0.0000181206,0.0000181206];
-taper=wing.Ctip/wing.Croot;
-aero_analysis.wing.MAC=wing.Croot*2/3*((1+taper+taper^2)/1+taper);
-aero_analysis.wing.rho=[0.302,0.237,1.225,1.225];
-aero_analysis.wing.air_velc=[294.9,294.9,340.3,340.3];
-aero_analysis.wing.Mach=[0.75,0.78,aero_analysis.wing.v_takeoff_ms/aero_analysis.wing.air_velc(3),aero_analysis.wing.v_landing_ms/aero_analysis.wing.air_velc(4)]; %Mach numbers of interest
-aero_analysis.wing.Re=aero_analysis.wing.rho.*aero_analysis.wing.air_velc*aero_analysis.wing.MAC./aero_analysis.wing.dyn_visc; %Reynolds number at each aspect of flight for the wing (accounts for the characteristic lengths)
+dyn_visc=1;
+MAC=3;
+rho=[1.225,1,1.225,1.225];
+air_velc=[200,200,330,330];
+aero_analysis.wing.Mach=[0.75,0.78,aero_analysis.wing.v_takeoff_ms/air_velc(3),aero_analysis.wing.v_landing_ms/air_velc(4)]; %Mach numbers of interest
+aero_analysis.wing.Re=[0,0,0,0]; %Reynolds number at each aspect of flight for the wing (accounts for the characteristic lengths)
+aero_analysis.wing.Re(1)=rho(1)*aero_analysis.wing.Mach(1)*air_velc(1)*MAC/dyn_visc;
+aero_analysis.wing.Re(2)=rho(2)*aero_analysis.wing.Mach(2)*air_velc(2)*MAC/dyn_visc;
+aero_analysis.wing.Re(3)=rho(3)*aero_analysis.wing.v_takeoff_ms*MAC/dyn_visc;
+aero_analysis.wing.Re(4)=rho(4)*aero_analysis.wing.v_landing_ms*MAC/dyn_visc;
 
-aero_analysis.wing.Re(1)=aero_analysis.wing.rho(1)*aero_analysis.wing.Mach(1)*aero_analysis.wing.air_velc(1)*aero_analysis.wing.MAC/aero_analysis.wing.dyn_visc(1);
-aero_analysis.wing.Re(2)=aero_analysis.wing.rho(2)*aero_analysis.wing.Mach(2)*aero_analysis.wing.air_velc(2)*aero_analysis.wing.MAC/aero_analysis.wing.dyn_visc(2);
-aero_analysis.wing.Re(3)=aero_analysis.wing.rho(3)*aero_analysis.wing.v_takeoff_ms*aero_analysis.wing.MAC/aero_analysis.wing.dyn_visc(3);
-aero_analysis.wing.Re(4)=aero_analysis.wing.rho(4)*aero_analysis.wing.v_landing_ms*aero_analysis.wing.MAC/aero_analysis.wing.dyn_visc(4);
-
-
+%aero_analysis.tail.Mach=[1,1,1,1]; %Mach numbers of tail plane at different configurations
 %(1): cruise
 %(2): max
 %(3): take-off
 %(4): approach
+
 
 %% Correction factors, wing
 aero_analysis.wing.beta=sqrt(1-aero_analysis.wing.Mach.^2); %compressibility effects
