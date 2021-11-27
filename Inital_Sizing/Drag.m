@@ -12,6 +12,7 @@ load('sizing.mat')
 load('Wing.mat')
 load('uc.mat')
 load("aero_analysis.mat")
+
 %% Drag Analysis
 %Parasite drag (zero-lift) & lift-induced
 
@@ -126,7 +127,7 @@ for i=1:length(chordwise_max_thickness)
 end
 aero_analysis.drag.FF(5)=1+(0.35/aero_analysis.drag.fineness(5));
 
-Q=[1,1,1.05,1.05,1.5]; %exact values to be added for horizontal and vertical stabiliser (term 3 and 4)
+Q=[1,1,1.055,1.055,1.5]; %assuming 5.5% for horizontal and vertical stabiliser
 
 S_wet=[1,1,1,1,1]; %wetted area, exact values to be added
 
@@ -213,4 +214,4 @@ for j=1:length(U)
     aero_analysis.induced_drag.wing.cd_0(j)=cl^2/(pi*wing_A*aero_analysis.induced_drag.wing.e(j));
     aero_analysis.induced_drag.wing.cd_0_V2(j)=cl^2/(pi*wing_A*aero_analysis.induced_drag.wing.e_V2(j));
 end
-save("aero_analysis")
+save('aero_analysis.mat', 'aero_analysis')

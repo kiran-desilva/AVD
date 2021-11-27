@@ -95,5 +95,6 @@ aero_analysis.wing.HLD.cl_alpha_flaps=aero_analysis.wing.Cl_alpha.*(1+(aero_anal
 %==> ignore the first 2 terms of the cl_alpha_flaps
 aero_analysis.wing.HLD.alpha=[-10,-15]; %change in flap angle [degrees]
 aero_analysis.wing.HLD.delta_alpha=aero_analysis.wing.HLD.alpha.*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
-save("aero_analysis")
+save('aero_analysis.mat', 'aero_analysis')
+
 
