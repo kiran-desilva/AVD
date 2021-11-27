@@ -9,7 +9,7 @@ clc
 %% Run lift matlab file
 %run Wing.m; error
 load('sizing.mat')
-load('Wing.mat')
+load('wing.mat')
 load('uc.mat')
 load("aero_analysis.mat")
 
@@ -21,14 +21,14 @@ S_ratio=6; %=S_wet/S_ref
 S=[500,100,5];
 %S(1):S_ref
 %S(2):A_eff
-%S(3): S_exposed_wing
+%S(3):S_exposed_wing
 
-t_c=[0.12,0.12,0.13]; %thickness to chord ratio
+t_c=[0.12,tailplane.horizontal.tc,tailplane.vertical.tc]; %thickness to chord ratio
 %(1): wing
 %(2): horizontal stabiliser
 %(3): vertical stabiliser
 
-sweep_angles=[20,40,20].*pi/180;
+sweep_angles=[18.1692,tailplane.horizontal.sweep_25,tailplane.vertical.sweep_25].*pi/180;
 %sweep angles @ 1/4 chord
 %sweep angles(1): wing
 %sweep angles(2): horizontal tail
@@ -37,17 +37,19 @@ sweep_angles=[20,40,20].*pi/180;
 d_fuselage=1.524; %fuselage diameter [m]
 l_fuselage=14.224; %fuselage length [m]
 
-delta=[0,15,45]*pi/180; %angle of deflection of HLD [rad]
+delta=[0,0,15,45]*pi/180; %angle of deflection of HLD [rad]
 %delta(1):Cruise
-%delta(2):TO
-%delta(3):Landing
+%delta(2):Max
+%delta(3):TO
+%delta(4):Landing
 
 uc_frontal_area_m_sq=5;
 %uc_frontal_area_m_sq comes from P's script
-A_UC_front=[0, uc_frontal_area_m_sq, uc_frontal_area_m_sq]; %Area of the UC [m^2]
+A_UC_front=[0, 0, uc_frontal_area_m_sq, uc_frontal_area_m_sq]; %Area of the UC [m^2]
 %(1): cruise
-%(2): TO
-%(3): Landing
+%(2): max
+%(3): TO
+%(4): Landing
 
 %% Wave drag, wing, M_dd
 %Drag divergence Mach number
@@ -87,7 +89,7 @@ end
 aero_analysis.drag.WE=0.3*S(2)/S(1);
 
 %% Fuselage upsweep
-upsweep=4*pi/180;
+upsweep=11*pi/180; %upsweep of the fuselage
 aero_analysis.drag.upsweep=3.83*(pi*d_fuselage^2/(4*S(1)))*upsweep^(2.5);
 
 %% Combine Misc terms
@@ -136,13 +138,14 @@ aero_analysis.drag.Re_cutoff=38.21.*(aero_analysis.drag.l_components*3.28084/2.0
 
 %conditions
 %(1):cruise
-%(2):TO
-%(3):landing
+%(2):max
+%(3):TO
+%(4):landing
 
-U=[300,100,100]; %velocity for consitions
-rho=[1,2,3]; %density for conditions
-nu=[1,1,1]; %dynamic viscosity for conditions
-M=[0.75,0.6,0.6]; %Mach number
+U=aero_analysis.wing.air_velc.*aero_analysis.wing.Mach; %velocity for conditions
+rho=aero_analysis.wing.rho; %density for conditions
+nu=aero_analysis.wing.dyn_visc; %dynamic viscosity for conditions
+M=aero_analysis.wing.Mach; %Mach number
 
 Re=zeros(length(U), length(aero_analysis.drag.l_components));
 for i=1:length(aero_analysis.drag.l_components)
@@ -176,17 +179,17 @@ end
 % Skin friction, Misc, Leakage
 %accounting for 4% of leakage
 for j=1:length(U)
-    aero_analysis.drag.cd0=1.04*(aero_analysis.drag.skin_friction(j)+aero_analysis.drag.cd_misc(j));
+    aero_analysis.drag.cd0(j)=1.04*(aero_analysis.drag.skin_friction(j)+aero_analysis.drag.cd_misc(j));
 end
 
 %% Induced drag
 % e_theoretical
-sweep_25=10; %input, sweep angle of 1/4 chord (degrees)
+sweep_25=18.1692; %input, sweep angle of 1/4 chord (degrees)
 df_b=0.12;
 ke_f=0.971;
 k_e_d0=0.864;
 big_k=0.38;
-wing_A=8;
+wing_A=7.8;
 a_e=-0.001521;
 b_e=10.82;
 cl=2.1; %define later
@@ -204,9 +207,8 @@ end
 
 aero_analysis.induced_drag.wing.Q=1/(aero_analysis.induced_drag.wing.e_theoretical*ke_f);
 
-for j=1:length(U)
-    aero_analysis.induced_drag.wing.P(j)=big_k*aero_analysis.drag.cd0;
-end
+aero_analysis.induced_drag.wing.P=big_k.*aero_analysis.drag.cd0;
+
 
 for j=1:length(U)
     aero_analysis.induced_drag.wing.e(j)=aero_analysis.induced_drag.wing.k_e_m(j)/(aero_analysis.induced_drag.wing.Q+aero_analysis.induced_drag.wing.P(j)*pi*wing_A);
