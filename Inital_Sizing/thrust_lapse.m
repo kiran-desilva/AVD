@@ -1,4 +1,5 @@
-function beta = thrust_lapse(height_m, mach_number, bypass_ratio)
+function beta = thrust_lapse(height_ft, mach_number, bypass_ratio)
+	height_m = distdim(height_ft, 'ft', 'm');
 	[~, ~, ~, rho0] = atmosisa(0);
 	[T, a, P, rho] = atmosisa(height_m);
 
