@@ -10,20 +10,20 @@ load('sizing.mat')
 load('design.mat')
 load('wing.mat')
 load('tailplane.mat')
-load("aero_analysis.mat")
+%load("aero_analysis.mat")
 %% Wing Lift Estimation
 
 %% Inputs from other scripts
 d=1.524; %diameter of the fuselage [m] from Camille 26/11
-AR=8;
+AR=7.8;
 S_exp=5;
 S_ref=design.sref; %[m^2]
 %h=0.3; %winglet height (m)
 b=wing.b; %wing span (m)
 max_sweep_t=20*pi/180; %sweep of wing at the chord location where the airfoil is thickest
 sweep_LE=wing.sweepLE*pi/180;
-cl_max_airfoil=2.4; %maximum lift of airfoil, at similar Reynolds number (Raymer)
-lambda_quarter=15*pi/180; %quarter-chord sweep
+cl_max_airfoil=1.6; %maximum lift of airfoil
+lambda_quarter=18.1692*pi/180; %quarter-chord sweep
 aero_analysis.wing.t_c=0.12;
 aero_analysis.wing.te_angle=wing.sweepTE; %degrees
 
@@ -34,23 +34,24 @@ aero_analysis.wing.v_landing_fts=3.2808*aero_analysis.wing.v_landing_ms; %units:
 aero_analysis.wing.v_takeoff_ms=1.2*aero_analysis.wing.stall_landing; %units:m/s
 aero_analysis.wing.v_takeoff_fts=3.2808*aero_analysis.wing.v_takeoff_ms; %units: ft/s 
 
-dyn_visc=1;
-MAC=3;
-rho=[1,1,1.225,1.225];
-air_velc=[200,200,330,330];
-aero_analysis.wing.Mach=[0.75,0.78,aero_analysis.wing.v_takeoff_ms/air_velc(3),aero_analysis.wing.v_landing_ms/air_velc(4)]; %Mach numbers of interest
-aero_analysis.wing.Re=[0,0,0,0]; %Reynolds number at each aspect of flight for the wing (accounts for the characteristic lengths)
-aero_analysis.wing.Re(1)=rho(1)*aero_analysis.wing.Mach(1)*air_velc(1)*MAC/dyn_visc;
-aero_analysis.wing.Re(2)=rho(2)*aero_analysis.wing.Mach(2)*air_velc(2)*MAC/dyn_visc;
-aero_analysis.wing.Re(3)=rho(3)*aero_analysis.wing.v_takeoff_ms*MAC/dyn_visc;
-aero_analysis.wing.Re(4)=rho(4)*aero_analysis.wing.v_landing_ms*MAC/dyn_visc;
+aero_analysis.wing.dyn_visc=[0.0000143226,0.0000143226,0.0000181206,0.0000181206];
+taper=wing.Ctip/wing.Croot;
+aero_analysis.wing.MAC=wing.Croot*2/3*((1+taper+taper^2)/1+taper);
+aero_analysis.wing.rho=[0.302,0.237,1.225,1.225];
+aero_analysis.wing.air_velc=[294.9,294.9,340.3,340.3];
+aero_analysis.wing.Mach=[0.75,0.78,aero_analysis.wing.v_takeoff_ms/aero_analysis.wing.air_velc(3),aero_analysis.wing.v_landing_ms/aero_analysis.wing.air_velc(4)]; %Mach numbers of interest
+aero_analysis.wing.Re=aero_analysis.wing.rho.*aero_analysis.wing.air_velc*aero_analysis.wing.MAC./aero_analysis.wing.dyn_visc; %Reynolds number at each aspect of flight for the wing (accounts for the characteristic lengths)
 
-%aero_analysis.tail.Mach=[1,1,1,1]; %Mach numbers of tail plane at different configurations
+aero_analysis.wing.Re(1)=aero_analysis.wing.rho(1)*aero_analysis.wing.Mach(1)*aero_analysis.wing.air_velc(1)*aero_analysis.wing.MAC/aero_analysis.wing.dyn_visc(1);
+aero_analysis.wing.Re(2)=aero_analysis.wing.rho(2)*aero_analysis.wing.Mach(2)*aero_analysis.wing.air_velc(2)*aero_analysis.wing.MAC/aero_analysis.wing.dyn_visc(2);
+aero_analysis.wing.Re(3)=aero_analysis.wing.rho(3)*aero_analysis.wing.v_takeoff_ms*aero_analysis.wing.MAC/aero_analysis.wing.dyn_visc(3);
+aero_analysis.wing.Re(4)=aero_analysis.wing.rho(4)*aero_analysis.wing.v_landing_ms*aero_analysis.wing.MAC/aero_analysis.wing.dyn_visc(4);
+
+
 %(1): cruise
 %(2): max
 %(3): take-off
 %(4): approach
-
 
 %% Correction factors, wing
 aero_analysis.wing.beta=sqrt(1-aero_analysis.wing.Mach.^2); %compressibility effects
@@ -78,22 +79,30 @@ aero_analysis.wing.supersonic_Mach=1/cos(sweep_LE);
 
 %% HLD
 % inputs from other scripts
-aero_analysis.wing.HLD.c=1;
-aero_analysis.wing.HLD.c_dash=1.2;
-aero_analysis.wing.HLD.s_ref=1;
-aero_analysis.wing.HLD.s_flapped=1.2;
-aero_analysis.wing.HLD.delta_hl=1; %hinge lift surface
+aero_analysis.wing.HLD.c_fraction=1.2415;
+aero_analysis.wing.HLD.s_ref=11.4246;
+aero_analysis.wing.HLD.s_flapped=6.6422;
+aero_analysis.wing.HLD.delta_hl=wing.sweepTE; %hinge lift surface
 
-
-aero_analysis.wing.HLD.delta_cl_device=1.3*(aero_analysis.wing.HLD.c_dash/aero_analysis.wing.HLD.c); %assumed Fowler. Can change - pg 415 Raymer
-aero_analysis.wing.HLD.delta_cl_max=0.9*aero_analysis.wing.HLD.delta_cl_device*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
-aero_analysis.wing.HLD.cl_alpha_flaps=aero_analysis.wing.Cl_alpha.*(1+(aero_analysis.wing.HLD.c_dash/aero_analysis.wing.HLD.c-1)*aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref);
+%calculations
+aero_analysis.wing.HLD.delta_cl_device=1.3*(aero_analysis.wing.HLD.c_fraction); %assumed Fowler. Can change - pg 415 Raymer
+%initialise vectors
+aero_analysis.wing.HLD.delta_cl_max=[0,0];
+aero_analysis.wing.HLD.delta_cl_max(2)=0.9*aero_analysis.wing.HLD.delta_cl_device*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
+aero_analysis.wing.HLD.delta_cl_max(1)=aero_analysis.wing.HLD.delta_cl_max(2)*0.8;
+aero_analysis.wing.HLD.cl_alpha_flaps=[0,0];
+aero_analysis.wing.HLD.delta_alpha=[0,0];
 %(1): cruise
 %(2): max
+
 %(3): take-off
 %(4): approach
 %==> ignore the first 2 terms of the cl_alpha_flaps
 aero_analysis.wing.HLD.alpha=[-10,-15]; %change in flap angle [degrees]
-aero_analysis.wing.HLD.delta_alpha=aero_analysis.wing.HLD.alpha.*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
-save("aero_analysis")
+for i=1:2
+    aero_analysis.wing.HLD.cl_alpha_flaps(i)=aero_analysis.wing.Cl_alpha(i+2)*(1+(aero_analysis.wing.HLD.c_fraction-1)*aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref);
+    aero_analysis.wing.HLD.delta_alpha(i)=aero_analysis.wing.HLD.alpha(i)*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
+end
+save('aero_analysis.mat', 'aero_analysis')
+
 
