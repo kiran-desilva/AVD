@@ -30,8 +30,7 @@ CL_design_cruise=( (W_cruise_W_total)*(W_S) )/ (0.5*rho_cruise*V_cruise^2)
 
 
 % Cl_max=max(Cl)
-t_c_cruiseonly=-0.0439*atan(3.3450*M_cruise+-3.0231)+0.0986
-
+t_c_cruiseonly=-0.0439*atan
 
 
 %mach
