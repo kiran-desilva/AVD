@@ -97,7 +97,7 @@ ctip = 0.5601;
 c(y) = (((2*(ctip-croot))/(span))*y) + croot;
 
 
-rib1 = span * 0.3/2;  
+rib1 = span * 0/2;  
 rib2 = span * 0.95/2;
 
 area = fuel_tank.area;
