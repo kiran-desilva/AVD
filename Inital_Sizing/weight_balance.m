@@ -1,15 +1,17 @@
+clear
 load('uc.mat')
 load('wing.mat')
 load('powerplant.mat')
 load('tailplane.mat')
 load('sizing.mat')
 load('fuse.mat')
+load('locations.mat')
 
 AR = sizing.AR;                                 % Wing aspect ratio
 AR_h = tailplane.horizontal.Ar;                 % Horizontal tailplane aspect ratio
 AR_v = tailplane.vertical.Ar;                   % Vertical tailplane aspect ratio
 B_h = tailplane.horizontal.b;                   % Horizontal tailplane span (ft)
-B_w = wing_design.wing_span_ft;                 % Wing span (ft)
+B_w = wing.b * 3.28084;                 % Wing span (ft)
 F_w = 0;                  % Fuselage width at horizontal tail intersection (ft)
 K_buf = 1.02;             % 1.02 for short ranges; 5.68 for very long ranges
 K_door = 1;               % 1.0 if no cargo door; 1.06 for one side cargo door; 1.12 for two sidecargo doors; 1.12 for aft clamshell door; 1.25 for two side and anaft clamshell cargo doors
@@ -25,10 +27,10 @@ L = fuse.structural_length/12;    % Fuselage structural length (ft)
 L_a = 47                 % Electrical routing distance; generators to avionics to cockpit (ft)
 L_ec = 94                % Engine controls routing distance; engine to cockpit - total if multiengine (ft)
 L_f = fuse.total_fuselage_length/12;          % Total fuselage length (ft)
-L_ht = distdim(tailplane.initial.horizontal.Xac,'m','ft');  % Length from wing aerodynamic centre to horizontal tailplane aerodynamic centre (ft)
+L_ht = locations.x_ac_w * 3.28084 ;  % Length from wing aerodynamic centre to horizontal tailplane aerodynamic centre (ft)
 L_m = uc.main_gear_length_in;        % Main landing gear length (inches)
 L_n = uc.nose_gear_length_in;        % Nose landing gear length (inches)
-L_vt = tailplane.ac_vt;              % Length from wing aerodynamic centre to vertical tailplane aerodynamic centre (ft)
+L_vt = locations.x_ac_v - locations.x_ac_w;  % Length from wing aerodynamic centre to vertical tailplane aerodynamic centre (ft)
 N_c = 2;                  % Number of crew
 N_en = 2;                 % Number of engines
 N_f = 6;                  % Number of functions performed by controls; typically 4 − 7 (pitch, yaw, roll, throttle, HLDs, undercarriage)
@@ -37,7 +39,7 @@ N_gen = 2;                % Number of generators; typically = Nen
 N_l = N_gear * 1.5;       % Ultimate landing gear load factor. 1.5 × Ngear
 N_Lt = powerplant.nacelle_length_ft;   % Nacelle length (ft)
 N_m = 2;                  % Number of mechanical function performed by controls; typically 0 − 2 (HLDs, stability controls)
-N_mss = uc.main_gear_shock_struts;     % Number of main gear shock struts
+%N_mss = uc.main_gear_shock_struts;     % Number of main gear shock struts
 N_mw = 2;                 % Number of main wheels
 N_nw = 2;                 % Number of nose wheels
 N_p = 6;                  % Total number of persons onboard (crew + passengers)
@@ -46,16 +48,16 @@ N_t = 2;                  % Total number of fuel tanks
 N_w = powerplant.nacelle_width_ft;    % Nacelle width (ft)
 N_z = 2.75*1.5;          % Ultimate load factor; 1.5× limit load factor (2.7-3)
 R_kva = 40               % System electrical rating; typically 40 − 60 for transports (kVA)
-S_cs = control_surface.total_area_ft2;      % Total control surface area (ft^2)
-S_csw = control_surface.wingmounted_area_ft2;      % Area of wing mounted control surfaces (ft^2)
-S_e  = control_surface.elevator_area_ft2;          % Elevator area (ft^2)
+%S_cs = control_surface.total_area_ft2;      % Total control surface area (ft^2)
+%S_csw = control_surface.wingmounted_area_ft2;      % Area of wing mounted control surfaces (ft^2)
+% S_e  = control_surface.elevator_area_ft2;          % Elevator area (ft^2)
 S_f  = 21.94 *10.7639;     % Fuselage wetted area (ft^2) (21.94m^2)
 S_ht = tailplane.initial.horizontal.s * 10.7639;   % Horizontal tailplane area (ft^2)
-S_n = powerplant.nacelle_wetted_area;    % Nacelle wetted area (ft^2)
-S_vt = tailplane.initial.vertical.s * 10.7639;     % Vertical tailplane area (ft^2)
-S_w = wing_design.wing_area_ft2;                  % Reference wing area (ft^2)
-tc_root = wing_design.tc_ratio;                 % Wing root thickness to chord ratio
-tc_rootv = 0.15;         % Vertical tailplane root thickness to chord ratio
+S_n = powerplant.nacelle_wetted_area_ft_sq;    % Nacelle wetted area (ft^2)
+S_vt = tailplane.initial.vertical.s * 10.7639; % Vertical tailplane area (ft^2)
+S_w = wing.Sref * 10.7639;                     % Reference wing area (ft^2)
+tc_root = 0.12;       % Wing root thickness to chord ratio
+tc_rootv = 0.15;      % Vertical tailplane root thickness to chord ratio
 V_i = 259.6;          % Integral fuel tank volume (gal)
 V_p  = 0;             % Self sealing tank volume (gal)
 W_pr = 456.62         % Volume of pressurized sections (ft^3) (12.93m^3)
