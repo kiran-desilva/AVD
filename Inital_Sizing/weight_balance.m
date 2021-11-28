@@ -112,6 +112,9 @@ weights.W_ec = 5*N_en + 0.8*L_ec;
 % Engine pneumatic starter
 weights.W_es = 49.19*((N_en*W_en/1000)^0.541);
 
+% Engine weight
+weights.W_en = N_en * W_en;
+
 % Fuel system
 weights.W_fs = 2.405*(V_t^0.606)*(N_t^0.5)*((1+V_p/V_t)/(1+V_i/V_t));
 
@@ -149,7 +152,7 @@ weights.W_hg = 3*10^(-4)*W_dg;
 % W_hg = 2.4*A_fc
 
 % Total weight with use of fudge factors
-weights.Total_weight = weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_hg
+weights.Total_weight = weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_en + weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_hg
 
 save('weights','weights')
 
