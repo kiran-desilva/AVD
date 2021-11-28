@@ -112,9 +112,12 @@ wheel_diam_in = uc.main_wheel.diameter_cm/2.54
 wheel_width_in = uc.main_wheel.width_cm/2.54
 %}
 
+uc.main_gear_shock_struts = 1;
 uc.main_wheel.diameter_cm = 26.3*2.54;
+uc.main_wheel.width_cm = 5; % TODO:
 uc.main_wheel.rolling_radius_cm = 10.4*2.54;
 uc.nose_wheel.diameter_cm = 13.25*2.54;
+uc.nose_wheel.width_cm = 5; % TODO:
 uc.nose_wheel.rolling_radius_cm = 5.2*2.54;
 
 % Oleo sizing
@@ -129,8 +132,8 @@ uc.nose_wheel.oleo.stroke_m = calc_oleo_stroke(landing_speed_ms, shock_absorber_
 uc.main_wheel.oleo.static_deflection = 2/3*uc.main_wheel.oleo.stroke_m;
 uc.nose_wheel.oleo.static_deflection = 2/3*uc.nose_wheel.oleo.stroke_m;
 
-uc.main_wheel.oleo.min_overall_length = 2.5*uc.main_wheel.oleo.stroke_m;
-uc.nose_wheel.oleo.min_overall_length = 2.5*uc.nose_wheel.oleo.stroke_m;
+uc.main_wheel.oleo.min_overall_length_m = 2.5*uc.main_wheel.oleo.stroke_m;
+uc.nose_wheel.oleo.min_overall_length_m = 2.5*uc.nose_wheel.oleo.stroke_m;
 
 uc.nose_wheel.oleo.diameter_in = 0.04*sqrt((max_nose_wheel_load_lbs + dynamic_nose_load_lbs));
 uc.main_wheel.oleo.diameter_in = 0.04*sqrt(max_main_wheel_load_lbs);
@@ -138,8 +141,19 @@ uc.main_wheel.oleo.diameter_in = 0.04*sqrt(max_main_wheel_load_lbs);
 uc.main_wheel.oleo
 uc.nose_wheel.oleo
 
-uc.main_gear_length_in = uc.main_wheel.diameter_cm*0.5/2.54 + uc.main_wheel.oleo.min_overall_length*39.37;
-uc.nose_gear_length_in = uc.nose_wheel.diameter_cm*0.5/2.54 + uc.nose_wheel.oleo.min_overall_length*39.37;
+uc.main_gear_length_in = uc.main_wheel.diameter_cm*0.5/2.54 + uc.main_wheel.oleo.min_overall_length_m*39.37;
+uc.nose_gear_length_in = uc.nose_wheel.diameter_cm*0.5/2.54 + uc.nose_wheel.oleo.min_overall_length_m*39.37;
+
+%% Calculate frontal undercarriage area for Isobell
+% Assume a box
+main_wheel_box_width_m = max(uc.main_wheel.width_cm, uc.main_wheel.oleo.diameter_in*2.54)/100;
+nose_wheel_box_width_m = max(uc.nose_wheel.width_cm, uc.nose_wheel.oleo.diameter_in*2.54)/100;
+
+main_wheel_box_area_m_sq = uc.main_gear_length_in*2.54/100*main_wheel_box_width_m;
+nose_wheel_box_area_m_sq = uc.nose_gear_length_in*2.54/100*nose_wheel_box_width_m;
+
+uc.uc_frontal_area_m_sq = nose_wheel_box_area_m_sq + 2*main_wheel_box_area_m_sq;
+uc.ratio_ngear = gear_load_factor;
 
 save('uc', 'uc')
 
