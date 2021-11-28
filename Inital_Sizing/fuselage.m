@@ -9,7 +9,7 @@ d_f = 66
 seat_length = 41;
 leg_room = 40;
 lavatory = 40;
-xtra = 20;
+xtra = 49.2;
 
 cabin_length = seat_length*2 + leg_room + lavatory + xtra
 

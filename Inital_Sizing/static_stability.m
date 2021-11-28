@@ -62,7 +62,7 @@ kH = (1- abs(Zh/wing_b))/(((2*lh)/(wing_b))^(1/3));
 
 deda = 4.44 * ((ka * klamb * kH * sqrt(phi_25_w))^1.19)*(Cl_alpha_m/Cl_alpha_m0);
 
-syms xcg_xac_bar
+syms xcg_xac_bar 
 %tailplane stability analysis
 static_stab_constraint_sh_sw(xcg_xac_bar) = (wing_Cl_alpha * xcg_xac_bar)/(tail_h_Cl_alpha*eta_h*(1-deda)*((lh/Cmac)-xcg_xac_bar));
 control_stab_constraint_sh_sw(xcg_xac_bar) = 
