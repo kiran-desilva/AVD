@@ -112,6 +112,7 @@ wheel_diam_in = uc.main_wheel.diameter_cm/2.54
 wheel_width_in = uc.main_wheel.width_cm/2.54
 %}
 
+uc.main_gear_shock_struts = 1;
 uc.main_wheel.diameter_cm = 26.3*2.54;
 uc.main_wheel.width_cm = 5; % TODO:
 uc.main_wheel.rolling_radius_cm = 10.4*2.54;
