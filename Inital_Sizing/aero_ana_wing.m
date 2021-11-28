@@ -28,10 +28,11 @@ aero_analysis.wing.t_c=0.12;
 aero_analysis.wing.te_angle=wing.sweepTE; %degrees
 
 %% Mach number definition, wing
-aero_analysis.wing.stall_landing=sqrt(2*sizing.W0/(1.225*wing.Sref*2.3));
-aero_analysis.wing.v_landing_ms=1.3*aero_analysis.wing.stall_landing; %units:m/s
+%aero_analysis.wing.stall_landing=sqrt(2*(sizing.W0-sizing.Wf)/(1.225*wing.Sref*2.3));
+%NOTE: need to change the weights used for the stall speed!!!!
+aero_analysis.wing.v_landing_ms=1.3*sqrt(2*(sizing.W0-sizing.Wf)/(1.225*wing.Sref*2.3)); %units:m/s, safety margin of 1.3
 aero_analysis.wing.v_landing_fts=3.2808*aero_analysis.wing.v_landing_ms; %units: ft/s
-aero_analysis.wing.v_takeoff_ms=1.2*aero_analysis.wing.stall_landing; %units:m/s
+aero_analysis.wing.v_takeoff_ms=1.2*sqrt(2*(sizing.W0)/(1.225*wing.Sref*2.3)); %units:m/s, safety margin of 1.2
 aero_analysis.wing.v_takeoff_fts=3.2808*aero_analysis.wing.v_takeoff_ms; %units: ft/s 
 
 aero_analysis.wing.dyn_visc=[0.0000143226,0.0000143226,0.0000181206,0.0000181206];
