@@ -217,3 +217,6 @@ for j=1:length(U)
     aero_analysis.induced_drag.wing.cd_0_V2(j)=cl^2/(pi*wing_A*aero_analysis.induced_drag.wing.e_V2(j));
 end
 save('aero_analysis.mat', 'aero_analysis')
+
+%% Total Drag
+

@@ -28,7 +28,7 @@ aero_analysis.wing.t_c=0.12;
 aero_analysis.wing.te_angle=wing.sweepTE; %degrees
 
 %% Mach number definition, wing
-aero_analysis.wing.stall_landing=sqrt(2*sizing.W0/(1.225*12.3283*2.3));
+aero_analysis.wing.stall_landing=sqrt(2*sizing.W0/(1.225*wing.Sref*2.3));
 aero_analysis.wing.v_landing_ms=1.3*aero_analysis.wing.stall_landing; %units:m/s
 aero_analysis.wing.v_landing_fts=3.2808*aero_analysis.wing.v_landing_ms; %units: ft/s
 aero_analysis.wing.v_takeoff_ms=1.2*aero_analysis.wing.stall_landing; %units:m/s
@@ -80,7 +80,7 @@ aero_analysis.wing.supersonic_Mach=1/cos(sweep_LE);
 %% HLD
 % inputs from other scripts
 aero_analysis.wing.HLD.c_fraction=1.2415;
-aero_analysis.wing.HLD.s_ref=11.4246;
+aero_analysis.wing.HLD.s_ref=wing.Sref;
 aero_analysis.wing.HLD.s_flapped=6.6422;
 aero_analysis.wing.HLD.delta_hl=wing.sweepTE; %hinge lift surface
 
