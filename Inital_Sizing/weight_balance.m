@@ -7,10 +7,10 @@ load('sizing.mat')
 load('fuse.mat')
 load('locations.mat')
 
-AR = sizing.AR;                                 % Wing aspect ratio
-AR_h = tailplane.horizontal.Ar;                 % Horizontal tailplane aspect ratio
-AR_v = tailplane.vertical.Ar;                   % Vertical tailplane aspect ratio
-B_h = tailplane.horizontal.b;                   % Horizontal tailplane span (ft)
+AR = sizing.AR;                         % Wing aspect ratio
+AR_h = tailplane.horizontal.Ar;         % Horizontal tailplane aspect ratio
+AR_v = tailplane.vertical.Ar;           % Vertical tailplane aspect ratio
+B_h = tailplane.horizontal.b;           % Horizontal tailplane span (ft)
 B_w = wing.b * 3.28084;                 % Wing span (ft)
 F_w = 0;                  % Fuselage width at horizontal tail intersection (ft)
 K_buf = 1.02;             % 1.02 for short ranges; 5.68 for very long ranges
@@ -39,7 +39,7 @@ N_gen = 2;                % Number of generators; typically = Nen
 N_l = N_gear * 1.5;       % Ultimate landing gear load factor. 1.5 × Ngear
 N_Lt = powerplant.nacelle_length_ft;   % Nacelle length (ft)
 N_m = 2;                  % Number of mechanical function performed by controls; typically 0 − 2 (HLDs, stability controls)
-%N_mss = uc.main_gear_shock_struts;     % Number of main gear shock struts
+N_mss = uc.main_gear_shock_struts;     % Number of main gear shock struts
 N_mw = 2;                 % Number of main wheels
 N_nw = 2;                 % Number of nose wheels
 N_p = 6;                  % Total number of persons onboard (crew + passengers)
@@ -68,11 +68,11 @@ W_c = 0;                 % Maximum cargo weight (lb) [NO CARGO WEIGHT NEEDED]
 W_dg = 3100;             % Design gross weight (lb)
 W_en = powerplant.engine_weight_lb;      % Engine weight (lb)
 W_enc = 2.231*(W_en^0.901);              % Weight of engine and contents (lb); ≈ 2.331KpKtrW0.901en - Kp is 1.4 for engine with propeller or 1.0 otherwise, Ktr is 1.18 for jet with thrust reversers or 1.0 otherwise
-W_l = uc.landing_design_gross_weight_lb;      % Landing design gross weight (lb)
+W_l = 3100*0.8;         % Landing design gross weight (lb)
 W_seat = 40;            % Weight of single seat (lb); ≈ 60 for flight deck seats, 32 for passenger seats, and 11 for troop seats
 W_uav = 191.61;         % Uninstalled avionics weight; typically 800 − 1400 (lb)
-lambda = wing_design.taper_ratio;                             % Wing taper ratio
-cap_lambda = wing_design.wing_quarter_chord_sweep;            % Wing quarter chord sweep
+lambda = wing.lambda;                % Wing taper ratio
+cap_lambda = wing.sweep_25;          % Wing quarter chord sweep
 cap_lambda_ht = tailplane.horizontal.sweep_25;        % Horizontal tailplane quarter chord sweep
 cap_lambda_vt = tailplane.vertical.sweep_25;          % Vertical tailplane quarter chord sweep
 
@@ -150,9 +150,9 @@ Total_weight = W_w*0.78 + (W_ht + W_vt)*0.75 + W_fus*0.85 + (W_mlg + W_nlg)*0.88
 I_y = W*K_y^2/9.81 %not sure what W is here
 
 % x & z cg coords
-cg_w = [x z]; % wing cg
+cg_w = [cg.x_wing -33]; % wing cg
 cg_t = [x z]; % tail cg
-cg_fus = [0.47*fuse.total_fuselage_length/12 0]; % fuselage cg
+cg_fus = [cg.x_fuse 0]; % fuselage cg
 cg_mlg = []; % main landing gear cg
 cg_nlg = [40 -53]; % '' '' etc
 cg_inl = [398 16.5];

@@ -17,9 +17,7 @@ cg.x_wing = xcg_metres * 3.28084 %in feet
 
 
 %fuselage xcg
-cg.x_fuse = (0.47 * fuse.total_fuselage_length)/12
-
-
+cg.x_fuse = 0.47 * fuse.total_fuselage_length
 
 
 
