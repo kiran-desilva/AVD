@@ -14,7 +14,7 @@ spar_distance = chord_35*0.75-chord_35*0.1 %spars at 10% and 75% chord
 x_chord = 0.7*spar_distance + 0.1*chord_35
 
 wing_xcg_metres = x_wing + x_sweep + x_chord
-cg.x_wing = xcg_metres * 3.28084 %in feet
+cg.x_wing = wing_xcg_metres * 3.28084 %in feet
 
 
 %fuselage xcg

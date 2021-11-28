@@ -7,6 +7,7 @@ load('sizing.mat')
 load('fuse.mat')
 load('locations.mat')
 load('control_surface.mat')
+load('cg.mat')
 
 AR = sizing.AR;                         % Wing aspect ratio
 AR_h = tailplane.horizontal.Ar;         % Horizontal tailplane aspect ratio
@@ -41,7 +42,7 @@ N_gen = 2;                % Number of generators; typically = Nen
 N_l = N_gear * 1.5;       % Ultimate landing gear load factor. 1.5 × Ngear
 N_Lt = powerplant.nacelle_length_ft;   % Nacelle length (ft)
 N_m = 2;                  % Number of mechanical function performed by controls; typically 0 − 2 (HLDs, stability controls)
-%N_mss = uc.main_gear_shock_struts;     % Number of main gear shock struts
+N_mss = uc.main_gear_shock_struts * 2;     % Number of main gear shock struts
 N_mw = 2;                 % Number of main wheels
 N_nw = 2;                 % Number of nose wheels
 N_p = 6;                  % Total number of persons onboard (crew + passengers)
@@ -97,7 +98,7 @@ weights.W_vt = 0.0026*(((1+H_t_H_v)^0.225)*(W_dg^0.556)*(N_z^0.536)*(S_vt^0.5)*(
 weights.W_fus = 0.328*K_door*K_Lg*((W_dg*N_z)^0.5)*(L^0.25)*(S_f^0.302)*((1+K_ws)^0.04)*(L_over_D^0.1);
 
 % Main landing gear 
-% weights.W_mlg = 0.0106*K_mp*(W_l^0.888)*(N_l^0.25)*(L_m^0.4)*(N_mw^0.321)*(V_s^0.1)/(N_mss^0.5);
+weights.W_mlg = 0.0106*K_mp*(W_l^0.888)*(N_l^0.25)*(L_m^0.4)*(N_mw^0.321)*(V_s^0.1)/(N_mss^0.5);
 
 % Nose landing gear
 weights.W_nlg = 0.032*K_np*(W_l^0.646)*(N_l^0.2)*(L_n^0.5)*(N_nw^0.45);
@@ -148,7 +149,9 @@ weights.W_hg = 3*10^(-4)*W_dg;
 % W_hg = 2.4*A_fc
 
 % Total weight with use of fudge factors
-weights.Total_weight = W_w*0.78 + (W_ht + W_vt)*0.75 + W_fus*0.85 + (W_mlg + W_nlg)*0.88 + W_inl*0.85 + W_ec + W_es + W_fs + W_fc + W_APUinst + W_instr + W_hydr + W_el + W_av + W_furn + W_ac + W_ai + W_hg
+weights.Total_weight = weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_hg
+
+save('weights','weights')
 
 % I_y = W*K_y^2/9.81 %not sure what W is here
 
@@ -177,4 +180,4 @@ wandb.x_cg = (W_w*cg_w(1)+(W_ht+W_vt)*cg_t(1)+W_fus*cg_fus(1)+W_mlg*cg_mlg(1)+W_
 wandb.z_cg = (W_w*cg_w(2)+(W_ht+W_vt)*cg_t(2)+W_fus*cg_fus(2)+W_mlg*cg_mlg(2)+W_nlg*cg_nlg(2)+W_inl*cg_inl(2)+W_ec*cg_es(2)+W_es*cg_es(2)+W_fs*cg_fs(2)+W_fc*cg_fc(2)+W_w*cg_w(2)+W_instr*cg_instr(2)+W_hydr*cg_hydr(2)+W_el*cg_el(2)+W_av*cg_av(2)+W_furn*cg_furn(2)+W_ac*cg_ac(2)+W_ai*cg_ai(2)+W_hg*cg_hg(2))/Total_weight
 
 save('wandb','wandb')
-save('weights','weights')
+
