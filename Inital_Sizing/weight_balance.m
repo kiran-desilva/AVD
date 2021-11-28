@@ -11,7 +11,6 @@ AR_v = tailplane.vertical.Ar;                   % Vertical tailplane aspect rati
 B_h = tailplane.horizontal.b;                   % Horizontal tailplane span (ft)
 B_w = wing_design.wing_span_ft;                 % Wing span (ft)
 F_w = 0;                  % Fuselage width at horizontal tail intersection (ft)
-
 K_buf = 1.02;             % 1.02 for short ranges; 5.68 for very long ranges
 K_door = 1;               % 1.0 if no cargo door; 1.06 for one side cargo door; 1.12 for two sidecargo doors; 1.12 for aft clamshell door; 1.25 for two side and anaft clamshell cargo doors
 K_lav = 3.9;              % 1.11 for long range aircraft; 0.31 for short range aircraft; 3.9 for business jets.
@@ -59,10 +58,10 @@ tc_root = wing_design.tc_ratio;                 % Wing root thickness to chord r
 tc_rootv = 0.15;         % Vertical tailplane root thickness to chord ratio
 V_i = 259.6;          % Integral fuel tank volume (gal)
 V_p  = 0;             % Self sealing tank volume (gal)
-% W_pr =              % Volume of pressurized sections (ft^3)
-V_s = 188.6136;       % Landing stall speed (ft/s) from Isobel
+W_pr = 456.62         % Volume of pressurized sections (ft^3) (12.93m^3)
+V_s = 188.6136;       % Landing stall speed (ft/s) (from Isobel)
 V_t = 259.6;             % Total volume of fuel tanks (gal)
-W_APU = 0;               % Uninstalled APU weight (lb)
+W_APU = 75;              % Uninstalled APU weight (lb)
 W_c = 0;                 % Maximum cargo weight (lb) [NO CARGO WEIGHT NEEDED]
 W_dg = 3100;             % Design gross weight (lb)
 W_en = powerplant.engine_weight_lb;      % Engine weight (lb)
@@ -78,7 +77,7 @@ cap_lambda_vt = tailplane.vertical.sweep_25;          % Vertical tailplane quart
 K_ws = 0.75*((1+2*lambda)/(1+lambda)) * B_w * tan(cap_lambda/L);    % 0.75[(1 + 2λ)/(1 + λ)]Bw tan Λ/L
 K_y = 0.3*L_ht;          % Aircraft pitching radius of gyration; ≈ 0.3Lht (ft)
 K_z = L_vt;              % Aircraft yaw radius of gyration; ≈ Lvt (ft)
-%I_y =                   % Pitching moment of inertia; ≈ W_o*Ky^2 (lb ft^2)
+I_y = (sizing.W0/9.81)*2.20462*K_y^2   % Pitching moment of inertia; ≈ W_o*Ky^2 (lb ft^2)
 
 % Aircraft wings
 W_w = 0.0051*((((W_dg*N_z)^0.557)*(S_w^0.649)*(AR^0.5)*((1+lambda)^0.1)*(S_csw^0.1)) / ((cos(cap_lambda))*(tc_root^0.4)));
@@ -113,8 +112,8 @@ W_fs = 2.405*(V_t^0.606)*(N_t^0.5)*((1+V_p/V_t)/(1+V_i/V_t));
 % Flight controls
 W_fc = 145.9*(N_f^0.554)*(S_cs^0.2)*((I_y*10^(-6))^0.07);
 
-% Installed APU - NOT APPLICABLE
-%W_APUinst = 2.2*W_APU;
+% Installed APU 
+W_APUinst = 2.2*W_APU;
 
 % Instruments
 W_instr = 4.509*K_r*K_tp*(N_c^0.541)*N_en*((L_f+B_w)^0.5);
@@ -151,7 +150,7 @@ I_y = W*K_y^2/9.81 %not sure what W is here
 % x & z cg coords
 cg_w = [x z]; % wing cg
 cg_t = [x z]; % tail cg
-cg_fus = []; % fuselage cg
+cg_fus = [0.47*fuse.total_fuselage_length/12 0]; % fuselage cg
 cg_mlg = []; % main landing gear cg
 cg_nlg = [40 -53]; % '' '' etc
 cg_inl = [398 16.5];
@@ -163,7 +162,7 @@ cg_instr = [];
 cg_hydr= [];
 cg_el = [];
 cg_av = [20 0];
-cg_furn = [];
+cg_furn = [ 0];
 cg_ac = [];
 cg_ai = [];
 cg_hg = [];
