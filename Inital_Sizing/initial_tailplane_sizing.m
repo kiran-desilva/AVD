@@ -8,7 +8,7 @@ load('wing.mat');
 
 
 
-fuselage_length = 12.7;
+fuselage_length = 11.83;
 cmac = wing.Cmac;
 sref = design.sref;
 b = sqrt(sizing.AR * sref);

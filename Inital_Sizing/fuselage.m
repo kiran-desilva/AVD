@@ -25,10 +25,12 @@ nose_length = nose_cone + flightdeck_length
 % theta_afterbody = atand(d_f/afterbody_length)
 
 %afterbody length
-L_D_a = 3
+L_D_a = 2.5
 afterbody_length = L_D_a * d_f
 bottom_theta_afterbody = 11
-upper_theta_afterbody = atand((d_f-(tand(bottom_theta_afterbody)*afterbody_length))/afterbody_length)
+% upper_theta_afterbody = atand((d_f-(tand(bottom_theta_afterbody)*afterbody_length))/afterbody_length)
+upper_theta_afterbody = 4;
+
 
 %total fuselage length
 fuse.total_fuselage_length = afterbody_length+cabin_length+nose_length
