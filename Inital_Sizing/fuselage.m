@@ -34,15 +34,8 @@ upper_theta_afterbody = 4;
 
 %total fuselage length
 fuse.total_fuselage_length = afterbody_length+cabin_length+nose_length
-L_D_f = fuse.total_fuselage_length/d_f
+fuse.L_D_f = fuse.total_fuselage_length/d_f
 
-% %volume of pressurised sections
-% cone_vol = 
-% nose_vol = ... -cone_vol
-% cabin_vol = pi * (d_f/2)^2 * cabin_length
-% aft_vol =
-% 
-% vol_press = nose_vol + cabin_vol + aft_vol
 
 %structural length
 aft_bulkhead = 100
