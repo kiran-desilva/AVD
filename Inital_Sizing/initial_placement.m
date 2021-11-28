@@ -6,7 +6,7 @@ load('tailplane.mat')
 
 %% x is defined at zero at nose 
 
-total_length = convlength(432.8,'in','m');
+total_length = convlength(462,'in','m');
 
 %assume vertical tail plane front spar is 0.1bv from tip
 
