@@ -4,6 +4,7 @@ clear
 load("wing.mat")
 load("locations.mat")
 load("fuse.mat")
+load("tailplane.mat")
 
 %wing xcg
 x_wing = locations.x_wing
@@ -17,7 +18,11 @@ cg.x_wing = xcg_metres * 3.28084 %in feet
 
 
 %fuselage xcg
-cg.x_fuse = 0.47 * fuse.total_fuselage_length
+cg.x_fuse = (0.47 * fuse.total_fuselage_length)/12
+
+%tail 
+offset_55_c = 0.55*tailplane.vertical.b*tand(tailplane.vertical.sweepLE);
+cg.x_tail = locations.x_vertical_stabilizer+offset_55_c+((tailplane.vertical.Croot - ((tailplane.vertical.Croot-tailplane.vertical.Ctip)*0.55))*.42)
 
 
 

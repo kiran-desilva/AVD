@@ -6,6 +6,7 @@ load('tailplane.mat')
 load('sizing.mat')
 load('fuse.mat')
 load('locations.mat')
+load('control_surface.mat')
 
 AR = sizing.AR;                         % Wing aspect ratio
 AR_h = tailplane.horizontal.Ar;         % Horizontal tailplane aspect ratio
@@ -13,6 +14,7 @@ AR_v = tailplane.vertical.Ar;           % Vertical tailplane aspect ratio
 B_h = tailplane.horizontal.b;           % Horizontal tailplane span (ft)
 B_w = wing.b * 3.28084;                 % Wing span (ft)
 F_w = 0;                  % Fuselage width at horizontal tail intersection (ft)
+H_t_H_v = 1               % Location of horizontal tailplane on vertical tail. 0.0 for fuselage mounted horizontal tail; 1.0 for T-tail
 K_buf = 1.02;             % 1.02 for short ranges; 5.68 for very long ranges
 K_door = 1;               % 1.0 if no cargo door; 1.06 for one side cargo door; 1.12 for two sidecargo doors; 1.12 for aft clamshell door; 1.25 for two side and anaft clamshell cargo doors
 K_lav = 3.9;              % 1.11 for long range aircraft; 0.31 for short range aircraft; 3.9 for business jets.
@@ -39,7 +41,7 @@ N_gen = 2;                % Number of generators; typically = Nen
 N_l = N_gear * 1.5;       % Ultimate landing gear load factor. 1.5 × Ngear
 N_Lt = powerplant.nacelle_length_ft;   % Nacelle length (ft)
 N_m = 2;                  % Number of mechanical function performed by controls; typically 0 − 2 (HLDs, stability controls)
-N_mss = uc.main_gear_shock_struts;     % Number of main gear shock struts
+%N_mss = uc.main_gear_shock_struts;     % Number of main gear shock struts
 N_mw = 2;                 % Number of main wheels
 N_nw = 2;                 % Number of nose wheels
 N_p = 6;                  % Total number of persons onboard (crew + passengers)
@@ -48,9 +50,9 @@ N_t = 2;                  % Total number of fuel tanks
 N_w = powerplant.nacelle_width_ft;    % Nacelle width (ft)
 N_z = 2.75*1.5;          % Ultimate load factor; 1.5× limit load factor (2.7-3)
 R_kva = 40               % System electrical rating; typically 40 − 60 for transports (kVA)
-%S_cs = control_surface.total_area_ft2;      % Total control surface area (ft^2)
-%S_csw = control_surface.wingmounted_area_ft2;      % Area of wing mounted control surfaces (ft^2)
-% S_e  = control_surface.elevator_area_ft2;          % Elevator area (ft^2)
+S_cs = control_surface.total_area_ft2;      % Total control surface area (ft^2)
+S_csw = control_surface.wingmounted_area_ft2;      % Area of wing mounted control surfaces (ft^2)
+S_e  = control_surface.elevator_area_ft2;          % Elevator area (ft^2)
 S_f  = 21.94 *10.7639;     % Fuselage wetted area (ft^2) (21.94m^2)
 S_ht = tailplane.initial.horizontal.s * 10.7639;   % Horizontal tailplane area (ft^2)
 S_n = powerplant.nacelle_wetted_area_ft_sq;    % Nacelle wetted area (ft^2)
@@ -60,7 +62,7 @@ tc_root = 0.12;       % Wing root thickness to chord ratio
 tc_rootv = 0.15;      % Vertical tailplane root thickness to chord ratio
 V_i = 259.6;          % Integral fuel tank volume (gal)
 V_p  = 0;             % Self sealing tank volume (gal)
-W_pr = 456.62         % Volume of pressurized sections (ft^3) (12.93m^3)
+V_pr = 456.62         % Volume of pressurized sections (ft^3) (12.93m^3)
 V_s = 188.6136;       % Landing stall speed (ft/s) (from Isobel)
 V_t = 259.6;             % Total volume of fuel tanks (gal)
 W_APU = 75;              % Uninstalled APU weight (lb)
@@ -80,78 +82,79 @@ K_ws = 0.75*((1+2*lambda)/(1+lambda)) * B_w * tan(cap_lambda/L);    % 0.75[(1 + 
 K_y = 0.3*L_ht;          % Aircraft pitching radius of gyration; ≈ 0.3Lht (ft)
 K_z = L_vt;              % Aircraft yaw radius of gyration; ≈ Lvt (ft)
 I_y = (sizing.W0/9.81)*2.20462*K_y^2   % Pitching moment of inertia; ≈ W_o*Ky^2 (lb ft^2)
+L_over_D = fuse.L_D_f
 
 % Aircraft wings
-W_w = 0.0051*((((W_dg*N_z)^0.557)*(S_w^0.649)*(AR^0.5)*((1+lambda)^0.1)*(S_csw^0.1)) / ((cos(cap_lambda))*(tc_root^0.4)));
+weights.W_w = 0.0051*((((W_dg*N_z)^0.557)*(S_w^0.649)*(AR^0.5)*((1+lambda)^0.1)*(S_csw^0.1)) / ((cos(cap_lambda))*(tc_root^0.4)));
 
 % Horizontal tailplane
-W_ht = 0.0379*(K_uht*(W_dg^0.639)*(N_z^0.1)*(S_ht^0.75)*(K_y^0.704)*(AR_h^0.166)*((1+S_e/S_ht)^0.1)) / (((1+F_w/B_h)^0.25)*L_ht*cos(cap_lambda_ht));
+weights.W_ht = 0.0379*(K_uht*(W_dg^0.639)*(N_z^0.1)*(S_ht^0.75)*(K_y^0.704)*(AR_h^0.166)*((1+S_e/S_ht)^0.1)) / (((1+F_w/B_h)^0.25)*L_ht*cos(cap_lambda_ht));
 
 % Vertical tailplane
-W_vt = 0.0026*(((1+H_t/H_v)^0.225)*(W_dg^0.556)*(N_z^0.536)*(S_vt^0.5)*(K_z^0.875)*(AR_v^0.35)) / ((L_vt^0.5)*cos(cap_lambda_vt)*(tc_root_v^0.5));
+weights.W_vt = 0.0026*(((1+H_t_H_v)^0.225)*(W_dg^0.556)*(N_z^0.536)*(S_vt^0.5)*(K_z^0.875)*(AR_v^0.35)) / ((L_vt^0.5)*cos(cap_lambda_vt)*(tc_rootv^0.5));
 
 % Fuselage
-W_fus = 0.328*K_door*K_Lg*((W_dg*N_z)^0.5)*(L^0.25)*(S_f^0.302)*((1+K_ws)^0.04)*(L_over_D^0.1);
+weights.W_fus = 0.328*K_door*K_Lg*((W_dg*N_z)^0.5)*(L^0.25)*(S_f^0.302)*((1+K_ws)^0.04)*(L_over_D^0.1);
 
 % Main landing gear 
-W_mlg = 0.0106*K_mp*(W_l^0.888)*(N_l^0.25)*(L_m^0.4)*(N_mw^0.321)*(V_s^0.1)/(N_mss^0.5);
+% weights.W_mlg = 0.0106*K_mp*(W_l^0.888)*(N_l^0.25)*(L_m^0.4)*(N_mw^0.321)*(V_s^0.1)/(N_mss^0.5);
 
 % Nose landing gear
-W_nlg = 0.032*K_np*(W_l^0.646)*(N_l^0.2)*(L_n^0.5)*(N_nw^0.45);
+weights.W_nlg = 0.032*K_np*(W_l^0.646)*(N_l^0.2)*(L_n^0.5)*(N_nw^0.45);
 
 % Nacelle
-W_inl = 0.6724*K_ng*(N_Lt^0.1)*(N_w^0.294)*(N_z^0.119)*(W_enc^0.611)*(N_en^0.984)*(S_n^0.224);
+weights.W_inl = 0.6724*K_ng*(N_Lt^0.1)*(N_w^0.294)*(N_z^0.119)*(W_enc^0.611)*(N_en^0.984)*(S_n^0.224);
 
 % Engine controls
-W_ec = 5*N_en + 0.8*L_ec;
+weights.W_ec = 5*N_en + 0.8*L_ec;
 
 % Engine pneumatic starter
-W_es = 49.19*((N_en*W_en/1000)^0.541);
+weights.W_es = 49.19*((N_en*W_en/1000)^0.541);
 
 % Fuel system
-W_fs = 2.405*(V_t^0.606)*(N_t^0.5)*((1+V_p/V_t)/(1+V_i/V_t));
+weights.W_fs = 2.405*(V_t^0.606)*(N_t^0.5)*((1+V_p/V_t)/(1+V_i/V_t));
 
 % Flight controls
-W_fc = 145.9*(N_f^0.554)*(S_cs^0.2)*((I_y*10^(-6))^0.07);
+weights.W_fc = 145.9*(N_f^0.554)*(S_cs^0.2)*((I_y*10^(-6))^0.07);
 
 % Installed APU 
-W_APUinst = 2.2*W_APU;
+weights.W_APUinst = 2.2*W_APU;
 
 % Instruments
-W_instr = 4.509*K_r*K_tp*(N_c^0.541)*N_en*((L_f+B_w)^0.5);
+weights.W_instr = 4.509*K_r*K_tp*(N_c^0.541)*N_en*((L_f+B_w)^0.5);
 
 % Hydraulic system
-W_hydr = 0.2673*N_f*((L_f+B_w)^0.937);
+weights.W_hydr = 0.2673*N_f*((L_f+B_w)^0.937);
 
 % Electrical system
-W_el = 7.291*(R_kva^0.782)*(L_a^0.346)*(N_gen^0.1);
+weights.W_el = 7.291*(R_kva^0.782)*(L_a^0.346)*(N_gen^0.1);
 
 % Avionics
-W_av = 1.73*(W_uav^0.983);
+weights.W_av = 1.73*(W_uav^0.983);
 
 % Furnishings
-W_furn = 0.0577*(N_c^0.1)*(W_c^0.393)*(S_f^0.75) + N_seat*W_seat + K_lav*(N_p^1.33) + K_buf*(N_p^1.12);
+weights.W_furn = 0.0577*(N_c^0.1)*(W_c^0.393)*(S_f^0.75) + N_seat*W_seat + K_lav*(N_p^1.33) + K_buf*(N_p^1.12);
 
 % Air-conditioning
-W_ac = 62.36*(N_p^0.25)*((V_pr*10^(-3))^0.604)*(W_uav^0.1);
+weights.W_ac = 62.36*(N_p^0.25)*((V_pr*10^(-3))^0.604)*(W_uav^0.1);
 
 % Anti-icing
-W_ai = 0.002*W_dg;
+weights.W_ai = 0.002*W_dg;
 
 % Handling gear (civilian)
-W_hg = 3*10^(-4)*W_dg;
+weights.W_hg = 3*10^(-4)*W_dg;
 
 % Handling gear military transport - NOT APPLICABLE
 % W_hg = 2.4*A_fc
 
 % Total weight with use of fudge factors
-Total_weight = W_w*0.78 + (W_ht + W_vt)*0.75 + W_fus*0.85 + (W_mlg + W_nlg)*0.88 + W_inl*0.85 + W_ec + W_es + W_fs + W_fc + W_APUinst + W_instr + W_hydr + W_el + W_av + W_furn + W_ac + W_ai + W_hg
+weights.Total_weight = W_w*0.78 + (W_ht + W_vt)*0.75 + W_fus*0.85 + (W_mlg + W_nlg)*0.88 + W_inl*0.85 + W_ec + W_es + W_fs + W_fc + W_APUinst + W_instr + W_hydr + W_el + W_av + W_furn + W_ac + W_ai + W_hg
 
-I_y = W*K_y^2/9.81 %not sure what W is here
+% I_y = W*K_y^2/9.81 %not sure what W is here
 
 % x & z cg coords
 cg_w = [cg.x_wing -33]; % wing cg
-cg_t = [x z]; % tail cg
+cg_t = [cg.x_tail z]; % tail cg
 cg_fus = [cg.x_fuse 0]; % fuselage cg
 cg_mlg = []; % main landing gear cg
 cg_nlg = [40 -53]; % '' '' etc
@@ -174,3 +177,4 @@ wandb.x_cg = (W_w*cg_w(1)+(W_ht+W_vt)*cg_t(1)+W_fus*cg_fus(1)+W_mlg*cg_mlg(1)+W_
 wandb.z_cg = (W_w*cg_w(2)+(W_ht+W_vt)*cg_t(2)+W_fus*cg_fus(2)+W_mlg*cg_mlg(2)+W_nlg*cg_nlg(2)+W_inl*cg_inl(2)+W_ec*cg_es(2)+W_es*cg_es(2)+W_fs*cg_fs(2)+W_fc*cg_fc(2)+W_w*cg_w(2)+W_instr*cg_instr(2)+W_hydr*cg_hydr(2)+W_el*cg_el(2)+W_av*cg_av(2)+W_furn*cg_furn(2)+W_ac*cg_ac(2)+W_ai*cg_ai(2)+W_hg*cg_hg(2))/Total_weight
 
 save('wandb','wandb')
+save('weights','weights')
