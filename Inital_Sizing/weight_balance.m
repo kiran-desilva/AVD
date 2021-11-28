@@ -8,6 +8,7 @@ load('fuse.mat')
 load('locations.mat')
 load('control_surface.mat')
 load('cg.mat')
+load('aero_analysis.mat')
 
 AR = sizing.AR;                         % Wing aspect ratio
 AR_h = tailplane.horizontal.Ar;         % Horizontal tailplane aspect ratio
@@ -64,7 +65,7 @@ tc_rootv = 0.15;      % Vertical tailplane root thickness to chord ratio
 V_i = 259.6;          % Integral fuel tank volume (gal)
 V_p  = 0;             % Self sealing tank volume (gal)
 V_pr = 509.484697     % Volume of pressurized sections (ft^3) (12.93m^3)
-V_s = 188.6136;       % Landing stall speed (ft/s) (from Isobel)
+V_s = aero_analysis.wing.v_landing_fts;       % Landing stall speed (ft/s) (from Isobel)
 V_t = 259.6;          % Total volume of fuel tanks (gal)
 W_APU = 75;           % Uninstalled APU weight (lb)
 W_c = 0;              % Maximum cargo weight (lb) [NO CARGO WEIGHT NEEDED]
