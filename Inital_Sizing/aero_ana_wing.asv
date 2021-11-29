@@ -15,13 +15,13 @@ load('fuse.mat')
 %% Wing Lift Estimation
 
 %% Inputs from other scripts
-d=(fuse.structural_length/fuse.L_D_f)/3.281; %diameter of the fuselage [m] from Camille 26/11
+d=fuse.total_fuselage_length*fuse.L_D_f/3.281; %diameter of the fuselage [m] from Camille 26/11
 AR=wing.Ar;
-S_exp=1;
+S_exp=5;
 S_ref=design.sref; %[m^2]
 %h=0.3; %winglet height (m)
 b=wing.b; %wing span (m)
-max_sweep_t=16.024*pi/180; %sweep of wing at the chord location where the airfoil is thickest
+max_sweep_t=20*pi/180; %sweep of wing at the chord location where the airfoil is thickest
 sweep_LE=wing.sweepLE*pi/180;
 cl_max_airfoil=1.6; %maximum lift of airfoil
 lambda_quarter=wing.sweepTE*pi/180; %quarter-chord sweep
@@ -60,7 +60,7 @@ aero_analysis.wing.beta=sqrt(1-aero_analysis.wing.Mach.^2); %compressibility eff
 aero_analysis.wing.cl_alpha_ratio=[0.95,0.945,0.945,0.945]; %read off graph - DATCOM 1978
 aero_analysis.wing.cl_alpha_theory=2*pi+4.7*aero_analysis.wing.t_c*(1+0.00375*0.6); %0.6 deg
 aero_analysis.wing.Cl_alpha_aerofoil=(1.05./aero_analysis.wing.beta).*aero_analysis.wing.cl_alpha_ratio*aero_analysis.wing.cl_alpha_theory; %cl of the airfoil as a function of the mach number. Varies so inputs must be changed manually based on readings off graph
-aero_analysis.wing.eta=(aero_analysis.wing.beta).*(aero_analysis.wing.Cl_alpha_aerofoil)./(2*pi); %fraction between both
+%aero_analysis.wing.eta=(aero_analysis.wing.beta).*(aero_analysis.wing.Cl_alpha_aerofoil)./(2*pi); %fraction between both
 %aero_analysis.wing.eta=[1,1,1,1];
 aero_analysis.wing.F=1.07*(1+d/b)^2;
 
