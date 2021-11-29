@@ -4,7 +4,7 @@ clc
 syms sweep_5 Cl_design Mdd Cl_cruise t_c sweep_25 t_c_eff
 
 
-design_cl = 0.33759
+design_cl = 0.3632
 
 % design_cl = 0;
 

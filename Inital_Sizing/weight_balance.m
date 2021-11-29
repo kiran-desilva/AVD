@@ -1,4 +1,6 @@
+clc
 clear
+
 load('uc.mat')
 load('wing.mat')
 load('powerplant.mat')
@@ -114,7 +116,7 @@ weights.W_ec = 5*N_en + 0.8*L_ec;
 weights.W_es = 49.19*((N_en*W_en/1000)^0.541);
 
 % Engine weight
-weights.W_en = N_en * W_en;
+weights.W_en = N_en * W_enc;
 
 % Fuel system
 weights.W_fs = 2.405*(V_t^0.606)*(N_t^0.5)*((1+V_p/V_t)/(1+V_i/V_t));
@@ -161,7 +163,8 @@ save('weights','weights')
 
 % x & z cg coords
 cg_w = [cg.x_wing -33]; % wing cg
-cg_t = [cg.x_tail z]; % tail cg
+cg_ht = [cg.x_htail z]; % htail cg
+cg_vt = [cg.x_vtail ]
 cg_fus = [cg.x_fuse 0]; % fuselage cg
 cg_mlg = []; % main landing gear cg
 cg_nlg = [40 -53]; % '' '' etc
