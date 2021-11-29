@@ -46,6 +46,16 @@ tailplane.initial.vertical.sweepLE = 35;
 tailplane.initial.horizontal.sweep_25 = sweep_angle(tailplane.initial.horizontal.sweepLE,25,0,tailplane.initial.horizontal.Ar,tailplane.initial.horizontal.lambda)
 tailplane.initial.vertical.sweep_25 = sweep_angle(tailplane.initial.vertical.sweepLE,25,0,tailplane.initial.vertical.Ar,tailplane.initial.vertical.lambda)
 
+tailplane.initial.horizontal.sweepTE = sweep_angle(tailplane.initial.horizontal.sweepLE,25,100,tailplane.initial.horizontal.Ar,tailplane.initial.horizontal.lambda)
+tailplane.initial.vertical.sweepTE = sweep_angle(tailplane.initial.vertical.sweepLE,25,100,tailplane.initial.vertical.Ar,tailplane.initial.vertical.lambda)
+
+tailplane.initial.horizontal.maxTC = sweep_angle(tailplane.initial.horizontal.sweepLE,25,40,tailplane.initial.horizontal.Ar,tailplane.initial.horizontal.lambda)
+tailplane.initial.vertical.maxTC= sweep_angle(tailplane.initial.vertical.sweepLE,25,35,tailplane.initial.vertical.Ar,tailplane.initial.vertical.lambda)
+
+tailplane.initial.horizontal.tc = 0.12; %64012
+tailplane.initial.vertical.tc = 0.15; % 64015
+
+
 tailplane.initial.horizontal = wing_geometry_calc_struct(tailplane.initial.horizontal,1);
 % using Vertical wing function overload to account for sref being 2*Sv 
 tailplane.initial.vertical = wing_geometry_calc_struct(tailplane.initial.vertical,2); % mulitplier of 2 as vertical is only half a wing
@@ -100,8 +110,6 @@ end
 
 
 
-tailplane.horizontal.tc = 0.12; %64012
-tailplane.vertical.tc = 0.15; % 64015
 
 
 

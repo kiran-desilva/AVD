@@ -7,6 +7,7 @@ load('tailplane.mat')
 load('wing.mat')
 load('locations.mat')
 load('fuse.mat')
+load('aero_analysis')
 
 %% initial variables
 
@@ -39,9 +40,6 @@ tail_h_xac_bar = locations.x_ac_h/Cmac;
 Lf = convlen(fuse.total_fuselage_length,'in','m'); %fueselage length
 Wf = convlen(fuse.d_f,'in','m'); % fueslage max width ( diameter)
 
-%%%%REGIONS%%%%%%
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -63,7 +61,7 @@ required_static_margin = .05*Cmac;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-syms lh_syms zh_syms kh deda
+syms lh_syms zh_syms kh deda cla_eta_syms
 %set to constant for now
 zh_syms = zh;
 % lh_syms = lh;
@@ -72,8 +70,17 @@ ka = (1/wing_AR) - (1/(1 + (wing_AR^1.7)));
 klamb = (10-(3*wing.lambda))/7;
 kh(lh_syms) = (1- abs(zh_syms/wing_b))/(((2*lh_syms)/(wing_b))^(1/3));
 
-deda(lh_syms) = 4.44 * ((ka * klamb * kh * sqrt(wing_sweep_25))^1.19)*(Cl_alpha_m/Cl_alpha_m0);
+deda(lh_syms,eta_mach_syms) = 4.44 * ((ka * klamb * kh * sqrt(wing_sweep_25))^1.19)*(cla_eta_syms);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%REGIONS%%%%%%
+region.regions = {'Takeoff','Landing','Cruise Start','Cruise End'};
+region.cla_eta = [aero_analysis.wing.eta([1 3 4 4])];
+region.deda = subs(deda,eta_mach_syms,region.cla_eta);
+region.xcg = [];
+region.cl_alpha_w = [aero_analysis.wing.Cl_alpha([1 3 4 4])];
+
+%%%%%%%%%%%%%%%%%
 
 % syms xcg_xac_bar 
 %tailplane stability analysis
