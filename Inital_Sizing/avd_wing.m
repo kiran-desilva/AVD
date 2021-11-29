@@ -30,7 +30,7 @@ CL_design_cruise=( (W_cruise_W_total)*(W_S) )/ (0.5*rho_cruise*V_cruise^2)
 
 
 % Cl_max=max(Cl)
-t_c_cruiseonly=-0.0439*atan(3.3450*M_cruise+-3.0231)+0.0986
+%t_c_cruiseonly=-0.0439*atan(3.3450*M_cruise+-3.0231)+0.0986
 
 
 
@@ -106,7 +106,7 @@ if CLmax_takeooff<Clmax_landing
 else
     q=CLmax_takeooff
 end
-CL_req_inc=CLmax-q
+CL_req_inc=q-CLmax_eff
 %need 1.0669
 
 %30% of the wing must be allocated to aileron placement for sufficient controllability
@@ -123,6 +123,8 @@ mainwing.HDL_Ctip=(1-mainwing.HDL_PERC)*mainwing.Ctip;
 
 
 sref=((mainwing.Croot+mainwing.Ctip)/2)*mainwing.b;
+
+
 mainwing.sref=sref
 %aileron starts at 70 of span
 mainwing.aileron_start_top=0.7*mainwing.b/2;
@@ -165,6 +167,8 @@ k=(delta_CL*sref) / (0.9*HDL_coeff*sflapped*cosd(sweep_hdl_find)) %c'/c
 fplot(k, [mainwing.sweepTE, mainwing.sweepLE])
 hold on
 plot([mainwing.sweepHDL, mainwing.sweepHDL],[1,2])
+cl_hdl=(delta_CL*sref) / (0.9*sflapped*cosd(mainwing.sweepTE))
+
 k=(delta_CL*sref) / (0.9*HDL_coeff*sflapped*cosd(mainwing.sweepTE))
 %k=cbar/c
 cbar_root=k*mainwing.Croot
@@ -177,7 +181,7 @@ mainwing.fraction_HDLchord_over_wingchord=fraction_HDLchord_over_wingchord
 
 %s_exposed=
 %s_wet=s_exposed*(1.977+0.52(t_c))
-
+dist_above_ground=mainwing.b/2*tand(1) +0.15 %use wiht landing gear heigh to vertically place the wing
 
 mainwing.AR=AR
 mainwing.sweep_25=sweep_25
@@ -185,5 +189,12 @@ mainwing.M_DD=M_DD
 mainwing.M_DD_Eff=M_DD_Eff
 mainwing.Cl_design_a=Cl_design_a
 mainwing.Km=Km
+
+[sweepmaxthick] = sweep_angle(sweep_25,39.9,25,AR,lambda);
+fuselage_diameter=1.68
+root_fuselage_chord=((2*(mainwing.Ctip-mainwing.Croot))/mainwing.b)*(fuselage_diameter/2) +mainwing.Croot
+c_fuselage=root_fuselage_chord - fuselage_diameter*(tand(mainwing.sweepLE) - tand(mainwing.sweepTE));
+WingArea_fuselage=0.5*fuselage_diameter*(root_fuselage_chord+c_fuselage)
+mainwing.S_exposed=mainwing.sref-WingArea_fuselage
 
  save('wing','wing.mat')
