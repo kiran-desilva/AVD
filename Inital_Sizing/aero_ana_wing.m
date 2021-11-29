@@ -21,8 +21,8 @@ S_exp=9.0771; %[m^2]
 S_ref=design.sref; %[m^2]
 %h=0.3; %winglet height (m)
 b=wing.b; %wing span (m)
-max_sweep_t=16.024*pi/180; %sweep of wing at the chord location where the airfoil is thickest
-sweep_LE=wing.sweepLE*pi/180;
+max_sweep_t=16.024*pi/180; %sweep of wing at the chord location where the airfoil is thickest [rad]
+sweep_LE=wing.sweepLE*pi/180; %[rad]
 cl_max_airfoil=1.6; %maximum lift of airfoil
 lambda_quarter=wing.sweepTE*pi/180; %quarter-chord sweep
 aero_analysis.wing.t_c=0.12;
@@ -51,7 +51,7 @@ aero_analysis.wing.Re(4)=aero_analysis.wing.rho(4)*aero_analysis.wing.v_landing_
 
 
 %(1): cruise
-%(2): max
+%(2): max speed at max altitude
 %(3): take-off
 %(4): approach
 
@@ -60,7 +60,7 @@ aero_analysis.wing.beta=sqrt(1-aero_analysis.wing.Mach.^2); %compressibility eff
 aero_analysis.wing.cl_alpha_ratio=[0.95,0.945,0.945,0.945]; %read off graph - DATCOM 1978
 aero_analysis.wing.cl_alpha_theory=2*pi+4.7*aero_analysis.wing.t_c*(1+0.00375*0.6); %0.6 deg
 aero_analysis.wing.Cl_alpha_aerofoil=(1.05./aero_analysis.wing.beta).*aero_analysis.wing.cl_alpha_ratio*aero_analysis.wing.cl_alpha_theory; %cl of the airfoil as a function of the mach number. Varies so inputs must be changed manually based on readings off graph
-%aero_analysis.wing.eta=(aero_analysis.wing.beta).*(aero_analysis.wing.Cl_alpha_aerofoil)./(2*pi); %fraction between both
+aero_analysis.wing.eta=(aero_analysis.wing.beta).*(aero_analysis.wing.Cl_alpha_aerofoil)./(2*pi); %fraction between both
 aero_analysis.wing.eta=[1,1,1,1];
 aero_analysis.wing.F=1.07*(1+d/b)^2;
 
@@ -109,5 +109,8 @@ for i=1:2
     aero_analysis.wing.HLD.delta_alpha(i)=aero_analysis.wing.HLD.alpha(i)*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
 end
 save('aero_analysis.mat', 'aero_analysis')
+
+aero_analysis.wing.Cl_max_landing=aero_analysis.wing.HLD.delta_cl_max(2)+aero_analysis.wing.Cl_max_wing;
+aero_analysis.wing.Cl_max_approach=aero_analysis.wing.HLD.delta_cl_max(1)+aero_analysis.wing.Cl_max_wing;
 
 
