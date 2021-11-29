@@ -16,7 +16,7 @@ load('fuse.mat')
 
 %% Inputs from other scripts
 d=(fuse.d_f)/39.3700787; %diameter of the fuselage [m] from Camille 26/11
-AR=wing.Ar;
+AR=tailplane.horizontal.Ar;
 S_exp=9.0771; %[m^2]
 S_ref=design.sref; %[m^2]
 %h=0.3; %winglet height (m)
@@ -78,37 +78,3 @@ aero_analysis.wing.Cl_alpha=2*pi*AR*1./(2+sqrt(4+(((AR^2.*aero_analysis.wing.bet
 aero_analysis.wing.Cl_max_wing=0.9*cl_max_airfoil*cos(lambda_quarter);
 
 aero_analysis.wing.zero_aoa=-3; %[degrees]
-%% Supersonic range
-%Mach number above which the Mach number is supersonic
-aero_analysis.wing.supersonic_Mach=1/cos(sweep_LE);
-
-%% HLD
-% inputs from other scripts
-aero_analysis.wing.HLD.c_fraction=1.2415;
-aero_analysis.wing.HLD.s_ref=wing.Sref;
-aero_analysis.wing.HLD.s_flapped=6.6422;
-aero_analysis.wing.HLD.delta_hl=wing.sweepTE; %hinge lift surface
-
-%calculations
-aero_analysis.wing.HLD.delta_cl_device=1.3*(aero_analysis.wing.HLD.c_fraction); %assumed Fowler. Can change - pg 415 Raymer
-%initialise vectors
-aero_analysis.wing.HLD.delta_cl_max=[0,0];
-aero_analysis.wing.HLD.delta_cl_max(2)=0.9*aero_analysis.wing.HLD.delta_cl_device*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
-aero_analysis.wing.HLD.delta_cl_max(1)=aero_analysis.wing.HLD.delta_cl_max(2)*0.8;
-aero_analysis.wing.HLD.cl_alpha_flaps=[0,0];
-aero_analysis.wing.HLD.delta_alpha=[0,0];
-%(1): cruise
-%(2): max
-
-%(3): take-off
-%(4): approach
-%==> ignore the first 2 terms of the cl_alpha_flaps
-aero_analysis.wing.HLD.alpha=[-10,-15]; %change in flap angle [degrees]
-for i=1:2
-    aero_analysis.wing.HLD.cl_alpha_flaps(i)=aero_analysis.wing.Cl_alpha(i+2)*(1+(aero_analysis.wing.HLD.c_fraction-1)*aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref);
-    aero_analysis.wing.HLD.delta_alpha(i)=aero_analysis.wing.HLD.alpha(i)*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
-end
-save('aero_analysis.mat', 'aero_analysis')
-
-%aero_analysis.wing.Cl_max_landing=aero_analysis.wing.HLD.delta_cl_max(2)+aero_analysis.wing.Cl_max_wing;
-%aero_analysis.wing.Cl_max_approach=aero_analysis.wing.HLD.delta_cl_max(1)+aero_analysis.wing.Cl_max_wing;
