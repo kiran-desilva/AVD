@@ -34,7 +34,7 @@ bottom_theta_afterbody = 11
 % upper_theta_afterbody = atand((d_f-(tand(bottom_theta_afterbody)*afterbody_length))/afterbody_length)
 upper_theta_afterbody = 4;
 
-fuse.x_afterbody = nose_length + cabin_length;
+fuse.x_afterbody = (nose_length + cabin_length)*0.0254; %in metres
 
 fuse.bottom_theta_afterbody = bottom_theta_afterbody;
 fuse.upper_theta_afterbody = upper_theta_afterbody;
