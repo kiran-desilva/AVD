@@ -209,11 +209,15 @@ mainwing.M_DD_Eff=M_DD_Eff
 mainwing.Cl_design_a=Cl_design_a
 mainwing.Km=Km
 
+wing.M_DD_Eff=mainwing.M_DD_Eff
+wing.Cl_design_a=mainwing.Cl_design_a
+wing.Km=mainwing.Km
+
 [sweepmaxthick] = sweep_angle(sweep_25,39.9,25,AR,lambda);
 fuselage_diameter=1.68
 root_fuselage_chord=((2*(mainwing.Ctip-mainwing.Croot))/mainwing.b)*(fuselage_diameter/2) +mainwing.Croot
 c_fuselage=root_fuselage_chord - fuselage_diameter*(tand(mainwing.sweepLE) - tand(mainwing.sweepTE));
 WingArea_fuselage=0.5*fuselage_diameter*(root_fuselage_chord+c_fuselage)
-mainwing.S_exposed=mainwing.sref-WingArea_fuselage
+wing.S_exposed=mainwing.sref-WingArea_fuselage
 
  save('wing','wing.mat')
