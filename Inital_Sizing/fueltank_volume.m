@@ -89,7 +89,7 @@ t_c_rearspar = topfit(x_rearspar) - bottomfit(x_rearspar)
 plot([x_frontspar, x_frontspar],[topfit(x_frontspar),bottomfit(x_frontspar)],'linewidth',5);
 plot([x_rearspar, x_rearspar],[topfit(x_rearspar),bottomfit(x_rearspar)],'linewidth',5);
 
-span = 9.8062;
+span = 8.9729;
 
 syms y
 croot = 1.9556;
