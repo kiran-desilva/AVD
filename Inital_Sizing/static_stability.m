@@ -39,6 +39,10 @@ tail_h_xac_bar = locations.x_ac_h/Cmac;
 Lf = convlen(fuse.total_fuselage_length,'in','m'); %fueselage length
 Wf = convlen(fuse.d_f,'in','m'); % fueslage max width ( diameter)
 
+%%%%REGIONS%%%%%%
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Kf_gen; % interpolate kf_gen data
