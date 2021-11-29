@@ -19,7 +19,7 @@ pressure_recovery_percent_loss = C_ram*(1 - F)
 
 % Bleed air
 C_bleed = 2;
-bleed_fraction = 0.05; % 1-5% range
+bleed_fraction = 0.02; % 1-5% range
 bleed_air_percent_loss = C_bleed*(bleed_fraction);
 
 total_percent_loss = bleed_air_percent_loss + pressure_recovery_percent_loss
@@ -64,7 +64,5 @@ powerplant.nacelle_width_ft = 1.1*powerplant.basic_diam_m*metres_to_ft;
 powerplant.nacelle_length_ft = (0.6*powerplant.basic_diam_m + powerplant.length_m)*metres_to_ft;
 fudge_factor = 1.1;
 powerplant.nacelle_wetted_area_ft_sq = fudge_factor*pi*powerplant.nacelle_width_ft^2/4*powerplant.nacelle_length_ft;
-
-
 
 save('powerplant', 'powerplant')

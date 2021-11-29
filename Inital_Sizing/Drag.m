@@ -29,6 +29,7 @@ t_c=[0.12,0.12,0.13]; %thickness to chord ratio
 %(3): vertical stabiliser
 
 sweep_angles=[20,40,20].*pi/180;
+%sweep angles @ 1/4 chord
 %sweep angles(1): wing
 %sweep angles(2): horizontal tail
 %sweep angles(3): vertical tail
@@ -109,9 +110,6 @@ for i=1:length(d_components)
     aero_analysis.drag.fineness(i)=aero_analysis.drag.l_components(i)/d_components(i);
 end
 
-aero_analysis.drag.FF=zeros(1,length(d_components));
-aero_analysis.drag.FF(1)=1+(60/aero_analysis.drag.fineness(1)^3)+(aero_analysis.drag.fineness(1)/400);
-
 chordwise_max_thickness=[0.3,0.4,0.5];
 %(1):wing
 %(2):horizontal stabiliser
@@ -122,6 +120,8 @@ sweep_max_thickness=[10,10,10]*pi/180;
 %(2):horizontal stabiliser
 %(3):vertical stabiliser
 
+aero_analysis.drag.FF=zeros(1,length(d_components));
+aero_analysis.drag.FF(1)=1+(60/aero_analysis.drag.fineness(1)^3)+(aero_analysis.drag.fineness(1)/400);
 for i=1:length(chordwise_max_thickness)
     aero_analysis.drag.FF(i+1)=(1+(0.6/chordwise_max_thickness(i))*t_c(i)+100*(t_c(i))^4)*(1.34*1^0.18*(cos(sweep_max_thickness(i))^0.28));
 end

@@ -2,30 +2,31 @@ clear
 
 load('sizing.mat');
 load('parameters.mat');
-load('design.mat')
+load('design.mat');
+load('wing.mat');
 
 
 
-%cessana citation mustang currently
-fuselage_length = 14.22;
-cmac = 1.369;
+
+fuselage_length = 11.83;
+cmac = wing.Cmac;
 sref = design.sref;
 b = sqrt(sizing.AR * sref);
 ar = sizing.AR;
+wing_taper = 0.3017;
 % wing_lambdaLE = sizing.sweepLE;
 
-wing_sweepLE = 18.1692;
+wing_sweepLE = sweep_angle(18.1692,0,25,ar,wing_taper)
 
 
 tailplane.initial.horizontal.l = 0.45*fuselage_length;
 tailplane.initial.vertical.l = 0.45*fuselage_length;
 
-%correction for T-tail endplate effect  and trimmable horizontal stab
-correction_factor = .95 * .9; 
+
 
 %from aero tn tailsizing pdf
-tailplane.initial.horizontal.v = 0.7 * correction_factor; % howe
-tailplane.initial.vertical.v = 0.065 * correction_factor; 
+tailplane.initial.horizontal.v = 0.7 * .95 * .9; % howe
+tailplane.initial.vertical.v = 0.065 * .95; 
 
 tailplane.initial.horizontal.s = ( tailplane.initial.horizontal.v * cmac * sref ) / (tailplane.initial.horizontal.l);
 
@@ -36,7 +37,7 @@ tailplane.initial.horizontal.Ar = 3.9; %this is probably too big
 tailplane.initial.vertical.Ar = 1.3; 
 
 %taper
-tailplane.initial.horizontal.lambda = 0.35; % obert -> looked good to me idk
+tailplane.initial.horizontal.lambda = .5; % obert -> looked good to me idk
 tailplane.initial.vertical.lambda = .7; %obert -> cant be too small as the vertical stabilizer has to support horizotnal tailplane
 
 tailplane.initial.horizontal.sweepLE = wing_sweepLE + 5; 
@@ -61,25 +62,38 @@ tailplane.vertical = tailplane.initial.vertical;
 [h_tail_constraint_fit,h_tail_constraint_fig] = horizontal_placement_graph;
 h_tail_constraint_fig;
 % currently assuming wing is on the bottom of the fueslage
-df = 1.52/2;
+fuselage_offset = 1.52;
 
-current_horizontal_position_bar = tailplane.horizontal.z_above_fuselage_bar + (df/cmac);
-
+current_horizontal_position_bar = tailplane.horizontal.z_above_fuselage_bar + (fuselage_offset/cmac);
 plot(tailplane.horizontal.l_bar,current_horizontal_position_bar,'o','color','green');
+
+% min_vertical_span_bar = h_tail_constraint_fit(tailplane.horizontal.l_bar);
+% yline(min_vertical_span_bar,'--');
+% if (min_vertical_span_bar > current_horizontal_position_bar)
+%     disp("Bad Vertical Position -> fixing span")
+%     required_span = (min_vertical_span_bar * cmac) - fuselage_offset;
+%     tailplane.vertical.Ar = ((required_span)^2)/tailplane.vertical.s;
+%     tailplane.vertical = wing_geometry_calc_struct(tailplane.vertical,2);
+% end
+
+% current_horizontal_position_bar = (tailplane.vertical.b + fuselage_offset)/ cmac;
+
+% plot(tailplane.horizontal.l_bar,current_horizontal_position_bar,'o','color','red');
+
+
 improvePlot(h_tail_constraint_fig)
 
-min_vertical_span_bar = h_tail_constraint_fit(tailplane.horizontal.l_bar);
-if (min_vertical_span_bar > current_horizontal_position_bar)
-    disp("Bad Vertical Position -> fixing span")
-    tailplane.vertical.Ar = ((min_vertical_span_bar * Cmac)^2)/
-end
+
 %ensure horizontal tailplane can fit on vertical tailplane
 min_vertical_Ctip = tailplane.horizontal.Croot;
 if tailplane.vertical.Ctip < min_vertical_Ctip
     % correct taper ratio to fix this issue
     disp("Initial vertical stablizer Ctip too small -> fixing taper")
-    tailplane.vertical.lambda = tailplane.horizontal.Croot/tailplane.vertical.Croot;
-    tailplane.vertical = wing_geometry_calc_struct(tailplane.initial.vertical,2); % recalculate paramters
+    syms lambda ctip
+    ctip(lambda) = (2*lambda*tailplane.vertical.s)/(sqrt(tailplane.vertical.Ar * tailplane.vertical.s) * (1+lambda));
+    tailplane.vertical.lambda = fsolve(@(x) double(ctip(x)) - min_vertical_Ctip,0.9);
+    %tailplane.vertical.lambda = tailplane.horizontal.Croot/tailplane.vertical.Croot;
+    tailplane.vertical = wing_geometry_calc_struct(tailplane.vertical,2); % recalculate paramters
 end
 
 

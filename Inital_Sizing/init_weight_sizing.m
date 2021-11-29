@@ -16,12 +16,12 @@ sizing.L_Dmax = sizing.Kld * sqrt(sizing.AR / sizing.swet_sref);
 sizing.cd0 = (pi * sizing.AR * sizing.e) / (4 * sizing.L_Dmax^2);
 
 
-%roskam.c_1=0.6197; %cruise
-%roskam.c_2=0.6197; %alternate cruise
-%roskam.c_3=0.5191; %loiter
-roskam.c_1=0.7; %cruise
-roskam.c_2=0.7; %alternate
-roskam.c_3=0.7; %loDesciter
+roskam.c_1=0.6197; %cruise
+roskam.c_2=0.6197; %alternate cruise
+roskam.c_3=0.5191; %loiter
+%roskam.c_1=0.7; %cruise
+%roskam.c_2=0.7; %alternate
+%roskam.c_3=0.7; %loDesciter
 roskam.LoverD_cruise(1) = 11; %ish?
 roskam.LoverD_cruise(2) = 0.866 * sizing.L_Dmax; % Raymer 
 roskam.LoverD_loiter(1) = 13; %ish?
@@ -166,6 +166,7 @@ sizing.Wf = roskam.Wf_W0(2) * sizing.W0;
 
 sizing.fraction.before_take_off=0.99*0.995;
 sizing.fraction.before_cruise=sizing.fraction.before_take_off*sizing.roskam.fuelfrac(2);
+sizing.fraction.end_cruise_1=sizing.fraction.before_cruise*sizing.roskam.fuelfrac(3);
 sizing.fraction.before_alternate_cruise=sizing.fraction.before_cruise*sizing.roskam.fuelfrac(3)*sizing.roskam.fuelfrac(4)*sizing.roskam.fuelfrac(5);
 sizing.fraction.before_loiter=sizing.fraction.before_alternate_cruise*sizing.roskam.fuelfrac(6);
 sizing.fraction.end=roskam.Wx_W0(2);

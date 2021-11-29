@@ -14,6 +14,12 @@ aileronC_inneredge = wing.Croot + 0.7 * (wing.Ctip - wing.Croot);
 aileronC_outeredge = wing.Croot + 0.95 * (wing.Ctip - wing.Croot);
 control_surface.aileron_area =  (1 - wing.HDL_PERC) * (aileronC_inneredge  + aileronC_outeredge) * 0.25 * 0.5 * wing.b; 
 
-flapC_inneredge = wing.Croot + 0.7 * (wing.Ctip - wing.Croot);
+flapC_inneredge = wing.Croot + (wing.HDL_start / (wing.b / 2)) * (wing.Ctip - wing.Croot);
 flapC_outeredge = wing.Croot + 0.7 * (wing.Ctip - wing.Croot);
-control_surface.flap_area =  (1 - wing.HDL_PERC) * (flapC_inneredge  + flapC_outeredge) * 0. * 0.5 * wing.b; 
+control_surface.flap_area =  (1 - wing.HDL_PERC) * (flapC_inneredge  + flapC_outeredge) * (0.7 - (wing.HDL_start / (wing.b / 2))) * 0.5 * wing.b; 
+
+control_surface.total_area_ft2 = (control_surface.elevator_area + control_surface.rudder_area + control_surface.aileron_area + control_surface.flap_area) * 3.28084^2;
+control_surface.wingmounted_area_ft2 = (control_surface.aileron_area + control_surface.flap_area) * 3.28084^2;
+control_surface.elevator_area_ft2 = control_surface.elevator_area * 3.28084^2;
+
+save('control_surface','control_surface')
