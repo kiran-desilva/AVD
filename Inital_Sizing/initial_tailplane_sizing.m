@@ -49,8 +49,8 @@ tailplane.initial.vertical.sweep_25 = sweep_angle(tailplane.initial.vertical.swe
 tailplane.initial.horizontal.sweepTE = sweep_angle(tailplane.initial.horizontal.sweepLE,25,100,tailplane.initial.horizontal.Ar,tailplane.initial.horizontal.lambda)
 tailplane.initial.vertical.sweepTE = sweep_angle(tailplane.initial.vertical.sweepLE,25,100,tailplane.initial.vertical.Ar,tailplane.initial.vertical.lambda)
 
-tailplane.initial.horizontal.maxTC = sweep_angle(tailplane.initial.horizontal.sweepLE,25,40,tailplane.initial.horizontal.Ar,tailplane.initial.horizontal.lambda)
-tailplane.initial.vertical.maxTC= sweep_angle(tailplane.initial.vertical.sweepLE,25,35,tailplane.initial.vertical.Ar,tailplane.initial.vertical.lambda)
+tailplane.initial.horizontal.sweepmaxTC = sweep_angle(tailplane.initial.horizontal.sweepLE,25,40,tailplane.initial.horizontal.Ar,tailplane.initial.horizontal.lambda)
+tailplane.initial.vertical.sweepmaxTC= sweep_angle(tailplane.initial.vertical.sweepLE,25,35,tailplane.initial.vertical.Ar,tailplane.initial.vertical.lambda)
 
 tailplane.initial.horizontal.tc = 0.12; %64012
 tailplane.initial.vertical.tc = 0.15; % 64015
