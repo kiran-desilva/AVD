@@ -28,7 +28,7 @@ t_c=[0.12,tailplane.horizontal.tc,tailplane.vertical.tc]; %thickness to chord ra
 %(2): horizontal stabiliser
 %(3): vertical stabiliser
 
-sweep_angles=[18.1692,tailplane.horizontal.sweep_25,tailplane.vertical.sweep_25].*pi/180;
+sweep_angles=[wing.sweep_25,tailplane.horizontal.sweep_25,tailplane.vertical.sweep_25].*pi/180;
 %sweep angles @ 1/4 chord
 %sweep angles(1): wing
 %sweep angles(2): horizontal tail
@@ -43,9 +43,8 @@ delta=[0,0,15,45]*pi/180; %angle of deflection of HLD [rad]
 %delta(3):TO
 %delta(4):Landing
 
-uc_frontal_area_m_sq=5;
 %uc_frontal_area_m_sq comes from P's script
-A_UC_front=[0, 0, uc_frontal_area_m_sq, uc_frontal_area_m_sq]; %Area of the UC [m^2]
+A_UC_front=[0, 0, uc.uc_frontal_area_m_sq, uc.uc_frontal_area_m_sq]; %Area of the UC [m^2]
 %(1): cruise
 %(2): max
 %(3): TO
@@ -112,7 +111,7 @@ for i=1:length(d_components)
     aero_analysis.drag.fineness(i)=aero_analysis.drag.l_components(i)/d_components(i);
 end
 
-chordwise_max_thickness=[0.3,0.4,0.5];
+chordwise_max_thickness=[0.399,0.4,0.5];
 %(1):wing
 %(2):horizontal stabiliser
 %(3):vertical stabiliser
