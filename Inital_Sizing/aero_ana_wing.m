@@ -15,9 +15,9 @@ load('fuse.mat')
 %% Wing Lift Estimation
 
 %% Inputs from other scripts
-d=(fuse.structural_length/fuse.L_D_f)/3.281; %diameter of the fuselage [m] from Camille 26/11
+d=(fuse.d_f)/39.3700787; %diameter of the fuselage [m] from Camille 26/11
 AR=wing.Ar;
-S_exp=1;
+S_exp=9.0771; %[m^2]
 S_ref=design.sref; %[m^2]
 %h=0.3; %winglet height (m)
 b=wing.b; %wing span (m)
@@ -60,8 +60,8 @@ aero_analysis.wing.beta=sqrt(1-aero_analysis.wing.Mach.^2); %compressibility eff
 aero_analysis.wing.cl_alpha_ratio=[0.95,0.945,0.945,0.945]; %read off graph - DATCOM 1978
 aero_analysis.wing.cl_alpha_theory=2*pi+4.7*aero_analysis.wing.t_c*(1+0.00375*0.6); %0.6 deg
 aero_analysis.wing.Cl_alpha_aerofoil=(1.05./aero_analysis.wing.beta).*aero_analysis.wing.cl_alpha_ratio*aero_analysis.wing.cl_alpha_theory; %cl of the airfoil as a function of the mach number. Varies so inputs must be changed manually based on readings off graph
-aero_analysis.wing.eta=(aero_analysis.wing.beta).*(aero_analysis.wing.Cl_alpha_aerofoil)./(2*pi); %fraction between both
-%aero_analysis.wing.eta=[1,1,1,1];
+%aero_analysis.wing.eta=(aero_analysis.wing.beta).*(aero_analysis.wing.Cl_alpha_aerofoil)./(2*pi); %fraction between both
+aero_analysis.wing.eta=[1,1,1,1];
 aero_analysis.wing.F=1.07*(1+d/b)^2;
 
 %% winglet
@@ -72,7 +72,9 @@ aero_analysis.wing.F=1.07*(1+d/b)^2;
 %% CL
 %lift curve slope per radian, accurate up to Mdd and reasonably accurate almost to M=1
 %from Raymer
-aero_analysis.wing.Cl_alpha=2*pi*AR*(S_exp/S_ref)*aero_analysis.wing.F./(2+sqrt(4+(((AR^2.*aero_analysis.wing.beta.^2)/aero_analysis.wing.eta.^2)*(1+((tan(max_sweep_t)^2)./aero_analysis.wing.beta.^2))))); 
+%aero_analysis.wing.Cl_alpha=2*pi*AR*(S_exp/S_ref)*aero_analysis.wing.F./(2+sqrt(4+(((AR^2.*aero_analysis.wing.beta.^2)/aero_analysis.wing.eta.^2)*(1+((tan(max_sweep_t)^2)./aero_analysis.wing.beta.^2))))); 
+aero_analysis.wing.Cl_alpha=2*pi*AR*1./(2+sqrt(4+(((AR^2.*aero_analysis.wing.beta.^2)/aero_analysis.wing.eta.^2)*(1+((tan(max_sweep_t)^2)./aero_analysis.wing.beta.^2))))); 
+
 aero_analysis.wing.Cl_max_wing=0.9*cl_max_airfoil*cos(lambda_quarter);
 
 
