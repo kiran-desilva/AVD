@@ -6,7 +6,7 @@ load('sizing.mat')
 
 newtons_to_lbf = 0.224808943;
 metres_to_ft = 3.2808399;
-installed_thrust_lbf = design.t_w * sizing.W0 * newtons_to_lbf / 2
+powerplant.installed_thrust_lbf = design.t_w * sizing.W0 * newtons_to_lbf / 2
 
 
 %% Estimating installed thrust
@@ -24,7 +24,7 @@ bleed_air_percent_loss = C_bleed*(bleed_fraction);
 
 total_percent_loss = bleed_air_percent_loss + pressure_recovery_percent_loss
 % total_percent_loss = 0.1;
-uninstalled_thrust_lbf = installed_thrust_lbf/(1 - total_percent_loss)
+uninstalled_thrust_lbf = powerplant.installed_thrust_lbf/(1 - total_percent_loss)
 
 %% Chosen engine PW615F
 % Thrust -> 1350lbf
