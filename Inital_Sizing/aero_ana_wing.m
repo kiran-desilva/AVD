@@ -77,7 +77,7 @@ aero_analysis.wing.Cl_alpha=2*pi*AR*1./(2+sqrt(4+(((AR^2.*aero_analysis.wing.bet
 
 aero_analysis.wing.Cl_max_wing=0.9*cl_max_airfoil*cos(lambda_quarter);
 
-
+aero_analysis.wing.zero_aoa=-3; %[degrees]
 %% Supersonic range
 %Mach number above which the Mach number is supersonic
 aero_analysis.wing.supersonic_Mach=1/cos(sweep_LE);
