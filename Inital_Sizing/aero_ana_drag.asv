@@ -20,7 +20,7 @@ load("fuse.mat")
 
 %% Inputs from other scripts
 S_ratio=6; %=S_wet/S_ref
-S=[wing.Sref,100,8.1292,((1.3985/2)/3.2808)^2*pi*2];
+S=[11.4246,100,9.0771,((1.3985/2)/3.2808)^2*pi*2];
 %S(1):S_ref
 %S(2):A_eff
 %S(3):S_exposed_wing
@@ -36,11 +36,11 @@ sweep_angles_quarter=[wing.sweep_25,tailplane.horizontal.sweep_25,tailplane.vert
 %sweep angles(1): wing
 %sweep angles(2): horizontal tail
 %sweep angles(3): vertical tail
-sweep_angles_half=14.5429*pi/180; %sweep of wing at 1/2 chord
+sweep_angles_half=25*pi/180; %sweep of wing at 1/2 chord
 
 
-d_fuselage=fuse.d_f/39.3700787; %fuselage diameter [m]
-l_fuselage=fuse.structural_length/39.3700787; %fuselage length [m]
+d_fuselage=fuse.d_f/3.2808; %fuselage diameter [m]
+l_fuselage=fuse.structural_length/3.2808; %fuselage length [m]
 
 delta=[0,0,15,45,0]*pi/180; %angle of deflection of HLD [rad]
 %delta(1):Cruise
@@ -59,10 +59,10 @@ A_UC_front=[0, 0, uc.uc_frontal_area_m_sq, uc.uc_frontal_area_m_sq,0]; %Area of 
 %% Wave drag, wing, M_dd
 %Drag divergence Mach number
 %only for wing
-cl_cruise=sizing.fraction.before_cruise*sizing.W0/(0.5*0.302*(aero_analysis.wing.Mach(2)*aero_analysis.wing.air_velc(2))^2*wing.Sref); %need to define
+cl=1; %need to define
 korn=0.87;
-aero_analysis.drag.M_DD=(korn/cos(sweep_angles_half))-(t_c(1)/cos(sweep_angles_half)^2)-(cl_cruise/(10*cos(sweep_angles_half)^3));
-aero_analysis.drag.M_cr_wing=aero_analysis.drag.M_DD-0.08;
+aero_analysis.drag.M_DD=(korn/cos(sweep_angles_half))-(t_c(1)/cos(sweep_angles_half)^2)-(cl/(10*cos(sweep_angles_half)^3));
+aero_analysis.drag.M_cr_wing=aero_analysis.drag.M_DD-nthroot((0.1/80),3);
 aero_analysis.drag.M.wing=aero_analysis.wing.Mach;
 
 aero_analysis.drag.C_d_aerofoil=zeros(1,length(aero_analysis.drag.M.wing));
@@ -112,13 +112,13 @@ end
 %(5): nacelle - note, there are 2 to consider (2 engines!)
 d_components=[d_fuselage,b,tailplane.horizontal.Cmac,tailplane.vertical.Cmac,sqrt(4*uc.uc_frontal_area_m_sq/pi)];
 
-aero_analysis.drag.l_components=[l_fuselage,wing.Cmac,tailplane.horizontal.Cmac,tailplane.vertical.Cmac,5]; %define characteristic length of each component
+aero_analysis.drag.l_components=[l_fuselage,1,1,1,5]; %define characteristic length of each component
 aero_analysis.drag.fineness=zeros(1,length(d_components));
 for i=1:length(d_components)
     aero_analysis.drag.fineness(i)=aero_analysis.drag.l_components(i)/d_components(i);
 end
 
-chordwise_max_thickness=[0.399,0.4,0.35];
+chordwise_max_thickness=[0.399,0.4,0.5];
 %(1):wing
 %(2):horizontal stabiliser
 %(3):vertical stabiliser
@@ -181,9 +181,9 @@ end
 
 %% Delta parasitic flap drag
 s_flapped=aero_analysis.wing.HLD.s_flapped;
-aero_analysis.drag.delta_cd0=zeros(1,length(U));
-aero_analysis.drag.delta_cd0(3)=0.0074*aero_analysis.wing.HLD.c_fraction*(s_flapped/wing.Sref)*(30-10);
-aero_analysis.drag.delta_cd0(4)=0.0074*aero_analysis.wing.HLD.c_fraction*(s_flapped/wing.Sref)*(65-10);
+aero_analysis.drag.delta.cd0=zeros(1,length(U));
+aero_analysis.drag.delta.cd0(3)=0.0074*aero_analysis.wing.HLD.c_fraction*(s_flapped/wing.Sref)*(
+
 
 %% Leakage
 %aero_analysis.drag.leakage=1; %find a method
@@ -192,7 +192,7 @@ aero_analysis.drag.delta_cd0(4)=0.0074*aero_analysis.wing.HLD.c_fraction*(s_flap
 % Skin friction, Misc, Leakage
 %accounting for 4% of leakage
 for j=1:length(U)
-    aero_analysis.drag.cd0(j)=1.04*(aero_analysis.drag.skin_friction(j)+aero_analysis.drag.cd_misc(j))+aero_analysis.drag.delta_cd0(j);
+    aero_analysis.drag.cd0(j)=1.04*(aero_analysis.drag.skin_friction(j)+aero_analysis.drag.cd_misc(j));
 end
 
 %% Induced drag
