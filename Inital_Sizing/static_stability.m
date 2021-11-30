@@ -50,7 +50,12 @@ Kf = Kf_fit(wing_root_quater_chord_percent_length);
 fuselage_Cm_alpha = Kf*(Lf*(Wf^2))/(Cmac * Sw);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
 xcg_wrt_ac = @(xacw,xach) x;
+
+xcg = @(xacw,xach,wf_tail,wf_wing,Pax) 5.6;
+
 
 Zt = .6;
 
@@ -100,6 +105,7 @@ regions.alpha_0_w = [];
 regions.alpha_0_h = [];
 
 
+
 %%%%%%%%%%%%%%%%%
 
 % syms xcg_xac_bar 
@@ -108,13 +114,13 @@ regions.alpha_0_h = [];
 % control_stab_constraint_sh_sw(xcg_xac_bar) = 
 
 
-syms xnp_bar wing_xac_bar_syms sh_sw_syms tail_h_xac_bar_syms lh_eq sm wing_Cl_alpha_syms
+syms xnp_bar wing_xac_bar_syms sh_sw_syms tail_h_xac_bar_syms lh_eq sm wing_Cl_alpha_syms, wf_tail
 
 lh_eq(tail_h_xac_bar_syms,wing_xac_bar_syms) = tail_h_xac_bar_syms - wing_xac_bar_syms;
 
 xnp_bar(sh_sw_syms,wing_xac_bar_syms,tail_h_xac_bar_syms,wing_Cl_alpha_syms) = ((wing_Cl_alpha_syms * wing_xac_bar_syms) - fuselage_Cm_alpha + (eta_h * sh_sw_syms * tail_h_Cl_alpha * (1-deda(lh_eq))*tail_h_xac_bar_syms))/(wing_Cl_alpha_syms + (eta_h*tail_h_Cl_alpha*(1-deda(lh_eq))*sh_sw_syms));
 
-sm(sh_sw_syms,wing_xac_bar_syms,tail_h_xac_bar_syms,wing_Cl_alpha_syms) = xnp_bar - (xcg_wrt_ac(wing_xac_bar_syms.*Cmac,tail_h_xac_bar_syms.*Cmac)./Cmac);
+sm(sh_sw_syms,wing_xac_bar_syms,tail_h_xac_bar_syms,wing_Cl_alpha_syms) = xnp_bar - (xcg(wing_xac_bar_syms,tail_h_xac_bar_syms,));
 
 figure
 hold on
@@ -140,5 +146,5 @@ syms CL_w CL_h C
 CL_w = 
 
 
-
+function [] = plot_sm_constraints()
 
