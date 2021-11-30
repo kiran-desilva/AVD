@@ -57,7 +57,7 @@ airfoilcoords.bottom = [ 0 0;
 
 
 x_frontspar = 0.1;
-x_rearspar = 0.75;
+x_rearspar = 0.74;
 
 k = x_rearspar - x_frontspar;
 
@@ -92,8 +92,8 @@ plot([x_rearspar, x_rearspar],[topfit(x_rearspar),bottomfit(x_rearspar)],'linewi
 span = 8.9729;
 
 syms y
-croot = 1.9556;
-ctip = 0.5601;
+croot = 1.7674;
+ctip = 0.5333;
 c(y) = (((2*(ctip-croot))/(span))*y) + croot;
 
 
@@ -105,3 +105,5 @@ area = fuel_tank.area;
 raw_vol = double(2*int(c^2*area, rib1, rib2))
 
 corrected_vol = raw_vol*0.975*0.975 %raymer -> fire and leak protection using foam
+
+

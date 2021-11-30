@@ -12,6 +12,11 @@ load('control_surface.mat')
 load('cg.mat')
 load('aero_analysis.mat')
 
+%%%WING FUELTANK CG%%%%%
+fueltank.x_cg_from_tip = 1.15; % m
+fueltank.z_cg_from_tip = 0.027; % m up 
+
+
 AR = sizing.AR;                         % Wing aspect ratio
 AR_h = tailplane.horizontal.Ar;         % Horizontal tailplane aspect ratio
 AR_v = tailplane.vertical.Ar;           % Vertical tailplane aspect ratio
