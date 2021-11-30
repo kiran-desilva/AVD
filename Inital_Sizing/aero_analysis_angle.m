@@ -73,35 +73,3 @@ bottomfit = fit(airfoilcoords.bottom(:,1),airfoilcoords.bottom(:,2),['smoothings
 
 plot(topfit)
 plot(bottomfit)
-
-x_range = linspace(x_frontspar,x_rearspar);
-x_points = [x_range flip(x_range)];
-
-y_points = [topfit(x_range)' bottomfit(flip(x_range))'];
-
-fuel_tank = polyshape(x_points,y_points);
-plot(fuel_tank)
-
-
-t_c_frontspar = topfit(x_frontspar) - bottomfit(x_frontspar)
-t_c_rearspar = topfit(x_rearspar) - bottomfit(x_rearspar)
-
-plot([x_frontspar, x_frontspar],[topfit(x_frontspar),bottomfit(x_frontspar)],'linewidth',5);
-plot([x_rearspar, x_rearspar],[topfit(x_rearspar),bottomfit(x_rearspar)],'linewidth',5);
-
-span = 8.9729;
-
-syms y
-croot = 1.9556;
-ctip = 0.5601;
-c(y) = (((2*(ctip-croot))/(span))*y) + croot;
-
-
-rib1 = span * 0/2;  
-rib2 = span * 0.95/2;
-
-area = fuel_tank.area;
-
-raw_vol = double(2*int(c^2*area, rib1, rib2))
-
-corrected_vol = raw_vol*0.975*0.975 %raymer -> fire and leak protection using foam

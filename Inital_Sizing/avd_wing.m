@@ -100,7 +100,7 @@ if CLmax_takeooff<Clmax_landing
 else
     q=CLmax_takeooff
 end
-CL_req_inc=CLmax-q
+CL_req_inc=q-CLmax_eff
 %need 1.0669
 
 %30% of the wing must be allocated to aileron placement for sufficient controllability
@@ -117,6 +117,9 @@ mainwing.HDL_Ctip=(1-mainwing.HDL_PERC)*mainwing.Ctip;
 
 
 sref=((mainwing.Croot+mainwing.Ctip)/2)*mainwing.b;
+
+
+mainwing.sref=sref
 %aileron starts at 70 of span
 mainwing.aileron_start_top=0.7*mainwing.b/2;
 mainwing.aileron_ypos_top=tand(mainwing.sweepHDL)*mainwing.aileron_start_top;
@@ -157,6 +160,8 @@ k=(delta_CL*sref) / (0.9*HDL_coeff*sflapped*cosd(sweep_hdl_find)) %c'/c
 fplot(k, [mainwing.sweepTE, mainwing.sweepLE])
 hold on
 plot([mainwing.sweepHDL, mainwing.sweepHDL],[1,2])
+cl_hdl=(delta_CL*sref) / (0.9*sflapped*cosd(mainwing.sweepTE))
+
 k=(delta_CL*sref) / (0.9*HDL_coeff*sflapped*cosd(mainwing.sweepTE))
 %k=cbar/c
 cbar_root=k*mainwing.Croot
@@ -169,6 +174,7 @@ perc_chord=(mainwing.Croot-cf)/mainwing.Croot
 
 %s_exposed=
 %s_wet=s_exposed*(1.977+0.52(t_c))
+dist_above_ground=mainwing.b/2*tand(1) +0.15 %use wiht landing gear heigh to vertically place the wing
 
 wing.b = mainwing.b;
 wing.Sref = sref;
@@ -181,6 +187,7 @@ wing.sweepLE = mainwing.sweepLE;
 wing.sweep_25 = sweep_25;
 wing.sweepTE = mainwing.sweepTE;
 [~,~,~,~,wing.Ybar,wing.Xac_from_tip] = wing_geometry_calc(sref,AR,lambda,wing.sweepLE,1);
+wing.twist = twist
 
 wing.HDL_PERC = mainwing.HDL_PERC;
 wing.HDL_Croot = mainwing.HDL_Croot;
@@ -203,4 +210,15 @@ mainwing.M_DD_Eff=M_DD_Eff
 mainwing.Cl_design_a=Cl_design_a
 mainwing.Km=Km
 
-save('wing','wing')
+wing.M_DD_Eff=mainwing.M_DD_Eff
+wing.Cl_design_a=mainwing.Cl_design_a
+wing.Km=mainwing.Km
+
+[sweepmaxthick] = sweep_angle(sweep_25,39.9,25,AR,lambda);
+fuselage_diameter=1.68
+root_fuselage_chord=((2*(mainwing.Ctip-mainwing.Croot))/mainwing.b)*(fuselage_diameter/2) +mainwing.Croot
+c_fuselage=root_fuselage_chord - fuselage_diameter*(tand(mainwing.sweepLE) - tand(mainwing.sweepTE));
+WingArea_fuselage=0.5*fuselage_diameter*(root_fuselage_chord+c_fuselage)
+wing.S_exposed=mainwing.sref-WingArea_fuselage
+
+ save('wing','wing.mat')
