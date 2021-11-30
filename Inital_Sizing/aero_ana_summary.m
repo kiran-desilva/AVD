@@ -49,6 +49,8 @@ legend('Cl_max clean', 'Cl_max_approach', 'Cl_max_TO', 'Clean Cruise', 'Max Crui
 
 ylim ([0 3])
 xlim([-15 25])
+title 'Wing'
+xlabel '\alpha [degrees]'
 hold off
 
 %Need to add annotations
