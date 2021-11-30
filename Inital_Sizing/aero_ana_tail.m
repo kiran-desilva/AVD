@@ -11,7 +11,8 @@ load('sizing.mat')
 load('design.mat')
 load('wing.mat')
 load('fuse.mat')
-%load("aero_analysis.mat")
+load('aero_analysis.mat')
+load('tailplane.mat')
 %% Wing Lift Estimation
 
 %% Inputs from other scripts
@@ -77,6 +78,8 @@ aero_analysis.tail.F=1.07*(1+d/b)^2;
 %aero_analysis.wing.Cl_alpha=2*pi*AR*(S_exp/S_ref)*aero_analysis.wing.F./(2+sqrt(4+(((AR^2.*aero_analysis.wing.beta.^2)/aero_analysis.wing.eta.^2)*(1+((tan(max_sweep_t)^2)./aero_analysis.wing.beta.^2))))); 
 aero_analysis.tail.Cl_alpha=2*pi*AR*1./(2+sqrt(4+(((AR^2.*aero_analysis.tail.beta.^2)/aero_analysis.tail.eta.^2)*(1+((tan(max_sweep_t)^2)./aero_analysis.tail.beta.^2))))); 
 
-aero_analysis.tail.Cl_max_wing=0.9*cl_max_airfoil*cos(lambda_quarter);
+aero_analysis.tail.Cl_max_tail=0.9*cl_max_airfoil*cos(lambda_quarter);
 
-aero_analysis.tail.zero_aoa=-3; %[degrees] to be defined
+aero_analysis.tail.zero_aoa=0; %[degrees] to be defined
+
+save('aero_analysis.mat', 'aero_analysis')
