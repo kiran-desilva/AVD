@@ -86,10 +86,14 @@ performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * aero
 
 performance.sigma_maxalt = (2 * sizing.fraction.before_cruise / (beta * T0)) * sqrt(
 
-Trust_lapse = @(V,h) ; %Thrust lapse model
-Drag = @(V,h,W);
+%Trust_lapse = @(V,h) ; %Thrust lapse model
+%Drag = @(V,h,W);
+Ps_fts = 0; %initialise
 
-f = @(M,h) M * atmos(h,2) * ((thrust_lapse(h*3.28084,M,powerplant.BPR) * powerplant.installed_thrust_lbf * 0.4482 * 2 - drag) / W) - Ps
-
-fimplicit(@(M,h) M * 
-
+for i = 1:10
+    Ps_fts = Ps_fts + 500; 
+    Ps = Ps_fts * 0.3048; %ft/s to m/s
+    f = @(M,h) M * atmos(h,2) * ((thrust_lapse(h*3.28084,M,powerplant.BPR) * powerplant.installed_thrust_lbf * 0.4482 * 2 - drag) / (sizing.fraction.before_cruise * sizing.W0)) - Ps
+    fimplicit(f, [0 1 0 13800]
+    hold on
+end
