@@ -13,15 +13,18 @@ load('wing.mat')
 load('uc.mat')
 load("aero_analysis.mat")
 load("tailplane.mat")
+load("powerplant.mat")
+load("fuse.mat")
 %% Drag Analysis
 %Parasite drag (zero-lift) & lift-induced
 
 %% Inputs from other scripts
 S_ratio=6; %=S_wet/S_ref
-S=[11.4246,100,5];
+S=[11.4246,100,9.0771,((1.3985/2)/3.2808)^2*pi*2];
 %S(1):S_ref
 %S(2):A_eff
 %S(3):S_exposed_wing
+%S(4): frontal area of nacelles (total)
 
 t_c=[0.12,tailplane.horizontal.tc,tailplane.vertical.tc]; %thickness to chord ratio
 %(1): wing
@@ -34,17 +37,18 @@ sweep_angles=[wing.sweep_25,tailplane.horizontal.sweep_25,tailplane.vertical.swe
 %sweep angles(2): horizontal tail
 %sweep angles(3): vertical tail
 
-d_fuselage=1.524; %fuselage diameter [m]
-l_fuselage=14.224; %fuselage length [m]
+d_fuselage=fuse.d_f/3.2808; %fuselage diameter [m]
+l_fuselage=fuse.structural_length/3.2808; %fuselage length [m]
 
-delta=[0,0,15,45]*pi/180; %angle of deflection of HLD [rad]
+delta=[0,0,15,45,0]*pi/180; %angle of deflection of HLD [rad]
 %delta(1):Cruise
 %delta(2):Max
 %delta(3):TO
 %delta(4):Landing
+%delta(5):Loiter
 
 %uc_frontal_area_m_sq comes from P's script
-A_UC_front=[0, 0, uc.uc_frontal_area_m_sq, uc.uc_frontal_area_m_sq]; %Area of the UC [m^2]
+A_UC_front=[0, 0, uc.uc_frontal_area_m_sq, uc.uc_frontal_area_m_sq,0]; %Area of the UC [m^2]
 %(1): cruise
 %(2): max
 %(3): TO
@@ -57,17 +61,18 @@ cl=1; %need to define
 korn=0.87;
 aero_analysis.drag.M_DD=(korn-(t_c(1)/cos(sweep_angles(1)))-(cl/(10*cos(sweep_angles(1))^2)))/cos(sweep_angles(1));
 aero_analysis.drag.M_cr_wing=aero_analysis.drag.M_DD-nthroot((0.1/80),3);
-aero_analysis.drag.M.wing=1;
+aero_analysis.drag.M.wing=aero_analysis.wing.Mach;
 
+aero_analysis.drag.C_d_aerofoil=zeros(1,length(aero_analysis.drag.M.wing))
 for i=1:length(aero_analysis.drag.M.wing)
     if aero_analysis.drag.M.wing(i) >= aero_analysis.drag.M_cr_wing
-        C_d_aerofoil=20*(aero_analysis.drag.M.wing-aero_analysis.drag.M_cr_wing)^4;
+        aero_analysis.drag.C_d_aerofoil(i)=20*(aero_analysis.drag.M.wing(i)-aero_analysis.drag.M_cr_wing)^4;
     else
-        C_d_aerofoil=0;
+        aero_analysis.drag.C_d_aerofoil(i)=0;
     end
 end
 
-aero_analysis.drag.wave=C_d_aerofoil*(S(3)/S(1));
+aero_analysis.drag.wave=aero_analysis.drag.C_d_aerofoil*(S(3)/S(1));
 
 %% Parasitic drag (not accounting for wave drag): skin friction, form & intereferece, leakage, protuberances
 
@@ -85,7 +90,7 @@ for i=1:length(delta)
 end
 
 %% windmilling engines
-aero_analysis.drag.WE=0.3*S(2)/S(1);
+aero_analysis.drag.WE=0.3*S(4);
 
 %% Fuselage upsweep
 upsweep=11*pi/180; %upsweep of the fuselage
@@ -130,7 +135,7 @@ aero_analysis.drag.FF(5)=1+(0.35/aero_analysis.drag.fineness(5));
 
 Q=[1,1,1.055,1.055,1.5]; %assuming 5.5% for horizontal and vertical stabiliser
 
-S_wet=[1,1,1,1,1]; %wetted area, exact values to be added
+S_wet=[5,5,5,5,5]; %wetted area, exact values to be added
 
 aero_analysis.drag.Re_cutoff=38.21.*(aero_analysis.drag.l_components*3.28084/2.08E-05).^(1.053);
 %note: must convert lengths to ft for the cutoff Re
@@ -183,22 +188,22 @@ end
 
 %% Induced drag
 % e_theoretical
-sweep_25=18.1692; %input, sweep angle of 1/4 chord (degrees)
+sweep_25=wing.sweep_25; %input, sweep angle of 1/4 chord (degrees)
 df_b=0.12;
 ke_f=0.971;
 k_e_d0=0.864;
 big_k=0.38;
-wing_A=7.8;
+wing_AR=wing.Ar;
 a_e=-0.001521;
 b_e=10.82;
-cl=2.1; %define later
+cl=1.6; %define later
 
-aero_analysis.induced_drag.wing.taper=wing.Ctip/wing.Croot;; %from Nadia
+aero_analysis.induced_drag.wing.taper=wing.Ctip/wing.Croot; %from Nadia
 aero_analysis.induced_drag.wing.lambda_delta=-0.357+0.45*exp(0.0375*sweep_25);
 aero_analysis.induced_drag.wing.taper_and_delta=aero_analysis.induced_drag.wing.taper-aero_analysis.induced_drag.wing.lambda_delta;
 aero_analysis.induced_drag.wing.fourth_order_lambda=0.0524*aero_analysis.induced_drag.wing.taper_and_delta^4-0.15*aero_analysis.induced_drag.wing.taper_and_delta^3+0.1659*aero_analysis.induced_drag.wing.taper_and_delta^2-0.0706*aero_analysis.induced_drag.wing.taper_and_delta+0.0119;
 
-aero_analysis.induced_drag.wing.e_theoretical=1/(1+aero_analysis.induced_drag.wing.fourth_order_lambda*wing_A);
+aero_analysis.induced_drag.wing.e_theoretical=1/(1+aero_analysis.induced_drag.wing.fourth_order_lambda*wing_AR);
 
 for j=1:length(U)
     aero_analysis.induced_drag.wing.k_e_m(j)=(a_e*(M(j)/0.3-1)^b_e)+1;
@@ -210,10 +215,10 @@ aero_analysis.induced_drag.wing.P=big_k.*aero_analysis.drag.cd0;
 
 
 for j=1:length(U)
-    aero_analysis.induced_drag.wing.e(j)=aero_analysis.induced_drag.wing.k_e_m(j)/(aero_analysis.induced_drag.wing.Q+aero_analysis.induced_drag.wing.P(j)*pi*wing_A);
+    aero_analysis.induced_drag.wing.e(j)=aero_analysis.induced_drag.wing.k_e_m(j)/(aero_analysis.induced_drag.wing.Q+aero_analysis.induced_drag.wing.P(j)*pi*wing_AR);
     aero_analysis.induced_drag.wing.e_V2(j)=aero_analysis.induced_drag.wing.e_theoretical*ke_f*k_e_d0*aero_analysis.induced_drag.wing.k_e_m(j); %without knowing Cd0
-    aero_analysis.induced_drag.wing.cd_0(j)=cl^2/(pi*wing_A*aero_analysis.induced_drag.wing.e(j));
-    aero_analysis.induced_drag.wing.cd_0_V2(j)=cl^2/(pi*wing_A*aero_analysis.induced_drag.wing.e_V2(j));
+    aero_analysis.induced_drag.wing.cd_0(j)=cl^2/(pi*wing_AR*aero_analysis.induced_drag.wing.e(j));
+    aero_analysis.induced_drag.wing.cd_0_V2(j)=cl^2/(pi*wing_AR*aero_analysis.induced_drag.wing.e_V2(j));
 end
 save('aero_analysis.mat', 'aero_analysis')
 
