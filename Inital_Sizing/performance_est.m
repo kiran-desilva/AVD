@@ -5,12 +5,12 @@ load("parameters.mat");
 %% Takeoff 
 
 Vinit = 0;
-v_stall_takeoff = sqrt(2 * sizing.W0 / (1.225 * Sref * aero_analysis.wing.takeoff_CLmax)); %need clmax takeoff
+v_stall_takeoff = %sqrt(2 * sizing.W0 / (1.225 * Sref * aero_analysis.wing.takeoff_CLmax)); %need clmax takeoff
 V_TO = aero_analysis.wing.v_takeoff_ms; %FAR-25  
 mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
 
-performance.Ka = (1.225 / (2 * wandb.W0 / wing.S_ref)) * (mu * high_lift_design.Clmax_takeoff - aero_analysis.drag.Cd0_takeoff - (high_lift_design.Clmax_takeoff^2) / (pi * wing_design.AR * aero_analyis.drag.e_takeoff));
+performance.Ka = (1.225 / (2 * sizing.W0 / wing.S_ref)) * (mu * high_lift_design.Clmax_takeoff - aero_analysis.drag.Cd0_takeoff - (high_lift_design.Clmax_takeoff^2) / (pi * wing_design.AR * aero_analyis.drag.e_takeoff));
 performance.Kt = (powerplant.Thrust_max_takeoff / wandb.W0) - mu;
 performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + performance.Ka * V_TO^2) / (performance.Kt + performance.Ka * Vinit^2)));
 
