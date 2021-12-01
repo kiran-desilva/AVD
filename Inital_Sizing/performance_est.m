@@ -21,8 +21,8 @@ H_obs = 35 / 3.2808; %meters
 R = (1.15 * analysis.wing.stall_TO_no_safety)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
 performance.Str = sqrt(R^2 - (R - H_obs)^2); %transition distance
 
-takeoff_CD = aero_analysis.drag.Cd0_takeoff + (aero_analysis.wing.takeoff_CLmaxchamge this^2) /  (pi * sizing.AR *  aero_analysis.drag.e_takeoff); 
-LoverD_TR = aero_analysis.wing.takeoff_CLmax / takeoff_CD; 
+takeoff_CD = aero_analysis.drag.Cd0_takeoff + (aero_analysis.wing.takeoff_CLmaxchamge this^2) /  (pi * wing.AR *  aero_analysis.drag.e_takeoff); 
+LoverD_TR = from isobelaero_analysis.wing.takeoff_CLmax / takeoff_CD; 
 gamma_climb = asin((powerplant.Thrust_max_takeoff / wandb.W0) - 1 / LoverD_TR);
 H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed CHECK THIS
 
