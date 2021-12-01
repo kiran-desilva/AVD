@@ -4,6 +4,7 @@ clc
 load('parameters')
 load('sizing')
 load('design')
+load('aero_analysis')
 
 %parameters from poster
 W_S= design.w_s; %
@@ -75,7 +76,11 @@ twist=-3
 [mainwing.sweepTE] = sweep_angle(sweep_25,100,25,AR,lambda);
 
 % i_w_mac=1
-% i_w= (y_bar/(b/2))*twist*(x_position) + i_w_mac
+%i_w= (y_bar/(b/2))*twist*(x_position) + i_w_mac
+
+mainwing.iw_root= 2.209
+mainwing.iw_tip= -0.79057
+
 alpha_0=-3
 CL_cruise=0.4809
 
@@ -89,6 +94,11 @@ figure
 plot(x_span,span_twist)
 
 i_w_method=((twist*y_bar)/(mainwing.b/2)) +i_mac+1.20939
+
+i_w=((twist*y_bar)/(mainwing.b/2)) +i_mac
+
+mainwing.iw_root=2.209
+mainwing.iw_tip=-0.79057
 CLmax=1.6
 CLmax_eff=0.9*CLmax*cosd(sweep_25)
 delta_y=19.3*t_c %for 65 series
@@ -165,9 +175,10 @@ cl_hdl=(delta_CL*sref) / (0.9*sflapped*cosd(mainwing.sweepTE))
 k=(delta_CL*sref) / (0.9*HDL_coeff*sflapped*cosd(mainwing.sweepTE))
 %k=cbar/c
 cbar_root=k*mainwing.Croot
-cf=cbar_root-mainwing.Croot
-f=cf/mainwing.Croot
-perc_chord=(mainwing.Croot-cf)/mainwing.Croot
+% cf_root=cbar_root-mainwing.Croot
+% cf_flat_start
+% f=cf/mainwing.Croot
+% perc_chord=(mainwing.Croot-cf)/mainwing.Croot
 
 
 [fig] = hdl(mainwing)
@@ -220,4 +231,8 @@ c_fuselage=root_fuselage_chord - fuselage_diameter*(tand(mainwing.sweepLE) - tan
 WingArea_fuselage=0.5*fuselage_diameter*(root_fuselage_chord+c_fuselage)
 wing.S_exposed=mainwing.sref-WingArea_fuselage
 
+span_fract=(0.7*mainwing.b-fuselage_diameter-0.1*mainwing.b)/mainwing.b
+
+height_down1=mainwing.b/2*tand(1)
+height_down2=mainwing.b/2*tand(2)
  save('wing','wing.mat')
