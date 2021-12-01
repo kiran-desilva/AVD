@@ -37,7 +37,7 @@ Kf_fit_data = [61.65860284863898, 3.122197140707298
 9.000659222117946, 0.056734386756959854
 ];
 
-Kf_fit = fit(Kf_fit_data(:,1),Kf_fit_data(:,2),'poly4');
+Kf_fit_coef = polyfit(Kf_fit_data(:,1),Kf_fit_data(:,2),'poly4');
 
 figure
 hold on
