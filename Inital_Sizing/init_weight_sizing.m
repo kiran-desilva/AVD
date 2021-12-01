@@ -165,7 +165,7 @@ sizing.Wf = roskam.Wf_W0(2) * sizing.W0;
 %Fractions 
 
 sizing.fraction.before_take_off=0.99*0.995;
-sizing.fraction.before_cruise=sizing.fraction.before_take_off*sizing.roskam.fuelfrac(2);
+sizing.fraction.before_cruise=0.995 * sizing.fraction.before_take_off*sizing.roskam.fuelfrac(2);
 sizing.fraction.end_cruise_1=sizing.fraction.before_cruise*sizing.roskam.fuelfrac(3);
 sizing.fraction.before_alternate_cruise=sizing.fraction.before_cruise*sizing.roskam.fuelfrac(3)*sizing.roskam.fuelfrac(4)*sizing.roskam.fuelfrac(5);
 sizing.fraction.before_loiter=sizing.fraction.before_alternate_cruise*sizing.roskam.fuelfrac(6);

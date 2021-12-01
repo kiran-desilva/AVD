@@ -36,6 +36,7 @@ U = 0.01 * aero_analysis.wing.takeoff_CLmax + 0.02;
 performance.BFL = (0.863 / (1 + 2.3 * G)) * (((powerplant.Thrust_max_takeoff / wandb.W0) / (1.225 * 9.81 * CL_climb)) + H_obs) * (1 / (T_av / wandb.W0 - U) + 2.7) + 655;
 
 %% Landing 
+HEAVIEST WEIGHT
 theta_apprch = 3; %deg from gudm.
 v_stall_landing = sqrt(2 * wandb.Wland / (1.225 * Sref * aero_analysis.wing.landing_CLmax));
 V_a = 1.3 * v_stall_landing;
