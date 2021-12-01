@@ -1,6 +1,8 @@
 clc
 clear
 
+metres_to_ft = 3.28084;
+
 load('uc.mat')
 load('wing.mat')
 load('powerplant.mat')
@@ -11,6 +13,11 @@ load('locations.mat')
 load('control_surface.mat')
 load('cg.mat')
 load('aero_analysis.mat')
+
+%%%WING FUELTANK CG%%%%%
+fueltank.x_cg_from_tip = 1.15; % m
+fueltank.z_cg_from_tip = 0.027; % m up 
+
 
 AR = sizing.AR;                         % Wing aspect ratio
 AR_h = tailplane.horizontal.Ar;         % Horizontal tailplane aspect ratio
@@ -69,11 +76,12 @@ V_p  = 0;             % Self sealing tank volume (gal)
 V_pr = 509.484697     % Volume of pressurized sections (ft^3) (12.93m^3)
 V_s = aero_analysis.wing.v_landing_fts;       % Landing stall speed (ft/s) (from Isobel)
 V_t = 259.6;          % Total volume of fuel tanks (gal)
-W_APU = 75;           % Uninstalled APU weight (lb)
+W_APU = 75;           % Uninstalled APU weight (lb) (12x13x24)
 W_c = 0;              % Maximum cargo weight (lb) [NO CARGO WEIGHT NEEDED]
 W_dg = 6772.601;      % Design gross weight (lb)
 W_en = powerplant.engine_weight_lb;      % Engine weight (lb)
 W_enc = 2.231*(W_en^0.901);              % Weight of engine and contents (lb); ≈ 2.331KpKtrW0.901en - Kp is 1.4 for engine with propeller or 1.0 otherwise, Ktr is 1.18 for jet with thrust reversers or 1.0 otherwise
+weights.W_f = 1932.35   % Fuel mass (lb)
 W_l = W_dg*0.8;         % Landing design gross weight (lb)
 W_seat = 40;            % Weight of single seat (lb); ≈ 60 for flight deck seats, 32 for passenger seats, and 11 for troop seats
 W_uav = 191.61;         % Uninstalled avionics weight; typically 800 − 1400 (lb)
@@ -148,43 +156,68 @@ weights.W_ac = 62.36*(N_p^0.25)*((V_pr*10^(-3))^0.604)*(W_uav^0.1);
 % Anti-icing
 weights.W_ai = 0.002*W_dg;
 
-% Handling gear (civilian)
-weights.W_hg = 3*10^(-4)*W_dg;
-
-% Handling gear military transport - NOT APPLICABLE
-% W_hg = 2.4*A_fc
+% Passengers + crew
+weights.W_p = 207.23 * 6;
 
 % Total weight with use of fudge factors
-weights.Total_weight = weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_en + weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_hg
+weights.Total_weight = weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_en + weights.W_f +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_p
 
 save('weights','weights')
 
 % I_y = W*K_y^2/9.81 %not sure what W is here
 
 % x & z cg coords
-cg_w = [cg.x_wing -33]; % wing cg
-cg_ht = [cg.x_htail z]; % htail cg
-cg_vt = [cg.x_vtail ]
+cg_w = [cg.x_wing -33/12]; % wing cg
+cg_ht = [cg.x_htail cg.z_htail]; % htail cg
+cg_vt = [cg.x_vtail cg.z_vtail]
 cg_fus = [cg.x_fuse 0]; % fuselage cg
-cg_mlg = []; % main landing gear cg
-cg_nlg = [40 -53]; % '' '' etc
-cg_inl = [398 16.5];
-cg_ec = [];
-cg_es = [];
-cg_fs = [];
-cg_fc = [];
-cg_instr = [];
-cg_hydr= [];
-cg_el = [];
-cg_av = [20 0];
-cg_furn = [ 0];
-cg_ac = [];
-cg_ai = [];
-cg_hg = [];
+cg_mlg = [cg.x_mlg cg.z_mlg]; % main landing gear cg
+cg_nlg = [cg.x_nlg cg.z_nlg]; % '' '' etc
+cg_inl = [cg.x_inl cg.z_inl];
+cg_ec = [cg.x_inl cg.z_inl];
+cg_es = [cg.x_inl cg.z_inl];
+cg_f = [metres_to_ft*(locations.x_ac_w - wing.Xac_from_tip + fueltank.x_cg_from_tip); -33/12]; % TODO: Might need to add underbelly in
+cg_fs = [metres_to_ft*(locations.x_ac_w - wing.Xac_from_tip + fueltank.x_cg_from_tip); -33/12]; % TODO: Might need to add underbelly in
+cg_fc = [4.5 -(33/12)];
+cg_APUinst = [cg.x_APUinst 0]
+cg_instr = [20 0]/12;
+cg_hydr= [22 -20]/12;
+cg_el = [22 -20]/12;
+cg_en = [metres_to_ft*locations.x_rear_bulkhead metres_to_ft*0.716];
+cg_av = [20 0]/12;
+cg_furn = [20 0]/12;
+cg_pass = [14 0]/12;
+cg_ac = [22 -20]/12;
+cg_ai = [22 -20]/12;
 
-wandb.x_cg = (W_w*cg_w(1)+(W_ht+W_vt)*cg_t(1)+W_fus*cg_fus(1)+W_mlg*cg_mlg(1)+W_nlg*cg_nlg(1)+W_inl*cg_inl(1)+W_ec*cg_es(1)+W_es*cg_es(1)+W_fs*cg_fs(1)+W_fc*cg_fc(1)+W_w*cg_w(1)+W_instr*cg_instr(1)+W_hydr*cg_hydr(1)+W_el*cg_el(1)+W_av*cg_av(1)+W_furn*cg_furn(1)+W_ac*cg_ac(1)+W_ai*cg_ai(1)+W_hg*cg_hg(1))/Total_weight
+wandb.x_cg = (weights.W_en*cg_en(1) + weights.W_w*cg_w(1)+weights.W_ht*cg_ht(1)+weights.W_vt*cg_vt(1)+weights.W_fus*cg_fus(1)+weights.W_mlg*cg_mlg(1)+weights.W_nlg*cg_nlg(1)+weights.W_inl*cg_inl(1)+weights.W_ec*cg_es(1)+weights.W_es*cg_es(1)+weights.W_f*cg_f(1)+weights.W_fs*cg_fs(1)+weights.W_fc*cg_fc(1)+weights.W_instr*cg_instr(1)+weights.W_hydr*cg_hydr(1)+weights.W_el*cg_el(1)+weights.W_av*cg_av(1)+weights.W_furn*cg_furn(1)+weights.W_ac*cg_ac(1)+weights.W_ai*cg_ai(1)+weights.W_p+cg_pass(1))/weights.Total_weight
 
-wandb.z_cg = (W_w*cg_w(2)+(W_ht+W_vt)*cg_t(2)+W_fus*cg_fus(2)+W_mlg*cg_mlg(2)+W_nlg*cg_nlg(2)+W_inl*cg_inl(2)+W_ec*cg_es(2)+W_es*cg_es(2)+W_fs*cg_fs(2)+W_fc*cg_fc(2)+W_w*cg_w(2)+W_instr*cg_instr(2)+W_hydr*cg_hydr(2)+W_el*cg_el(2)+W_av*cg_av(2)+W_furn*cg_furn(2)+W_ac*cg_ac(2)+W_ai*cg_ai(2)+W_hg*cg_hg(2))/Total_weight
+wandb.z_cg = (weights.W_en*cg_en(2) + weights.W_w*cg_w(2)+weights.W_ht*cg_ht(2)+weights.W_vt*cg_vt(2)+weights.W_fus*cg_fus(2)+weights.W_mlg*cg_mlg(2)+weights.W_nlg*cg_nlg(2)+weights.W_inl*cg_inl(2)+weights.W_ec*cg_es(2)+weights.W_es*cg_es(2)+weights.W_f*cg_f(2)+weights.W_fs*cg_fs(2)+weights.W_fc*cg_fc(2)+weights.W_instr*cg_instr(2)+weights.W_hydr*cg_hydr(2)+weights.W_el*cg_el(2)+weights.W_av*cg_av(2)+weights.W_furn*cg_furn(2)+weights.W_ac*cg_ac(2)+weights.W_ai*cg_ai(2)+weights.W_p+cg_pass(2))/weights.Total_weight
+
+fuel_used_at_weight_fraction = @(total_initial_weight, weight_fraction) (total_initial_weight*(1 - weight_fraction));
+x_cg_at_weight_fraction = @(total_initial_weight, weight_fraction) (wandb.x_cg*total_initial_weight - fuel_used_at_weight_fraction(total_initial_weight, weight_fraction)*cg_f(1))/(total_initial_weight*weight_fraction);  
+
+weights.total_weight_no_fuel = weights.Total_weight - weights.W_f
+wandb.x_cg_drained = (wandb.x_cg*weights.Total_weight - weights.W_f*cg_f(1))/weights.total_weight_no_fuel
+wandb.z_cg_drained = (wandb.z_cg*weights.Total_weight - weights.W_f*cg_f(2))/weights.total_weight_no_fuel
+
+%% Cg envelope calc
+% with passengers
+with_passengers = @(w_frac) x_cg_at_weight_fraction(weights.Total_weight, w_frac);
+start_cg = with_passengers(1 - weights.W_f/weights.Total_weight);
+start_weight = weights.Total_weight - weights.W_f; 
+cg_envelope = [start_cg, wandb.x_cg, with_passengers(sizing.fraction.before_cruise), with_passengers(sizing.fraction.end_cruise_1), start_cg;...
+			   start_weight, weights.Total_weight, sizing.fraction.before_cruise*weights.Total_weight, sizing.fraction.end_cruise_1*weights.Total_weight, start_weight];
+
+% without passengers and baggage
+x_cg_at_weight_fraction = @(total_initial_weight, weight_fraction) (wandb.x_cg*total_initial_weight - fuel_used_at_weight_fraction(total_initial_weight, weight_fraction)*cg_f(1) - weights.W_p*4/6*)/(total_initial_weight*weight_fraction);  
+no_passengers = @(w_frac) x_cg_at_weight_fraction(weights.Total_weight - weights.W_p*4/6, w_frac);
+start_cg = no_passengers(1 - weights.W_f/weights.Total_weight);
+start_weight = weights.Total_weight - weights.W_p*4/6 - weights.W_f; 
+cg_envelope = [start_cg, no_passengers(1), no_passengers(sizing.fraction.before_cruise), no_passengers(sizing.fraction.end_cruise_1), start_cg;...
+			   start_weight, weights.Total_weight, sizing.fraction.before_cruise*weights.Total_weight, sizing.fraction.end_cruise_1*weights.Total_weight, start_weight];
+
+plot(cg_envelope(1, :), cg_envelope(2, :));
+
 
 save('wandb','wandb')
-

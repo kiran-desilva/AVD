@@ -5,13 +5,13 @@ load("parameters.mat");
 %% Takeoff 
 
 Vinit = 0;
-v_stall_takeoff = sqrt(2 * wandb.W0 / (1.225 * Sref * aero_analysis.wing.takeoff_CLmax)); %need clmax takeoff
-V_TO = 1.1 * v_stall_takeoff; %FAR-25  
+%v_stall_takeoff = %sqrt(2 * sizing.W0 / (1.225 * Sref * aero_analysis.wing.takeoff_CLmax)); %need clmax takeoff
+V_TO = aero_analysis.wing.v_takeoff_ms; %FAR-25  
 mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
 
-performance.Ka = (1.225 / (2 * wandb.W0 / wing_design.S_ref)) * (mu * high_lift_design.Clmax_takeoff - aero_analysis.drag.Cd0_takeoff - (high_lift_design.Clmax_takeoff^2) / (pi * wing_design.AR * aero_analyis.drag.e_takeoff));
-performance.Kt = (powerplant.Thrust_max_takeoff / wandb.W0) - mu;
+performance.Ka = (1.225 / (2 * sizing.W0 / wing.S_ref)) * (mu * aero_analysis.cl_max_TO - aero_analysis.drag.Cd0_takeoff - (aero_analysis.wing.Clmax_takeoff^2) / (pi * wing.AR * aero_analyis.drag.e_takeoff));
+performance.Kt = (2 * powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - mu;
 performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + performance.Ka * V_TO^2) / (performance.Kt + performance.Ka * Vinit^2)));
 
 performance.Sr = 3 * V_TO; 
@@ -20,7 +20,7 @@ H_obs = 35 / 3.2808; %meters
 R = (1.15 * v_stall_takeoff)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
 performance.Str = sqrt(R^2 - (R - H_obs)^2); %transition distance
 
-takeoff_CD = aero_analysis.drag.Cd0_takeoff + (aero_analysis.wing.takeoff_CLmax^2) /  (pi * sizing.AR *  aero_analysis.drag.e_takeoff); 
+takeoff_CD = aero_analysis.drag.Cd0_takeoff + (aero_analysis.wing.takeoff_CLmaxchamge this^2) /  (pi * sizing.AR *  aero_analysis.drag.e_takeoff); 
 LoverD_TR = aero_analysis.wing.takeoff_CLmax / takeoff_CD; 
 gamma_climb = asin((powerplant.Thrust_max_takeoff / wandb.W0) - 1 / LoverD_TR);
 H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed 
@@ -50,8 +50,8 @@ mul = 0.3; %errikos
 performance.Sa = (H_obs - H_f) / tand(theta_apprch);
 performance.Sf = 0.1512 * v_stall_landing^2 * sind(theta_apprch); 
 performance.Sfr = tfr * V_td; 
-performance.Ktl = design_t_w (moderate power - mul; %t/w need to change? note mjst be neative
-performance.Ka_l = (1.225 / (2 * wandb.Wland / wing.Sref)) * (mul * aero_analysis.wing.landing_CLmax - aero_analysis.drag.Cd0_landing - (aero_analysis.wing.landing_CLmax^2) / (pi * wing.AR *aero_analysis.drag.e_landing));
+performance.Ktl = ((2 * 0.5 * powerplant.installed_thrust_lbf * 4.44822) / wandb.wlanding - mul; %0.5 max takeoff thrust setting 2 engines -  note mjst be neative
+performance.Ka_l = (1.225 / (2 *e wandb.Wland / wing.Sref)) * (mul * aero_analysis.wing.landing_CLmax - aero_analysis.drag.Cd0_landing - (aero_analysis.wing.landing_CLmax^2) / (pi * wing.AR *aero_analysis.drag.e_landing));
 performance.Sb = (1 / 2 * 9.81 * performance.Ka_l) * log((performance.Ktl + performance.Ka_l * 0) / (performance.Ktl + performance.Ka_l * Vtd^2)); 
 
 performance.SL  = 1.666 * (performance.Sa + performance.Sf + performance.Sfr + performance.Sb); %FAR25
@@ -84,8 +84,16 @@ performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * aero
 
 %% Point performance
 
-performance.sigma_maxalt = (2 * sizing.fraction.before_cruise / (beta * T0)) * sqrt(
+%performance.sigma_maxalt = (2 * sizing.fraction.before_cruise / (beta * T0)) * sqrt(
 
-Trust_lapse = @(V,h) ; %Thrust lapse model
-Drag = @(V,h,W) ; 
+%Trust_lapse = @(V,h) ; %Thrust lapse model
+%Drag = @(V,h,W);
+Ps_fts = 0; %initialise
 
+for i = 1:10
+    Ps_fts = Ps_fts + 500; 
+    Ps = Ps_fts * 0.3048; %ft/s to m/s
+    f = @(M,h) M * atmos(h,2) * ((thrust_lapse(h*3.28084,M,powerplant.BPR) * powerplant.installed_thrust_lbf * 0.4482 * 2 - drag) / (sizing.fraction.before_cruise * sizing.W0)) - Ps;
+    fimplicit(f, [0 1 0 13800])
+    hold on
+end
