@@ -59,3 +59,5 @@ save('aero_analysis.mat', 'aero_analysis')
 %Thicker lines
 %Colours
 %Terminate line after cross line
+
+save('aero_analysis.summary','aero_analysis')

@@ -10,7 +10,7 @@ V_TO = aero_analysis.wing.v_takeoff_ms; %FAR-25
 mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
 
-performance.Ka = (1.225 / (2 * sizing.W0 / wing.S_ref)) * (mu * aero_analysis.wing.Clmax_takeoff - aero_analysis.drag.Cd0_takeoff - (aero_analysis.wing.Clmax_takeoff^2) / (pi * wing.AR * aero_analyis.drag.e_takeoff));
+performance.Ka = (1.225 / (2 * sizing.W0 / wing.S_ref)) * (mu * aero_analysis.cl_max_TO - aero_analysis.drag.Cd0_takeoff - (aero_analysis.wing.Clmax_takeoff^2) / (pi * wing.AR * aero_analyis.drag.e_takeoff));
 performance.Kt = (2 * powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - mu;
 performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + performance.Ka * V_TO^2) / (performance.Kt + performance.Ka * Vinit^2)));
 
@@ -20,7 +20,7 @@ H_obs = 35 / 3.2808; %meters
 R = (1.15 * v_stall_takeoff)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
 performance.Str = sqrt(R^2 - (R - H_obs)^2); %transition distance
 
-takeoff_CD = aero_analysis.drag.Cd0_takeoff + (aero_analysis.wing.takeoff_CLmax^2) /  (pi * sizing.AR *  aero_analysis.drag.e_takeoff); 
+takeoff_CD = aero_analysis.drag.Cd0_takeoff + (aero_analysis.wing.takeoff_CLmaxchamge this^2) /  (pi * sizing.AR *  aero_analysis.drag.e_takeoff); 
 LoverD_TR = aero_analysis.wing.takeoff_CLmax / takeoff_CD; 
 gamma_climb = asin((powerplant.Thrust_max_takeoff / wandb.W0) - 1 / LoverD_TR);
 H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed 
