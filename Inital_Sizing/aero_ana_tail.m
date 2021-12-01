@@ -58,13 +58,13 @@ aero_analysis.tail.Re(5)=aero_analysis.tail.rho(5)*aero_analysis.tail.Mach(5)*ae
 %(5): loiter (5000 ft @ M=0.28)
 
 
-%% Correction factors, wing
+%% Correction factors, tail
 aero_analysis.tail.beta=sqrt(1-aero_analysis.tail.Mach.^2); %compressibility effects
 aero_analysis.tail.cl_alpha_ratio=[0.95,0.945,0.945,0.945, 0.95]; %read off graph - DATCOM 1978
 aero_analysis.tail.cl_alpha_theory=2*pi+4.7*aero_analysis.tail.t_c*(1+0.00375*0.6); %0.6 deg
 aero_analysis.tail.Cl_alpha_aerofoil=(1.05./aero_analysis.tail.beta).*aero_analysis.tail.cl_alpha_ratio*aero_analysis.tail.cl_alpha_theory; %cl of the airfoil as a function of the mach number. Varies so inputs must be changed manually based on readings off graph
-%aero_analysis.tail.eta=(aero_analysis.tail.beta).*(aero_analysis.tail.Cl_alpha_aerofoil)./(2*pi); %fraction between both
-aero_analysis.tail.eta=[1,1,1,1,1];
+aero_analysis.tail.eta=(aero_analysis.tail.beta).*(aero_analysis.tail.Cl_alpha_aerofoil)./(2*pi); %fraction between both
+%aero_analysis.tail.eta=[1,1,1,1,1];
 aero_analysis.tail.F=1.07*(1+d/b)^2;
 
 %% winglet
