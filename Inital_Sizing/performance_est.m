@@ -10,7 +10,7 @@ V_TO = aero_analysis.wing.v_takeoff_ms; %FAR-25
 mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
 
-performance.Ka = (1.225 / (2 * sizing.W0 / wing.S_ref)) * (mu * aero_analysis.wing.Clmax_takeoff - aero_analysis.drag.Cd0_takeoff - (aero_analysis.wing.Clmax_takeoff^2) / (pi * wing.AR * aero_analyis.drag.e_takeoff));
+performance.Ka = (1.225 / (2 * sizing.W0 / wing.S_ref)) * (mu * aero_analysis.cl_max_TO - aero_analysis.drag.Cd0_takeoff - (aero_analysis.wing.Clmax_takeoff^2) / (pi * wing.AR * aero_analyis.drag.e_takeoff));
 performance.Kt = (2 * powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - mu;
 performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + performance.Ka * V_TO^2) / (performance.Kt + performance.Ka * Vinit^2)));
 
