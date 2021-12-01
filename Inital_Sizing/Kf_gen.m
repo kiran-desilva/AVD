@@ -37,12 +37,12 @@ Kf_fit_data = [61.65860284863898, 3.122197140707298
 9.000659222117946, 0.056734386756959854
 ];
 
-Kf_fit_coef = polyfit(Kf_fit_data(:,1),Kf_fit_data(:,2),'poly4');
-
+Kf_fit_coef = polyfit(Kf_fit_data(:,1),Kf_fit_data(:,2),4);
+kf_equation = poly2sym(Kf_fit_coef);
 figure
 hold on
 plot(Kf_data(:,1),Kf_data(:,2),'x');
 plot(Kf_fit_data(:,1),Kf_fit_data(:,2),'o')
-plot(Kf_fit);
+fplot(kf_equation);
 xlabel('wing quater chord position, percent of fuselage length')
 ylabel('Kf')

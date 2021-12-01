@@ -188,6 +188,7 @@ wing.sweep_25 = sweep_25;
 wing.sweepTE = mainwing.sweepTE;
 [~,~,~,~,wing.Ybar,wing.Xac_from_tip] = wing_geometry_calc(sref,AR,lambda,wing.sweepLE,1);
 wing.twist = twist
+wing.i_w =i_w;
 
 wing.HDL_PERC = mainwing.HDL_PERC;
 wing.HDL_Croot = mainwing.HDL_Croot;
@@ -221,4 +222,4 @@ c_fuselage=root_fuselage_chord - fuselage_diameter*(tand(mainwing.sweepLE) - tan
 WingArea_fuselage=0.5*fuselage_diameter*(root_fuselage_chord+c_fuselage)
 wing.S_exposed=mainwing.sref-WingArea_fuselage
 
- save('wing','wing.mat')
+ save('wing','wing')
