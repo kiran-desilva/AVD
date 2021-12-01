@@ -80,7 +80,7 @@ V_s = aero_analysis.wing.v_landing_fts;       % Landing stall speed (ft/s) (from
 
 V_t = 257.43;          % Total volume of fuel tanks (gal) -> changed from 259.6
 
-W_APU = 75;           % Uninstalled APU weight (lb) (12x13x24)
+W_APU = 0 ;           % Uninstalled APU weight (lb) (12x13x24)
 W_c = 0;              % Maximum cargo weight (lb) [NO CARGO WEIGHT NEEDED]
 W_dg = convforce(sizing.W0,'n','lbf');      % Design gross weight (lb)
 W_en = powerplant.engine_weight_lb;      % Engine weight (lb)
