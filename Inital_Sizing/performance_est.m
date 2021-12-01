@@ -17,7 +17,7 @@ performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + p
 performance.Sr = 3 * V_TO; 
 
 H_obs = 35 / 3.2808; %meters
-R = (1.15 * v_stall_takeoff)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
+R = (1.15 * analysis.wing.stall_TO_no_safety)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
 performance.Str = sqrt(R^2 - (R - H_obs)^2); %transition distance
 
 takeoff_CD = aero_analysis.drag.Cd0_takeoff + (aero_analysis.wing.takeoff_CLmaxchamge this^2) /  (pi * sizing.AR *  aero_analysis.drag.e_takeoff); 
@@ -36,9 +36,10 @@ U = 0.01 * aero_analysis.wing.takeoff_CLmax + 0.02;
 performance.BFL = (0.863 / (1 + 2.3 * G)) * (((powerplant.Thrust_max_takeoff / wandb.W0) / (1.225 * 9.81 * CL_climb)) + H_obs) * (1 / (T_av / wandb.W0 - U) + 2.7) + 655;
 
 %% Landing 
-HEAVIEST WEIGHT
+
 theta_apprch = 3; %deg from gudm.
-v_stall_landing = sqrt(2 * wandb.Wland / (1.225 * Sref * aero_analysis.wing.landing_CLmax));
+Wland_noalternatecruise = sizing.fraction.end_cruise_1 * 0.99 * sizing.W0;
+v_stall_landing = sqrt(2 * Wland_noalternatecruise / (1.225 * Sref * aero_analysis.wing.landing_CLmax));
 V_a = 1.3 * v_stall_landing;
 V_f = 1.23 * v_stall_landing;
 V_td = 1.15 * v_stall_landing; %errikos slides
