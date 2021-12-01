@@ -159,7 +159,7 @@ weights.W_ai = 0.002*W_dg;
 % Passengers + crew
 weights.W_p = 207.23 * 6;
 
-weights.W_pay = convmass((20 * 6),"kg","lbm")
+weights.W_pay = convmass((20 * 6),"kg","lbm" )
 
 % Total weight with use of fudge factors -> MTOW
 weights.Total_weight = weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_en + weights.W_f +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_p + weights.W_pay
