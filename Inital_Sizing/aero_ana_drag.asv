@@ -25,7 +25,6 @@ S=[wing.Sref,100,8.1292,((1.3985/2)/3.2808)^2*pi*2,50];
 %S(2):A_eff
 %S(3):S_exposed_wing
 %S(4): frontal area of nacelles (total)
-%S(5): wetted surface area of the whole plane
 
 t_c=[0.12,tailplane.horizontal.tc,tailplane.vertical.tc]; %thickness to chord ratio
 %(1): wing
@@ -85,19 +84,19 @@ for i=1:length(A_UC_front)
 end
 
 %% Flaps
-b=wing.b;
+b=5;
 b_f=3;
 
 for i=1:length(delta)
-    aero_analysis.drag.HLD(i)=0.0023*(0.4138)*delta(i);
+    aero_analysis.drag.HLD(i)=0.0023*(b_f/b)*delta(i);
 end
 
 %% windmilling engines
-aero_analysis.drag.WE=0.3*S(4)/wing.Sref;
+aero_analysis.drag.WE=0.3*S(4);
 
 %% Fuselage upsweep
 upsweep=11*pi/180; %upsweep of the fuselage
-aero_analysis.drag.upsweep=3.83*(pi*d_fuselage^2/(4*S(1)))*(upsweep)^(2.5);
+aero_analysis.drag.upsweep=3.83*(pi*d_fuselage^2/(4*S(1)))*upsweep^(2.5);
 
 %% Combine Misc terms
 aero_analysis.drag.cd_misc=zeros(1,length(delta));
@@ -138,7 +137,7 @@ aero_analysis.drag.FF(5)=1+(0.35/aero_analysis.drag.fineness(5));
 
 Q=[1,1,1.055,1.055,1.5]; %assuming 5.5% for horizontal and vertical stabiliser
 
-S_wet=[28.252,15,3,3,5]; %wetted area, exact values to be added
+S_wet=[28.252,15,5,5,10]; %wetted area, exact values to be added
 %(1):fuselage
 %(2):wing
 %(3): horizontal stabiliser
@@ -229,7 +228,7 @@ aero_analysis.induced_drag.Q=1./(aero_analysis.induced_drag.e_theoretical.*ke_f)
 aero_analysis.induced_drag.P=big_k.*aero_analysis.drag.cd0;
 
 %assuming efficiency of tail (eta_h) is 0.9 since it's a t-tail
-angle_flight=[0.5,0.5,7,7,0.5]*pi/180;
+angle_flight=[0.5,0.5,3,3,0.5]*pi/180;
 for j=1:length(U)
     aero_analysis.induced_drag.wing.e(j)=aero_analysis.induced_drag.k_e_m(j)/(aero_analysis.induced_drag.Q(1)+aero_analysis.induced_drag.P(j)*pi*induced_AR(1));
     aero_analysis.induced_drag.wing.e_V2(j)=aero_analysis.induced_drag.e_theoretical(1)*ke_f*k_e_d0*aero_analysis.induced_drag.k_e_m(j); %without knowing Cd0
@@ -242,7 +241,7 @@ for j=1:length(U)
     aero_analysis.induced_drag.cd_i(j)=aero_analysis.induced_drag.wing.cd_i(j)+aero_analysis.induced_drag.tail.cd_i(j);
 end
 
-aero_analysis.induced_drag.HLD=0.28^2.*aero_analysis.wing.HLD.delta_cl_max.^2*cos(wing.sweep_25);
+aero_analysis.induced_drag.HLD=0.14^2.*aero_analysis.wing.HLD.delta_cl_max.^2*cos(wing.sweep_25);
 aero_analysis.induced_drag.cd_i(3)=aero_analysis.induced_drag.cd_i(3)+aero_analysis.induced_drag.HLD(1);
 aero_analysis.induced_drag.cd_i(4)=aero_analysis.induced_drag.cd_i(4)+aero_analysis.induced_drag.HLD(2);
 
@@ -250,9 +249,11 @@ save('aero_analysis.mat', 'aero_analysis')
 
 %% Total Drag
 
-
+%aero_analysis.drag.oswald=1./(aero_analysis.induced_drag.wing.Q+aero_analysis.induced_drag.wing.P*pi*
 cd_induced_total=aero_analysis.induced_drag.cd_i
 cd_parasitic_total=aero_analysis.drag.cd0
 aero_analysis.drag.wave
 cd_total=cd_parasitic_total+cd_induced_total+aero_analysis.drag.wave
+%cd_induced_total=[
+percentge=[cd_induced_total(1)/cd_total(1), cd_parasitic_total(1)/cd_total(1), aero_analysis.drag.wave(1)/cd_total(1)]
 
