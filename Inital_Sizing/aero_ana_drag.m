@@ -251,8 +251,7 @@ save('aero_analysis.mat', 'aero_analysis')
 %% Total Drag
 
 
-cd_induced_total=aero_analysis.induced_drag.cd_i
-cd_parasitic_total=aero_analysis.drag.cd0
-aero_analysis.drag.wave
-cd_total=cd_parasitic_total+cd_induced_total+aero_analysis.drag.wave
+aero_analysis.drag.cd_induced_total=aero_analysis.induced_drag.cd_i;
+aero_analysis.drag.cd_parasitic_total=aero_analysis.drag.cd0;
+aero_analysis.drag.cd_total=aero_analysis.drag.cd_parasitic_total+aero_analysis.drag.cd_induced_total+aero_analysis.drag.wave;
 
