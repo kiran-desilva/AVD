@@ -9,6 +9,7 @@ load("uc.mat")
 
 %wing xcg
 x_wing = locations.x_wing;
+x_wing_from_ac = @(ac) ac - wing.Xac_from_tip;
 x_sweep = 0.35*0.5*wing.b/tand(wing.sweepLE);
 chord_35 = (wing.Ctip-wing.Croot)*0.35 +wing.Croot;
 spar_distance = chord_35*0.75-chord_35*0.1; %spars at 10% and 75% chord
@@ -17,13 +18,15 @@ x_chord = 0.7*spar_distance + 0.1*chord_35;
 wing_xcg_metres = x_wing + x_sweep + x_chord;
 cg.x_wing = wing_xcg_metres * 3.28084 %in feet
 
+cg.x_wing_from_ac_func = @(ac) (x_wing_from_ac(ac) + x_sweep + x_chord) * 3.28084 ;
+
 
 %fuselage xcg
 cg.x_fuse = (0.47 * fuse.total_fuselage_length)/12
 
 %vertical tail cg
 offset_55_c = 0.55*tailplane.vertical.b*tand(tailplane.vertical.sweepLE);
-vtail_xcg_metres = locations.x_vertical_stabilizer+offset_55_c+((tailplane.vertical.Croot - ((tailplane.vertical.Croot-tailplane.vertical.Ctip)*0.55))*.42);
+vtail_xcg_metres = locations.+offset_55_c+((tailplane.vertical.Croot - ((tailplane.vertical.Croot-tailplane.vertical.Ctip)*0.55))*.42);
 cg.x_vtail = vtail_xcg_metres * 3.28084
 
 vtail_zcg_metres = 0.55*tailplane.vertical.b + (0.84-(locations.x_vertical_stabilizer-fuse.x_afterbody)*tand(4))

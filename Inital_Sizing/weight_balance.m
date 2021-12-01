@@ -159,8 +159,13 @@ weights.W_ai = 0.002*W_dg;
 % Passengers + crew
 weights.W_p = 207.23 * 6;
 
-% Total weight with use of fudge factors
+% Total weight with use of fudge factors -> MTOW
 weights.Total_weight = weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_en + weights.W_f +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_p
+
+
+fuel_fraction_to_fuel_weight = @(wf_fuel) (1-wf_fuel)*sizing.W0*0.2248089431; % conversion from newton to lbf
+weights.Total_weight_func = @(wf_fuel,payload_factor) weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_en + weights.W_f +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_p
+
 
 save('weights','weights')
 
@@ -191,6 +196,15 @@ cg_ac = [22 -20]/12;
 cg_ai = [22 -20]/12;
 
 wandb.x_cg = (weights.W_en*cg_en(1) + weights.W_w*cg_w(1)+weights.W_ht*cg_ht(1)+weights.W_vt*cg_vt(1)+weights.W_fus*cg_fus(1)+weights.W_mlg*cg_mlg(1)+weights.W_nlg*cg_nlg(1)+weights.W_inl*cg_inl(1)+weights.W_ec*cg_es(1)+weights.W_es*cg_es(1)+weights.W_f*cg_f(1)+weights.W_fs*cg_fs(1)+weights.W_fc*cg_fc(1)+weights.W_instr*cg_instr(1)+weights.W_hydr*cg_hydr(1)+weights.W_el*cg_el(1)+weights.W_av*cg_av(1)+weights.W_furn*cg_furn(1)+weights.W_ac*cg_ac(1)+weights.W_ai*cg_ai(1)+weights.W_p+cg_pass(1))/weights.Total_weight
+
+
+%	wing_ac	-	aerodynamic centre of the wing, measured from the nose of the plane, in metres
+%	wf_fuel -	fuel weight fraction, defined as current_weight/max_takeoff_weight 
+%	payload_factor -	payload fraction, varies from 0 to 1, where 0 means no passengers and no baggage (but 2 pilots)
+%						and 1 means 4 passengers, 4 bags (and 2 pilots)
+
+wandb.x_cg_fuction = @(wing_ac,wf_fuel,payload_factor) (weights.W_en*cg_en(1) + weights.W_w*cg.x_wing_from_ac_func(wing_ac)+weights.W_ht*cg_ht(1)+weights.W_vt*cg_vt(1)+weights.W_fus*cg_fus(1)+weights.W_mlg*cg_mlg(1)+weights.W_nlg*cg_nlg(1)+weights.W_inl*cg_inl(1)+weights.W_ec*cg_es(1)+weights.W_es*cg_es(1)+(wf_fuel*weights.Total_weight*cg_f(1))+weights.W_fs*cg_fs(1)+weights.W_fc*cg_fc(1)+weights.W_instr*cg_instr(1)+weights.W_hydr*cg_hydr(1)+weights.W_el*cg_el(1)+weights.W_av*cg_av(1)+weights.W_furn*cg_furn(1)+weights.W_ac*cg_ac(1)+weights.W_ai*cg_ai(1)+weights.W_p+cg_pass(1))/weights.Total_weight
+
 
 wandb.z_cg = (weights.W_en*cg_en(2) + weights.W_w*cg_w(2)+weights.W_ht*cg_ht(2)+weights.W_vt*cg_vt(2)+weights.W_fus*cg_fus(2)+weights.W_mlg*cg_mlg(2)+weights.W_nlg*cg_nlg(2)+weights.W_inl*cg_inl(2)+weights.W_ec*cg_es(2)+weights.W_es*cg_es(2)+weights.W_f*cg_f(2)+weights.W_fs*cg_fs(2)+weights.W_fc*cg_fc(2)+weights.W_instr*cg_instr(2)+weights.W_hydr*cg_hydr(2)+weights.W_el*cg_el(2)+weights.W_av*cg_av(2)+weights.W_furn*cg_furn(2)+weights.W_ac*cg_ac(2)+weights.W_ai*cg_ai(2)+weights.W_p+cg_pass(2))/weights.Total_weight
 
