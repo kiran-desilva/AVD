@@ -28,7 +28,7 @@ F_w = 0;                  % Fuselage width at horizontal tail intersection (ft)
 H_t_H_v = 1               % Location of horizontal tailplane on vertical tail. 0.0 for fuselage mounted horizontal tail; 1.0 for T-tail
 K_buf = 1.02;             % 1.02 for short ranges; 5.68 for very long ranges
 K_door = 1;               % 1.0 if no cargo door; 1.06 for one side cargo door; 1.12 for two sidecargo doors; 1.12 for aft clamshell door; 1.25 for two side and anaft clamshell cargo doors
-K_lav = 3.9;              % 1.11 for long range aircraft; 0.31 for short range aircraft; 3.9 for business jets.
+K_lav = 0.39;              % 1.11 for long range aircraft; 0.31 for short range aircraft; 3.9 for business jets.
 K_Lg = 1;                 % 1.12  for fuselage mounted landing gear; 1.0 otherwise
 K_mp = 1;                 % 1.126 for kneeling main gear; 1.0 otherwise
 K_ng = 1;                 % 1.017 for pylon mounted nacelle; 1.0 otherwise
@@ -40,14 +40,14 @@ L = fuse.structural_length/12;    % Fuselage structural length (ft)
 L_a = 47                 % Electrical routing distance; generators to avionics to cockpit (ft)
 L_ec = 94                % Engine controls routing distance; engine to cockpit - total if multiengine (ft)
 L_f = fuse.total_fuselage_length/12; % Total fuselage length (ft)
-L_ht = locations.x_ac_w * 3.28084 ;  % Length from wing aerodynamic centre to horizontal tailplane aerodynamic centre (ft)
+L_ht = (locations.x_ac_h - locations.x_ac_w)* 3.28084 ;  % Length from wing aerodynamic centre to horizontal tailplane aerodynamic centre (ft)
 L_m = uc.main_gear_length_in;        % Main landing gear length (inches)
 L_n = uc.nose_gear_length_in;        % Nose landing gear length (inches)
 L_vt = (locations.x_ac_v - locations.x_ac_w) * 3.28084;  % Length from wing aerodynamic centre to vertical tailplane aerodynamic centre (ft)
 N_c = 2;                  % Number of crew
 N_en = 2;                 % Number of engines
-N_f = 6;                  % Number of functions performed by controls; typically 4 − 7 (pitch, yaw, roll, throttle, HLDs, undercarriage)
-N_gear = uc.ratio_ngear;  % The ratio of the average total load applied to the main gear during landing to the max landing weight; typically 2.7−3 for commercial aircraft
+N_f = 4;                  % Number of functions performed by controls; typically 4 − 7 (pitch, yaw, roll, throttle, HLDs, undercarriage)
+N_gear = 2.7%uc.ratio_ngear;  % The ratio of the average total load applied to the main gear during landing to the max landing weight; typically 2.7−3 for commercial aircraft
 N_gen = 2;                % Number of generators; typically = Nen
 N_l = N_gear * 1.5;       % Ultimate landing gear load factor. 1.5 × Ngear
 N_Lt = powerplant.nacelle_length_ft;   % Nacelle length (ft)
@@ -59,38 +59,42 @@ N_p = 6;                  % Total number of persons onboard (crew + passengers)
 N_seat = 4;               % Number of seats of given type
 N_t = 3;                  % Total number of fuel tanks
 N_w = powerplant.nacelle_width_ft; % Nacelle width (ft)
-N_z = 2.75*1.5;          % Ultimate load factor; 1.5× limit load factor (2.7-3)
+N_z = 2.7%2.75*1.5;          % Ultimate load factor; 1.5× limit load factor (2.7-3)
 R_kva = 40               % System electrical rating; typically 40 − 60 for transports (kVA)
 S_cs = control_surface.total_area_ft2;        % Total control surface area (ft^2)
 S_csw = control_surface.wingmounted_area_ft2; % Area of wing mounted control surfaces (ft^2)
 S_e  = control_surface.elevator_area_ft2;     % Elevator area (ft^2)
-S_f  = 50.192 *10.7639;     % Fuselage wetted area (ft^2) (21.94m^2)
+S_f  = 50.192 * 10.7639;     % Fuselage wetted area (ft^2) (21.94m^2)
 S_ht = tailplane.initial.horizontal.s * 10.7639;   % Horizontal tailplane area (ft^2)
 S_n = powerplant.nacelle_wetted_area_ft_sq;    % Nacelle wetted area (ft^2)
 S_vt = tailplane.initial.vertical.s * 10.7639; % Vertical tailplane area (ft^2)
 S_w = wing.Sref * 10.7639;                     % Reference wing area (ft^2)
 tc_root = 0.12;       % Wing root thickness to chord ratio
 tc_rootv = 0.15;      % Vertical tailplane root thickness to chord ratio
-V_i = 259.6;          % Integral fuel tank volume (gal) -> should be 247.63
+
+V_i = 247.63;          % Integral fuel tank volume (gal) -> should be 247.63
+
 V_p  = 0;             % Self sealing tank volume (gal)
 V_pr = 509.484697     % Volume of pressurized sections (ft^3) (12.93m^3)
 V_s = aero_analysis.wing.v_landing_fts;       % Landing stall speed (ft/s) (from Isobel)
-V_t = 259.6;          % Total volume of fuel tanks (gal) -> changed from 259.6
+
+V_t = 247.63;          % Total volume of fuel tanks (gal) -> changed from 259.6
+
 W_APU = 75;           % Uninstalled APU weight (lb) (12x13x24)
 W_c = 0;              % Maximum cargo weight (lb) [NO CARGO WEIGHT NEEDED]
 W_dg = convforce(sizing.W0,'n','lbf');      % Design gross weight (lb)
 W_en = powerplant.engine_weight_lb;      % Engine weight (lb)
 W_enc = 2.231*(W_en^0.901);              % Weight of engine and contents (lb); ≈ 2.331KpKtrW0.901en - Kp is 1.4 for engine with propeller or 1.0 otherwise, Ktr is 1.18 for jet with thrust reversers or 1.0 otherwise
-weights.W_f = 1601.7   % Fuel mass (lb)
+weights.W_f = 1601.1  % Fuel mass (lb)
 W_l = W_dg*0.8;         % Landing design gross weight (lb)
 W_seat = 40;            % Weight of single seat (lb); ≈ 60 for flight deck seats, 32 for passenger seats, and 11 for troop seats
-W_uav = convmass(191.61,'kg','lbm');         % Uninstalled avionics weight; typically 800 − 1400 (lb)
+W_uav = 191.6;         % Uninstalled avionics weight; typically 800 − 1400 (lb)
 lambda = wing.lambda;                % Wing taper ratio
 cap_lambda = wing.sweep_25;          % Wing quarter chord sweep
 cap_lambda_ht = tailplane.horizontal.sweep_25;        % Horizontal tailplane quarter chord sweep
 cap_lambda_vt = tailplane.vertical.sweep_25;          % Vertical tailplane quarter chord sweep
 
-K_ws = 0.75*((1+2*lambda)/(1+lambda)) * B_w * tan(cap_lambda/L);    % 0.75[(1 + 2λ)/(1 + λ)]Bw tan Λ/L
+K_ws = 0.75*((1+2*lambda)/(1+lambda)) * B_w * tand(cap_lambda/L);    % 0.75[(1 + 2λ)/(1 + λ)]Bw tan Λ/L
 K_y = 0.3*L_ht;          % Aircraft pitching radius of gyration; ≈ 0.3Lht (ft)
 K_z = L_vt;              % Aircraft yaw radius of gyration; ≈ Lvt (ft)
 I_y = (sizing.W0/9.81)*2.20462*K_y^2   % Pitching moment of inertia; ≈ W_o*Ky^2 (lb ft^2)
@@ -130,10 +134,10 @@ weights.W_en = N_en * W_enc;
 weights.W_fs = 2.405*(V_t^0.606)*(N_t^0.5)*((1+V_p/V_t)/(1+V_i/V_t));
 
 % Flight controls
-weights.W_fc = (145.9*(N_f^0.554)*(S_cs^0.2)*((I_y*10^(-6))^0.07))/(1+(N_m/N_f));
+weights.W_fc = (145.9*(N_f^0.554)*(S_cs^0.2)*((I_y*(10^(-6)))^0.07))/(1+(N_m/N_f));
 
 % Installed APU 
-weights.W_APUinst = 2.2*W_APU;
+weights.W_APUinst = 0%2.2*W_APU;
 
 % Instruments
 weights.W_instr = 4.509*K_r*K_tp*(N_c^0.541)*N_en*((L_f+B_w)^0.5);
@@ -159,10 +163,11 @@ weights.W_ai = 0.002*W_dg;
 % Passengers + crew
 weights.W_p = 207.23 * 6;
 
-weights.W_pay = convmass((20 * 6),"kg","lbm")
+weights.W_pay = convmass((15 * 6),"kg","lbm")
 
 % Total weight with use of fudge factors -> MTOW
 weights.Total_weight = weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_en + weights.W_f +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_p + weights.W_pay
+weights.Total_weight_lol = weights.W_w + (weights.W_ht + weights.W_vt) + weights.W_fus + (weights.W_mlg + weights.W_nlg) + weights.W_inl + weights.W_ec + weights.W_es + weights.W_en + weights.W_f +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_p + weights.W_pay
 empty = weights.Total_weight - weights.W_f;
 
 fuel_fraction_to_fuel_weight = @(wf_fuel) (1-wf_fuel)*sizing.W0*0.2248089431; % conversion from newton to lbf
@@ -193,7 +198,7 @@ cg_el = [22 -20]/12;
 cg_en = [metres_to_ft*locations.x_rear_bulkhead metres_to_ft*0.716];
 cg_av = [20 0]/12;
 cg_furn = [20 0]/12;
-cg_pass = [14 0]/12;
+cg_pass = [14 0];
 cg_ac = [22 -20]/12;
 cg_ai = [22 -20]/12;
 
