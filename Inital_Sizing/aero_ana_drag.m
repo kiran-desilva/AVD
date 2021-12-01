@@ -211,7 +211,7 @@ big_k=0.38;
 induced_AR=[wing.Ar, tailplane.horizontal.Ar];
 a_e=-0.001521;
 b_e=10.82;
-cl=[1.6,1.6]; %define later
+cl=[0.45,0.2]; %define later
 
 aero_analysis.induced_drag.taper=[wing.Ctip/wing.Croot, tailplane.horizontal.Ctip/tailplane.horizontal.Croot] ; %from Nadia
 aero_analysis.induced_drag.lambda_delta=-0.357+0.45*exp(0.0375.*sweep_25);
@@ -238,7 +238,7 @@ for j=1:length(U)
 %    aero_analysis.induced_drag.wing.cd_0(j)=cl^2/(pi*induced_AR(1)*aero_analysis.induced_drag.wing.e(j));
 %    aero_analysis.induced_drag.wing.cd_0_V2(j)=cl^2/(pi*induced_AR(1)*aero_analysis.induced_drag.wing.e_V2(j));
     aero_analysis.induced_drag.wing.cd_i(j)=(aero_analysis.wing.Cl_alpha(j)*angle_flight(j))^2/(pi*induced_AR(1)*aero_analysis.induced_drag.e_theoretical(1));
-    aero_analysis.induced_drag.tail.cd_i(j)=(aero_analysis.tail.Cl_alpha(j)*angle_flight(j))^2/(pi*induced_AR(2)*aero_analysis.induced_drag.e_theoretical(2))*0.9*tailplane.horizontal.s/wing.Sref;
+    aero_analysis.induced_drag.tail.cd_i(j)=(aero_analysis.tail.Cl_alpha(j)*angle_flight(j))^2/(pi*induced_AR(2)*aero_analysis.induced_drag.e_theoretical(2))*1*tailplane.horizontal.s/wing.Sref;
     aero_analysis.induced_drag.cd_i(j)=aero_analysis.induced_drag.wing.cd_i(j)+aero_analysis.induced_drag.tail.cd_i(j);
 end
 

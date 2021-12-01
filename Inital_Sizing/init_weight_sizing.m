@@ -58,7 +58,7 @@ for j = 1:2
         sizing.roskam.fuelfrac(2) = 0.98;    %climb
         sizing.roskam.fuelfrac(3) = exp(-(p.parameters.cruise_range_km * 1000 * roskam.c_1 / 3600) / (p.parameters.cruise_mach * 295.07 * roskam.LoverD_cruise(j)));  %cruise 1 using breguet range
         sizing.roskam.fuelfrac(4) = 0.99;  %descent 1
-        sizing.roskam.fuelfrac(5) = 0.98;  %climb and accelerate note assumed same as prev climb
+        sizing.roskam.fuelfrac(5) = 0.98;  %climb and accelerate 
         sizing.roskam.fuelfrac(6) = exp(-(p.parameters.alternate_range_km * 1000 * roskam.c_2 / 3600) / (p.parameters.cruise_mach * 309.6199 * roskam.LoverD_cruise(j)));  %cruise 2
         sizing.roskam.fuelfrac(7) = exp(-(p.parameters.loiter_duration * 60 * roskam.c_3 / 3600) / (roskam.LoverD_loiter(j))); % loiter using endurance eqn
         sizing.roskam.fuelfrac(8) = 0.99; %descent 2
@@ -165,7 +165,7 @@ sizing.Wf = roskam.Wf_W0(2) * sizing.W0;
 %Fractions 
 
 sizing.fraction.before_take_off=0.99*0.995;
-sizing.fraction.before_cruise=sizing.fraction.before_take_off*sizing.roskam.fuelfrac(2);
+sizing.fraction.before_cruise=0.995 * sizing.fraction.before_take_off*sizing.roskam.fuelfrac(2);
 sizing.fraction.end_cruise_1=sizing.fraction.before_cruise*sizing.roskam.fuelfrac(3);
 sizing.fraction.before_alternate_cruise=sizing.fraction.before_cruise*sizing.roskam.fuelfrac(3)*sizing.roskam.fuelfrac(4)*sizing.roskam.fuelfrac(5);
 sizing.fraction.before_loiter=sizing.fraction.before_alternate_cruise*sizing.roskam.fuelfrac(6);
