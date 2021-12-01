@@ -219,13 +219,13 @@ for idx = 1:length(region.regions)
     % sub in thrust settings
     Cmcg_function = subs(Cmcg_function,[C_thrust_syms],[region.C_thrust(idx)]);
     % expose the variables we want
-    Cmcg_function(alpha,ih_syms,iw_syms) = Cmcg_function;
+    Cmcg_function(alpha,ih_syms,iw_syms) = matlabFunction(Cmcg_function,'vars',[alpha,ih_syms,iw_syms]);
 
-    CL_function(alpha,ih_syms,iw_syms) = subs(CL,[cla_eta_syms,wing_Cl_alpha_syms],[region.cla_eta(idx),region.cl_alpha_w(idx)])
+    CL_function(alpha,ih_syms,iw_syms) = matlabFunction(subs(CL,[cla_eta_syms,wing_Cl_alpha_syms],[region.cla_eta(idx),region.cl_alpha_w(idx)],'vars',[alpha,ih_syms,iw_syms]);
 
     %x(1) = alpha, x(2) = ih
-    F(1) = @(x) double(Cmcg_function(x(1),x(2),wing.i_w));
-    F(2) = @(x) double(CL_function(x(1),x(2),wing.i_w)) - region.CL{idx};
+    F(1) = @(x) Cmcg_function(x(1),x(2),wing.i_w);
+    F(2) = @(x) CL_function(x(1),x(2),wing.i_w) - region.CL{idx};
     x0 = [0,0];
     res = fsolve(F,x0)
 
