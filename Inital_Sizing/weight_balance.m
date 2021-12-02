@@ -193,14 +193,14 @@ cg_ec = [cg.x_inl cg.z_inl];
 cg_es = [cg.x_inl cg.z_inl];
 cg_f = [metres_to_ft*(locations.x_ac_w - wing.Xac_from_tip + fueltank.x_cg_from_tip); -33/12]; % TODO: Might need to add underbelly in
 cg_fs = [metres_to_ft*(locations.x_ac_w - wing.Xac_from_tip + fueltank.x_cg_from_tip); -33/12]; % TODO: Might need to add underbelly in
-cg_fc = [4.5 -(33/12)];
+cg_fc = [4.5 -0.66];
 cg_APUinst = [cg.x_APUinst 0]
 cg_instr = [20 0]/12;
 cg_hydr= [22 -20]/12;
 cg_el = [22 -20]/12;
 cg_en = [metres_to_ft*locations.x_rear_bulkhead metres_to_ft*0.716];
 cg_av = [20 0]/12;
-cg_furn = [20 0]/12;
+cg_furn = [20 -(25/12)];
 %locating passenger cg in center of wing root for easy emergency access
 wing_center = convlength(((wing.Croot*0.5) + locations.x_wing),'m','ft')
 cg_pass = [wing_center 0];

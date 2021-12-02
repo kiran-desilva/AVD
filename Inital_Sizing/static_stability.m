@@ -241,8 +241,8 @@ CL_h(alpha,ih_syms,iw_syms,cla_eta_syms) = tail_h_Cl_alpha.*( ((alpha + iw_syms 
 Cmcg(alpha,ih_syms,iw_syms) = -CL_w(alpha,iw_syms,wing_Cl_alpha_syms).*(wing_xac_bar_syms - xcg_bar_eq(wing_xac_bar_syms,wf_fuel_syms,payload_factor_syms)) + Cm0w(cla_eta_syms) + (fuselage_Cm_alpha(wing_xac_bar_syms).*alpha) - (eta_h.*CL_h(alpha,ih_syms,iw_syms,cla_eta_syms).*sh_sw.*(tail_h_xac_bar - xcg_bar_eq(wing_xac_bar_syms,wf_fuel_syms,payload_factor_syms))) + (Zt.*C_thrust_syms);
 CL(alpha,ih_syms,iw_syms) = CL_w(alpha,iw_syms,wing_Cl_alpha_syms) + (eta_h.*sh_sw.*CL_h(alpha,ih_syms,iw_syms,cla_eta_syms));
 
-load('optimized_incidence')
-wing.i_w = iw_required;
+% load('optimized_incidence')
+% wing.i_w = iw_required;
 for idx = 1:length(region.regions)
 
     %sub in aerodymaic constants
