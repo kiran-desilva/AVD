@@ -70,20 +70,33 @@ cl_wing=[0:0.001:2];
 e_polar=aero_analysis.induced_drag.e_theoretical;
 
 cd_wing_polar=(cl_wing).^2/(pi*induced_AR(1)*e_polar(1));
-cd_total_polar=aero_analysis.drag.cd0(1)+cd_wing_polar+aero_analysis.drag.wave(1);
+cd_total_polar_cruise=aero_analysis.drag.cd0(1)+cd_wing_polar+aero_analysis.drag.wave(1);
 l_d_max_wing_cruise=12.85.*cl_wing;
+% figure
+% plot(cd_total_polar_cruise,cl_wing)
+% hold on
+% plot(cl_wing,l_d_max_wing_cruise)
+% hold off
+% grid on
+% grid minor
+% xlim([0 0.15])
+% title 'Wing'
+
+
+cd_tail_polar=(cl_wing).^2/(pi*induced_AR(1)*e_polar(1));
+cd_total_polar_loiter=aero_analysis.drag.cd0(5)+cd_wing_polar+aero_analysis.drag.wave(5);
+l_d_max_wing_loiter=13.2.*cl_wing;
 figure
-plot(cd_total_polar,cl_wing)
+plot(cd_total_polar_loiter,cl_wing)
 hold on
-plot(cl_wing,l_d_max_wing_cruise)
+plot(cl_wing,l_d_max_wing_loiter)
 hold off
 grid on
 grid minor
 xlim([0 0.15])
-
 %l_d_cruise=aero_analysis.summary.L_D_cruise.*cl_wing_polar;
 %l_d_cruise=13.2*cl_wing_polar;
-% 
+ 
 % figure
 % plot(cd_total_polar,cl_total_polar)
 % hold on
@@ -114,6 +127,9 @@ aero_analysis.summary.zero_aoa.landing=zero_AoA+aero_analysis.wing.HLD.delta_alp
 
 aero_analysis.summary.y_intercept_approach=0.3538;
 aero_analysis.summary.y_intercept_TO=0.3488;
+aero_analysis.summary.zero_AoA_TO=(zero_AoA+aero_analysis.wing.HLD.delta_alpha(1))*pi/180;
+aero_analysis.summary.zero_AoA_Land=(zero_AoA+aero_analysis.wing.HLD.delta_alpha(2))*pi/180;
+
 
 aero_analysis.summary.cl_transition=0.9*aero_analysis.summary.cl_max_TO;
 ylim ([0 3])
