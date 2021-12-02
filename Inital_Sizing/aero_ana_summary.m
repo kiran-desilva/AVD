@@ -113,7 +113,7 @@ title 'Wing'
 xlabel '\alpha [degrees]'
 hold off
 
-%save('aero_analysis.mat', 'aero_analysis')
+save('aero_analysis.mat', 'aero_analysis')
 %Need to add annotations
 %Fix legend
 %Thicker lines
