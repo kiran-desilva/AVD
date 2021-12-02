@@ -10,6 +10,7 @@ V_TO = aero_analysis.wing.v_takeoff_ms; %FAR-25
 mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
 
+Cl_gr = cl_alpha_TO * wing.i_w + 
 performance.Ka = (1.225 / (2 * sizing.W0 / wing.S_ref)) * (mu * aero_analysis.cl_max_TO - aero_analysis.drag.Cd0_takeoff - (aero_analysis.wing.Clmax_takeoff^2) / (pi * wing.AR * aero_analyis.drag.e_takeoff));
 performance.Kt = (2 * powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - mu;
 performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + performance.Ka * V_TO^2) / (performance.Kt + performance.Ka * Vinit^2)));
@@ -17,13 +18,13 @@ performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + p
 performance.Sr = 3 * V_TO; 
 
 H_obs = 35 / 3.2808; %meters
-R = (1.15 * v_stall_takeoff)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
+R = (1.15 * analysis.wing.stall_TO_no_safety)^2 / (0.2 * 9.81); %V_TR = 1.15*stall speed
 performance.Str = sqrt(R^2 - (R - H_obs)^2); %transition distance
 
-takeoff_CD = aero_analysis.drag.Cd0_takeoff + (aero_analysis.wing.takeoff_CLmaxchamge this^2) /  (pi * sizing.AR *  aero_analysis.drag.e_takeoff); 
-LoverD_TR = aero_analysis.wing.takeoff_CLmax / takeoff_CD; 
+takeoff_CD = aero_analysis.drag.Cd0_takeoff + (aero_analysis.wing.takeoff_CLmaxchamge this^2) /  (pi * wing.AR *  aero_analysis.drag.e_takeoff); 
+LoverD_TR = from isobelaero_analysis.wing.takeoff_CLmax / takeoff_CD; 
 gamma_climb = asin((powerplant.Thrust_max_takeoff / wandb.W0) - 1 / LoverD_TR);
-H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed 
+H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed CHECK THIS
 
 performance.Sto = 1.15 * (performance.Sg + performance.Sr + performance.Str); %FAR25 15% safety factor all engines operative
 
@@ -36,8 +37,10 @@ U = 0.01 * aero_analysis.wing.takeoff_CLmax + 0.02;
 performance.BFL = (0.863 / (1 + 2.3 * G)) * (((powerplant.Thrust_max_takeoff / wandb.W0) / (1.225 * 9.81 * CL_climb)) + H_obs) * (1 / (T_av / wandb.W0 - U) + 2.7) + 655;
 
 %% Landing 
+
 theta_apprch = 3; %deg from gudm.
-v_stall_landing = sqrt(2 * wandb.Wland / (1.225 * Sref * aero_analysis.wing.landing_CLmax));
+Wland_noalternatecruise = sizing.fraction.end_cruise_1 * 0.99 * sizing.W0;
+v_stall_landing = sqrt(2 * Wland_noalternatecruise / (1.225 * Sref * aero_analysis.wing.landing_CLmax));
 V_a = 1.3 * v_stall_landing;
 V_f = 1.23 * v_stall_landing;
 V_td = 1.15 * v_stall_landing; %errikos slides
