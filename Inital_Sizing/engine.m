@@ -62,7 +62,6 @@ A_throat = area_ratio * (pi * powerplant.basic_diam_m^2 / 4);
 powerplant.inlet_width_ft = 2 * sqrt(A_throat / pi) * metres_to_ft;
 powerplant.nacelle_length_ft = (0.6*powerplant.basic_diam_m + powerplant.length_m)*metres_to_ft;
 powerplant.nacelle_width_ft = 0.18*powerplant.nacelle_length_ft + powerplant.basic_diam_m*metres_to_ft;
-fudge_factor = 1.1;
-powerplant.nacelle_wetted_area_ft_sq = fudge_factor*pi*powerplant.nacelle_width_ft^2/4*powerplant.nacelle_length_ft;
+powerplant.nacelle_wetted_area_ft_sq = pi*powerplant.nacelle_width_ft^2/4*powerplant.nacelle_length_ft;
 
 save('powerplant', 'powerplant')
