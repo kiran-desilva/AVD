@@ -2,10 +2,12 @@
 %  Summary script (with plots)
 clear
 clc
+close all
 
 load 'aero_analysis.mat'
 load 'tailplane.mat'
 load 'wing.mat'
+load 'sizing.mat'
 
 %(1): wing
 %(2): HLD
@@ -49,12 +51,48 @@ end
 
 
 %% L/D
+%aero_analysis.summary.cl_cruise=
+%aero_analysis.summary.cl_loiter=
+%aero_analysis.summary.L_D_cruise=aero_analysis.summary.cl_cruise/aero_analysis.drag.cd_total(1);
+%aero_analysis.summary.L_D_loiter=aero_analysis.summary.cl_loiter/aero_analysis.drag.cd_total(5);
+aero_analysis.summary.e_wing=aero_analysis.induced_drag.e_theoretical(1);
+%aero_analysis.summary.e_aircraft=aero_analysis.induced_drag.e_theoretical(1)+aero_analysis.induced_drag.e_theoretical(2)*tailplane.horizontal.s/wing.Sref;
+%aero_analysis.summary.e_v2=aero_analysis.induced_drag.wing.e(1)+aero_analysis.induced_drag.tail.e(1)*tailplane.horizontal.s/wing.Sref;
+%sizing.fraction.before_cruise
+aero_analysis.summary.cl_cruise=(2*sizing.fraction.before_cruise*sizing.W0)/(aero_analysis.wing.rho(1)*(aero_analysis.wing.Mach(1)*aero_analysis.wing.air_velc(1))^2*aero_analysis.wing.HLD.s_ref);
+aero_analysis.summary.cl_loiter=(2*sizing.fraction.before_loiter*sizing.W0)/(aero_analysis.wing.rho(2)*(aero_analysis.wing.Mach(2)*aero_analysis.wing.air_velc(2))^2*aero_analysis.wing.HLD.s_ref);
+aero_analysis.summary.l_d_cruise=aero_analysis.summary.cl_cruise/aero_analysis.drag.cd_total(1);
+aero_analysis.summary.l_d_loiter=aero_analysis.summary.cl_loiter/aero_analysis.drag.cd_total(2);
+%% Drag polar
 
-aero_analysis.summary.L_D_cruise=aero_analysis.summary.cl_cruise/aero_analysis.drag.cd_total(1);
-aero_analysis.summary.L_D_loiter=aero_analysis.summary.cl_loiter/aero_analysis.drag.cd_total(5);
+induced_AR=[wing.Ar, tailplane.horizontal.Ar];
+cl_wing=[0:0.001:2];
+e_polar=aero_analysis.induced_drag.e_theoretical;
 
-aero_analysis.summary.e_aircraft=aero_analysis.induced_drag.e_theoretical(1)+aero_analysis.induced_drag.e_theoretical(2)*tailplane.horizontal.s/wing.Sref;
-aero_analysis.summary.e_v2=aero_analysis.induced_drag.wing.e(1)+aero_analysis.induced_drag.tail.e(1)*tailplane.horizontal.s/wing.Sref;
+cd_wing_polar=(cl_wing).^2/(pi*induced_AR(1)*e_polar(1));
+cd_total_polar=aero_analysis.drag.cd0(1)+cd_wing_polar+aero_analysis.drag.wave(1);
+l_d_max_wing_cruise=12.85.*cl_wing;
+figure
+plot(cd_total_polar,cl_wing)
+hold on
+plot(cl_wing,l_d_max_wing_cruise)
+hold off
+grid on
+grid minor
+xlim([0 0.15])
+
+%l_d_cruise=aero_analysis.summary.L_D_cruise.*cl_wing_polar;
+%l_d_cruise=13.2*cl_wing_polar;
+% 
+% figure
+% plot(cd_total_polar,cl_total_polar)
+% hold on
+% plot(cl_wing_polar,l_d_cruise)
+% %plot(aero_analysis.drag.cd_total(1),aero_analysis.summary.cl_cruise, 'o') 
+% hold off
+% grid on
+% grid minor
+% xlim([0 0.15])
 
 %% Plots
 figure
@@ -63,18 +101,30 @@ yline(aero_analysis.summary.cl_max_wing_clean, '--k')
 hold on
 yline(aero_analysis.summary.cl_max_approach, '--b')
 yline(aero_analysis.summary.cl_max_TO, '--r')
+%xline(0, '--m')
 plot(x+zero_AoA,cl_alpha_wing_cruise_clean)
 plot(x+zero_AoA, cl_alpha_wing_max_clean)
-plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha(1),cl_alpha_wing_TO)
-plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha(2),cl_alpha_wing_approach)
+plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha(1),cl_alpha_wing_TO, 'm')
+plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha(2),cl_alpha_wing_approach, 'k')
 plot(x+zero_AoA,cl_alpha_wing_loiter_clean)
 legend('Cl_max clean', 'Cl_max_approach', 'Cl_max_TO', 'Clean Cruise', 'Max Cruise', 'Takeoff', 'Approach', 'Loiter')
 
+aero_analysis.summary.zero_aoa.TO=zero_AoA+aero_analysis.wing.HLD.delta_alpha(1);
+aero_analysis.summary.zero_aoa.landing=zero_AoA+aero_analysis.wing.HLD.delta_alpha(2);
+
+aero_analysis.summary.y_intercept_approach=0.3538;
+aero_analysis.summary.y_intercept_TO=0.3488;
+
+aero_analysis.summary.cl_transition=0.9*aero_analysis.summary.cl_max_TO;
 ylim ([0 3])
 xlim([-15 25])
 title 'Wing'
 xlabel '\alpha [degrees]'
 hold off
+grid on
+grid minor
+
+
 
 save('aero_analysis.mat', 'aero_analysis')
 %Need to add annotations
@@ -84,3 +134,4 @@ save('aero_analysis.mat', 'aero_analysis')
 %Terminate line after cross line
 
 save('aero_analysis.summary','aero_analysis')
+
