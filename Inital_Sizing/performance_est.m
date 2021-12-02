@@ -39,8 +39,8 @@ performance.BFL = (0.863 / (1 + 2.3 * G)) * (((powerplant.Thrust_max_takeoff / w
 %% Landing 
 
 theta_apprch = 3; %deg from gudm.
-Wland_noalternatecruise = sizing.fraction.end_cruise_1 * 0.99 * sizing.W0;
-v_stall_landing = sqrt(2 * Wland_noalternatecruise / (1.225 * Sref * aero_analysis.wing.landing_CLmax));
+%Wland_noalternatecruise = sizing.fraction.end_cruise_1 * 0.99 * sizing.W0;
+v_stall_landing = sqrt(2 * sizing.W0 / (1.225 * Sref * aero_analysis.wing.landing_CLmax));
 V_a = 1.3 * v_stall_landing;
 V_f = 1.23 * v_stall_landing;
 V_td = 1.15 * v_stall_landing; %errikos slides
@@ -48,12 +48,12 @@ tfr = 2; % mid sized ac?
 n_land = 1.2; 
 R_land = V_f^2 / ((n_land - 1) * 9.81);
 H_f = R_land * (1 - cosd(theta_apprch)); %errikos slides
-mul = 0.3; %errikos
+mul = 0.5; %raymer
 
 performance.Sa = (H_obs - H_f) / tand(theta_apprch);
 performance.Sf = 0.1512 * v_stall_landing^2 * sind(theta_apprch); 
 performance.Sfr = tfr * V_td; 
-performance.Ktl = ((2 * 0.5 * powerplant.installed_thrust_lbf * 4.44822) / wandb.wlanding - mul; %0.5 max takeoff thrust setting 2 engines -  note mjst be neative
+performance.Ktl = ((2 * 0.15 * powerplant.installed_thrust_lbf * 4.44822) / wandb.wlanding - mul; %0.15 max takeoff thrust setting 2 engines -  note mjst be neative
 performance.Ka_l = (1.225 / (2 *e wandb.Wland / wing.Sref)) * (mul * aero_analysis.wing.landing_CLmax - aero_analysis.drag.Cd0_landing - (aero_analysis.wing.landing_CLmax^2) / (pi * wing.AR *aero_analysis.drag.e_landing));
 performance.Sb = (1 / 2 * 9.81 * performance.Ka_l) * log((performance.Ktl + performance.Ka_l * 0) / (performance.Ktl + performance.Ka_l * Vtd^2)); 
 
@@ -80,7 +80,7 @@ performance.frac_cruise1 = Wx_W0 / (new_Wx_W0);
 performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * aero_analysis.wing.cruise_LoverD * log(performance.frac_cruise1);
 
 %extended range
-Wx_W0_ext = (wandb.W0 - (wandb.Wf + W_pld * 0.453592 * 9.81)) / wandb.W0; %extended range replacing all pld weight with fuel
+Wx_W0_ext = (wandb.W0 - (wandb.Wf + 15 * 9.81)) / wandb.W0; %extended range replacing all pld weight (15kg) with fuel
 new_Wx_W0_ext = new_Wx_W0_ext * performance.frac_cruise2 * performance.frac_loiter; % not including cruise 1 segment
 performance.frac_cruise1_ext = Wx_W0_ext / (new_Wx_W0_ext); % calculate new cruise fuel frac using original wx/w0 and the new loiter and crusie 2 fractions
 performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * aero_analysis.wing.cruise_LoverD * log(performance.frac_cruise1_ext);
