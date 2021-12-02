@@ -60,7 +60,7 @@ aero_analysis.summary.e_wing=aero_analysis.induced_drag.e_theoretical(1);
 %aero_analysis.summary.e_v2=aero_analysis.induced_drag.wing.e(1)+aero_analysis.induced_drag.tail.e(1)*tailplane.horizontal.s/wing.Sref;
 %sizing.fraction.before_cruise
 aero_analysis.summary.cl_cruise=(2*sizing.fraction.before_cruise*sizing.W0)/(aero_analysis.wing.rho(1)*(aero_analysis.wing.Mach(1)*aero_analysis.wing.air_velc(1))^2*aero_analysis.wing.HLD.s_ref);
-aero_analysis.summary.cl_loiter=(2*sizing.fraction.before_loiter*sizing.W0)/(aero_analysis.wing.rho(2)*(aero_analysis.wing.Mach(2)*aero_analysis.wing.air_velc(2))^2*aero_analysis.wing.HLD.s_ref);
+aero_analysis.summary.cl_loiter=(2*sizing.fraction.before_loiter*sizing.W0)/(aero_analysis.wing.rho(5)*(aero_analysis.wing.Mach(5)*aero_analysis.wing.air_velc(5))^2*aero_analysis.wing.HLD.s_ref);
 aero_analysis.summary.l_d_cruise=aero_analysis.summary.cl_cruise/aero_analysis.drag.cd_total(1);
 aero_analysis.summary.l_d_loiter=aero_analysis.summary.cl_loiter/aero_analysis.drag.cd_total(2);
 %% Drag polar
