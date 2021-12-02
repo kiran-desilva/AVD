@@ -1,18 +1,28 @@
-clear
 clc
-
-% Engine -  FJ442C
 
 g = 9.81;
 newtons_to_lbs = 0.2248089431;
+feet_to_metres = 0.3048;
+
+fail = 0;
 
 load('sizing.mat')
 load('locations')
 try
 	load('wandb.mat')
 	load('fuse')
+	load('wing')
+	tailstrike_point.x = 11.736;
+	tailstrike_point.z = 0.024;
+	wandb.x_cg_aft = max(wandb.x_cg, wandb.x_cg_drained)*feet_to_metres;
+	wandb.x_cg_front = min(wandb.x_cg, wandb.x_cg_drained)*feet_to_metres;
+
+	wandb.z_cg = (wandb.z_cg + wandb.z_cg_drained)/2 * feet_to_metres;
+	lowest_spanwise_point.y = wing.b/2;
+	lowest_spanwise_point.z = -0.663;
 catch e
 	% TODO: CHECK ALL THE VARS HERE
+	non_blocking_assert(false, "COULDNT LOAD ALL FILES, CONTINUING WITH DEFAULT VARIABLES!!", 10000)
 	wandb.z_cg = 1.5;
 	wandb.x_cg_front = 5.5;
 	wandb.x_cg_aft = 6;
@@ -20,14 +30,27 @@ catch e
 	lowest_spanwise_point.y = 6;
 	lowest_spanwise_point.z = 0;
 
-	tailstrike_point.x = 10;
-	tailstrike_point.z = 1.3;
+	tailstrike_point.x = 11.736;
+	tailstrike_point.z = 0.024;
 end
 
-uc.nose_wheel.x = 0.8; % TODO:
-uc.main_wheel.y = 66*2.54/100;
-uc.main_wheel.x = locations.x_gear; % TODO:
-uc.main_wheel.z = 1;
+
+try
+	% disp()
+	uc.nose_wheel.x = placer.nose_wheel.x; % TODO:
+	uc.main_wheel.y = placer.main_wheel.y;
+	uc.main_wheel.x = placer.main_wheel.x; % TODO:
+	disp("Loaded placer variables successfully")
+catch
+	% uc.nose_wheel.x = 0.5; % TODO:
+	% uc.main_wheel.y = 3.54;%66*2.54/100;
+	% uc.main_wheel.x = 5.6513; % TODO:
+	uc.nose_wheel.x = 0.5; % TODO:
+	uc.main_wheel.y = 3.54;%66*2.54/100;
+	uc.main_wheel.x = 11.84; % TODO:
+end
+init_gear_length = 0.7;
+uc.main_wheel.z = -0.635 -0.704 - init_gear_length;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,19 +70,31 @@ uc.main_wheel.z = 1;
 %% Overturn angle section
 theta = atan(uc.main_wheel.y/(uc.main_wheel.x - uc.nose_wheel.x));
 projected_side = uc.main_wheel.y * cos(theta);
-uc.overturn_angle_deg = atand(wandb.z_cg/projected_side)
-non_blocking_assert(uc.overturn_angle_deg < 63, 'overturn angle too large');
+uc.overturn_angle_deg = atand((wandb.z_cg - uc.main_wheel.z)/projected_side)
+fail = non_blocking_assert(uc.overturn_angle_deg < 63 && uc.overturn_angle_deg > 0, 'overturn angle too large', 1);
+
+if fail ~= 0
+	return;
+end
 
 %% Roll angle section
-roll_clearance = uc.main_wheel.z - (lowest_spanwise_point.y * tand(5) + lowest_spanwise_point.z)
-non_blocking_assert(roll_clearance > 6*0.0254, 'not enough roll clearance')
+roll_clearance =  (lowest_spanwise_point.y * sind(5) + lowest_spanwise_point.z) - uc.main_wheel.z
+fail = non_blocking_assert(roll_clearance > 6*0.0254, 'not enough roll clearance', 2)
+
+if fail ~= 0
+	return;
+end
 
 %% Tipback angle section
-tipback_angle = atand(tailstrike_point.z/(tailstrike_point.x - uc.main_wheel.x))
-cg_main_wheel_angle_min = atand((uc.main_wheel.x - wandb.x_cg_aft)/wandb.z_cg)
-cg_main_wheel_angle_max = atand((uc.main_wheel.x - wandb.x_cg_front)/wandb.z_cg)
+tipback_angle = atand((-uc.main_wheel.z + tailstrike_point.z)/(tailstrike_point.x - uc.main_wheel.x))
+cg_main_wheel_angle_min = atand((uc.main_wheel.x - wandb.x_cg_aft)/(wandb.z_cg - uc.main_wheel.z))
 
-non_blocking_assert(min(cg_main_wheel_angle_max, cg_main_wheel_angle_min) > max(15, tipback_angle), 'angle between cg and main wheel not sufficiently large')
+fail = non_blocking_assert(cg_main_wheel_angle_min > max(15, tipback_angle), 'angle between cg and main wheel not sufficiently large', 3)
+% fail = non_blocking_assert(cg_main_wheel_angle_min > max(0, tipback_angle), 'angle between cg and main wheel not sufficiently large', 3)
+
+if fail ~= 0
+	return;
+end
 
 uc.tyres.psi = 90; % TODO:
 uc.percent_weight_nose = 0.1;
@@ -73,8 +108,16 @@ N_f = wandb.x_cg_front - uc.nose_wheel.x;
 N_a = wandb.x_cg_aft - uc.nose_wheel.x;
 
 % Checks
-non_blocking_assert(M_a/B > 0.05, 'M_a/B not in valid range');
-non_blocking_assert(M_f/B < 0.2, 'M_f/B not in valid range');
+M_a / B
+fail = non_blocking_assert(M_a/B > 0.08, 'M_a/B not in valid range', 4);
+if fail ~= 0
+	return;
+end
+M_f / B
+fail = non_blocking_assert(M_f/B < 0.2 && M_f/B > 0, 'M_f/B not in valid range', 5);
+if fail ~= 0
+	return;
+end
 
 frontmost_possible_main_x = (0.2 * (-uc.nose_wheel.x) + wandb.x_cg_front)/0.8;
 
@@ -163,17 +206,19 @@ save('uc', 'uc')
 function oleo_stroke_m = calc_oleo_stroke(landing_speed_ms, shock_absorber_efficiency, gear_load_factor, tire_efficiency, wheel_diam_cm, wheel_rolling_rad_cm)
 	tire_stroke_m = (0.5*(wheel_diam_cm) - wheel_rolling_rad_cm)/100;
 	oleo_stroke_m = (landing_speed_ms^2/(2*9.81*shock_absorber_efficiency*gear_load_factor)) - tire_efficiency/ shock_absorber_efficiency * tire_stroke_m + 0.0254;
-	non_blocking_assert(oleo_stroke_m > 0.2, 'Oleo stroke should be at least 20cm, will proceed with 20cm');
+	% non_blocking_assert(oleo_stroke_m > 0.2, 'Oleo stroke should be at least 20cm, will proceed with 20cm');
 	oleo_stroke_m = max(oleo_stroke_m, 0.2);
 end
 
-function non_blocking_assert(cond, msg)
+function errc = non_blocking_assert(cond, msg, errc)
 	if ~cond
 		disp("WARNING!!!!")
 		disp(msg);
-		response = input("Do you still wish to continue? (y/n)" + newline, 's');
-		if response == 'n'
-			disp(); % crash the program
-		end
+		% response = input("Do you still wish to continue? (y/n)" + newline, 's');
+		% if response == 'n'
+		% 	disp(); % crash the program
+		% end
+		return;
 	end
+	errc = 0;
 end
