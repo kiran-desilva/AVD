@@ -11,9 +11,11 @@ load('aero_analysis')
 load('design')
 load('wing')
 load('wandb')
+load('uc')
+load('cg')
 
 %% initial variables
-
+metres_to_ft = 3.28084;
 
 
 
@@ -64,7 +66,7 @@ fuselage_Cm_alpha(wing_xac_bar_syms) = Kf.*(Lf.*(Wf.^2))./(Cmac .* Sw);
 % xacw - m
 % wf_fuel - fuel fraction
 % payload factor - 0 - 1
-xcg = @(xacw,wf_fuel,payload_factor) wandb.x_cg_function(xacw,wf_fuel,payload_factor)*0.3048;
+xcg = @(xacw,wf_fuel,payload_factor) wandb.x_cg_function(xacw,(cg.x_wing_tip_from_ac(xacw) + (wing.Croot/2)),cg.x_nlg/metres_to_ft,wf_fuel,payload_factor)*0.3048;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -241,8 +243,8 @@ CL_h(alpha,ih_syms,iw_syms,cla_eta_syms) = tail_h_Cl_alpha.*( ((alpha + iw_syms 
 Cmcg(alpha,ih_syms,iw_syms) = -CL_w(alpha,iw_syms,wing_Cl_alpha_syms).*(wing_xac_bar_syms - xcg_bar_eq(wing_xac_bar_syms,wf_fuel_syms,payload_factor_syms)) + Cm0w(cla_eta_syms) + (fuselage_Cm_alpha(wing_xac_bar_syms).*alpha) - (eta_h.*CL_h(alpha,ih_syms,iw_syms,cla_eta_syms).*sh_sw.*(tail_h_xac_bar - xcg_bar_eq(wing_xac_bar_syms,wf_fuel_syms,payload_factor_syms))) + (Zt.*C_thrust_syms);
 CL(alpha,ih_syms,iw_syms) = CL_w(alpha,iw_syms,wing_Cl_alpha_syms) + (eta_h.*sh_sw.*CL_h(alpha,ih_syms,iw_syms,cla_eta_syms));
 
-load('optimized_incidence')
-wing.i_w = iw_required;
+% load('optimized_incidence')
+% wing.i_w = iw_required;
 for idx = 1:length(region.regions)
 
     %sub in aerodymaic constants
@@ -290,8 +292,34 @@ res = fsolve(F,x0);
 ih_required = res(1) * (180/pi)
 iw_required = res(2) * (180/pi)
 
-save('optimized_incidence','ih_required','iw_required')
 
+for idx = 1:length(region.regions)
+
+    %sub in aerodymaic constants
+    Cmcg_function = subs(Cmcg,[cla_eta_syms,wing_Cl_alpha_syms,wing_xac_bar_syms,tail_h_xac_bar_syms],[region.cla_eta(idx),region.cl_alpha_w(idx),wing_xac_bar,tail_h_xac_bar]);
+    % sub in for weight configuration -> assuming always fully loaded with payload
+    Cmcg_function = subs(Cmcg_function,[wf_fuel_syms,payload_factor_syms],[region.fuel_fraction(idx),1]);
+    % sub in thrust settings
+    Cmcg_function = subs(Cmcg_function,[C_thrust_syms],[region.C_thrust(idx)]);
+    % expose the variables we want
+    Cmcg_function(alpha,ih_syms,iw_syms) = matlabFunction(Cmcg_function,'vars',[alpha,ih_syms,iw_syms]);
+
+    CL_function = subs(CL,[cla_eta_syms,wing_Cl_alpha_syms],[region.cla_eta(idx),region.cl_alpha_w(idx)]);
+    CL_function(alpha,ih_syms,iw_syms) = matlabFunction(CL_function,'vars',[alpha,ih_syms,iw_syms]);
+
+    %x(1) = alpha, x(2) = ih
+    F = @(x) [double(Cmcg_function(x(1),x(2),iw_required * (pi/180))); double(CL_function(x(1),x(2),iw_required * (pi/180))) - region.CL(idx)];
+ 
+
+    x0 = [0,0];
+    res = fsolve(F,x0);
+
+    region.aoa_ideal(idx) = res(1) * (180/pi);
+    region.ih_ideal(idx) = res(2) * (180/pi);
+
+end
+
+region
 
 
 function [] = plot_sm_constraints(func,color)
