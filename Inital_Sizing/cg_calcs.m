@@ -50,7 +50,7 @@ cg.z_htail = htail_zcg_metres * 3.28084
 
 %mlg
 cg.z_mlg = -33/12
-cg.x_mlg = (locations.x_wing + wing.Croot/2) * 3.28084
+cg.x_mlg = 5.56 * 3.28084
 
 %nlg
 cg.z_nlg = -33/12
