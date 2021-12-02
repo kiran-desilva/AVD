@@ -106,7 +106,7 @@ aero_analysis.wing.HLD.delta_alpha=[0,0];
 %(3): take-off
 %(4): approach
 %==> ignore the first 2 terms of the cl_alpha_flaps
-aero_analysis.wing.HLD.alpha=[-10,-15]; %change in flap angle [degrees]
+aero_analysis.wing.HLD.alpha=[-10,-15].*pi/180; %change in flap angle [degrees]
 for i=1:2
     aero_analysis.wing.HLD.cl_alpha_flaps(i)=aero_analysis.wing.Cl_alpha(i+2)*(1+(aero_analysis.wing.HLD.c_fraction-1)*aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref);
     aero_analysis.wing.HLD.delta_alpha(i)=aero_analysis.wing.HLD.alpha(i)*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
