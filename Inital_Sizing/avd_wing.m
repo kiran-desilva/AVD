@@ -237,4 +237,4 @@ span_fract=(0.7*mainwing.b-fuselage_diameter-0.1*mainwing.b)/mainwing.b
 
 height_down1=mainwing.b/2*tand(1)
 height_down2=mainwing.b/2*tand(2)
- save('wing','wing.mat')
+ save('wing','wing')
