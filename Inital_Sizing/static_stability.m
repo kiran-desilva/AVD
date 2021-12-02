@@ -13,6 +13,7 @@ load('wing')
 load('wandb')
 load('uc')
 load('cg')
+load('weights')
 
 %% initial variables
 metres_to_ft = 3.28084;
@@ -66,7 +67,7 @@ fuselage_Cm_alpha(wing_xac_bar_syms) = Kf.*(Lf.*(Wf.^2))./(Cmac .* Sw);
 % xacw - m
 % wf_fuel - fuel fraction
 % payload factor - 0 - 1
-xcg = @(xacw,wf_fuel,payload_factor) wandb.x_cg_function(xacw,(cg.x_wing_tip_from_ac(xacw) + (wing.Croot/2)),cg.x_nlg/metres_to_ft,wf_fuel,payload_factor)*0.3048;
+xcg = @(xacw,wf_fuel,payload_factor) wandb.x_cg_function(xacw,cg.x_mlg/metres_to_ft,cg.x_nlg/metres_to_ft,wf_fuel,payload_factor)*0.3048;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,7 +115,7 @@ region.CL = (region.fuel_fraction*sizing.W0)./(region.q * Sw); % design lift coe
 
 CD_cruise = aero_analysis.drag.cd_total(1);
 
-region.C_thrust = [design.t0/(region.q(1)*Sw*Cmac),(design.t0/(region.q(1)*Sw*Cmac)) * 0.5,CD_cruise/Cmac,CD_cruise/Cmac]; % T/(q*sw*cbar) -> takeoff = 100% thrust, landing = 50% thrust
+region.C_thrust = [design.t0/(region.q(1)*Sw*Cmac),(design.t0/(region.q(1)*Sw*Cmac)) * 0.15,CD_cruise/Cmac,CD_cruise/Cmac]; % T/(q*sw*cbar) -> takeoff = 100% thrust, landing = 50% thrust
 % region.alpha_0_w = degtorad([-3 -3 -3 -3]);
 % region.alpha_0_h = degtorad([0 0 0 0]);
 
@@ -145,7 +146,11 @@ for i = 1:length(region.regions)
     region.de_da(i) = double(deda(lh,region.cla_eta(i)));
     region.Kn_off(i) = double(sm(Sh/Sw,locations.x_ac_w/Cmac,locations.x_ac_h/Cmac,region.cl_alpha_w(i),region.cl_alpha_h(i),region.cla_eta(i),region.fuel_fraction(i),1));
     region.Kn_on(i) = region.Kn_off(i) - 0.02;
+    region.Kn_off_np(i) = double(sm(Sh/Sw,locations.x_ac_w/Cmac,locations.x_ac_h/Cmac,region.cl_alpha_w(i),region.cl_alpha_h(i),region.cla_eta(i),region.fuel_fraction(i),0));
+    region.Kn_on_np(i) = region.Kn_off_np(i) - 0.02;
     region.xnp_bar(i) = double(xnp_bar(Sh/Sw,locations.x_ac_w/Cmac,locations.x_ac_h/Cmac,region.cl_alpha_w(i),region.cl_alpha_h(i),region.cla_eta(i)));
+    region.xcg_bar(i) = double(xcg_bar_eq(locations.x_ac_w/Cmac,region.fuel_fraction(i),1));
+    region.xcg_bar_np(i) = double(xcg_bar_eq(locations.x_ac_w/Cmac,region.fuel_fraction(i),0));  
 end
 
 region
@@ -175,11 +180,13 @@ plot_sm_constraints(f3,'green')
 f4 = matlabFunction(subs(sm,[tail_h_xac_bar_syms,wing_Cl_alpha_syms,tail_Cl_alpha_syms,cla_eta_syms,wf_fuel_syms,payload_factor_syms],[tail_h_xac_bar,region.cl_alpha_w(4),region.cl_alpha_h(4),region.cla_eta(4),sizing.fraction.end_cruise_1,1]));
 plot_sm_constraints(f4,'magenta')
 
-yline(Sh/Sw,'--','linewidth',1.5)
-xline(xacw/Cmac,'--','linewidth',1.5)
+plot(xacw/Cmac,Sh/Sw,'x',,'linewidth',1.5,'markersize',6)
+
+% yline(Sh/Sw,'--','linewidth',1.5)
+% xline(xacw/Cmac,'--','linewidth',1.5)
 
 % legend('Sm > 0%','Sm < 20%','Sm > 4%','Sm < 7%')
-legend('Takeoff - Passengers','','','','Landing - Passengers','','','','Cruise Start - Passengers','','','','Cruise End - Passengers','','','')
+legend('Takeoff - Passengers','','','','Landing - Passengers','','','','Cruise Start - Passengers','','','','Cruise End - Passengers','','','','Design Point')
 
 ylabel('{S_h}/{S_w}')
 xlabel('{x_ac_w}/{Cmac}')
@@ -209,12 +216,12 @@ plot_sm_constraints(f3,'green')
 f4 = matlabFunction(subs(sm,[tail_h_xac_bar_syms,wing_Cl_alpha_syms,tail_Cl_alpha_syms,cla_eta_syms,wf_fuel_syms,payload_factor_syms],[tail_h_xac_bar,region.cl_alpha_w(4),region.cl_alpha_h(4),region.cla_eta(4),sizing.fraction.end_cruise_1,0]));
 plot_sm_constraints(f4,'magenta')
 
-
-yline(Sh/Sw,'--','linewidth',1.5)
-xline(xacw/Cmac,'--','linewidth',1.5)
+plot(xacw/Cmac,Sh/Sw,'x',,'linewidth',1.5,'markersize',6)
+% yline(Sh/Sw,'--','linewidth',1.5)
+% xline(xacw/Cmac,'--','linewidth',1.5)
 
 % legend('Sm > 0%','Sm < 20%','Sm > 4%','Sm < 7%')
-legend('Takeoff - No Passengers','','','','Landing - No Passengers','','','','Cruise Start - No Passengers','','','','Cruise End - No Passengers','','','')
+legend('Takeoff - No Passengers','','','','Landing - No Passengers','','','','Cruise Start - No Passengers','','','','Cruise End - No Passengers','','','','Design Point')
 
 ylabel('{S_h}/{S_w}')
 xlabel('{x_ac_w}/{Cmac}')
@@ -320,6 +327,37 @@ for idx = 1:length(region.regions)
 end
 
 region
+
+save('ss_region','region')
+
+fraction = [sizing.fraction.before_take_off,sizing.fraction.before_cruise,sizing.fraction.end_cruise_1,sizing.fraction.before_alternate_cruise,sizing.fraction.before_loiter,sizing.fraction.end];
+wew0 = (1-(sizing.Wf/sizing.W0)); 
+
+empty_cg = wandb.x_cg_function(locations.x_ac_w,cg.x_mlg/metres_to_ft,cg.x_nlg/metres_to_ft,wew0,0);
+empty_weight = convforce(wew0 * sizing.W0,'n','lbf') - (weights.W_pay + weights.W_p);
+
+figure
+hold on
+plot(0.3048*[empty_cg;wandb.x_cg_function(locations.x_ac_w,cg.x_mlg/metres_to_ft,cg.x_nlg/metres_to_ft,fraction,1)';empty_cg],4.4482*[empty_weight;weights.Total_weight_func(fraction,1)';empty_weight],'x-')
+plot(0.3048*[empty_cg;wandb.x_cg_function(locations.x_ac_w,cg.x_mlg/metres_to_ft,cg.x_nlg/metres_to_ft,fraction,0)';empty_cg],4.4482*[empty_weight;weights.Total_weight_func(fraction,0)';empty_weight],'x-')
+
+
+
+xline(region.xnp_bar(1)*wing.Cmac,'-.','linewidth',1.2,'color','red') 
+xline(region.xnp_bar(2)*wing.Cmac,'--','linewidth',1.2,'color','green') 
+xline(region.xnp_bar(3)*wing.Cmac,'-.','linewidth',1.2,'color','blue') 
+xline(region.xnp_bar(4)*wing.Cmac,'--','linewidth',1.2,'color','black') 
+
+
+
+xlabel('X_{cg} [m]')
+ylabel('Weight [N]')
+grid on
+grid minor
+
+legend('Full Payload CG envelope','No Payload CG envelope','x_{np} Takeoff','x_{np} Landing','x_{np} Cruise Start','x_{np} Cruise End')
+
+improvePlot(gcf)
 
 
 function [] = plot_sm_constraints(func,color)
