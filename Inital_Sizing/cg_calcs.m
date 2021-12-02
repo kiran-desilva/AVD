@@ -6,19 +6,22 @@ load("locations.mat")
 load("fuse.mat")
 load("tailplane.mat")
 load("uc.mat")
+metres_to_ft = 3.28084;
 
 %wing xcg
 x_wing = locations.x_wing;
-x_wing_from_ac = @(ac) ac - wing.Xac_from_tip;
-x_sweep = 0.35*0.5*wing.b/tand(wing.sweepLE);
-chord_35 = (wing.Ctip-wing.Croot)*0.35 +wing.Croot;
-spar_distance = chord_35*0.75-chord_35*0.1; %spars at 10% and 75% chord
+cg.x_wing_tip_from_ac = @(ac) ac - wing.Xac_from_tip;
+x_sweep = (0.35*0.5*wing.b)*tand(wing.sweepLE);
+
+chord_35 = wing.Croot - (wing.Croot-wing.Ctip)*0.35 ;
+
+spar_distance = (chord_35*0.74)-(chord_35*0.1); %spars at 10% and 75% chord
 x_chord = 0.7*spar_distance + 0.1*chord_35;
 
 wing_xcg_metres = x_wing + x_sweep + x_chord;
 cg.x_wing = wing_xcg_metres * 3.28084 %in feet
 
-cg.x_wing_from_ac_func = @(ac) (x_wing_from_ac(ac) + x_sweep + x_chord) * 3.28084 ;
+cg.x_wing_from_ac_func = @(ac) (cg.x_wing_tip_from_ac(ac) + x_sweep + x_chord) * 3.28084 ;
 
 
 %fuselage xcg
@@ -42,12 +45,12 @@ x_tailchord = 0.7*tailspar_distance + 0.1*tailchord_35;
 htail_xcg_metres = x_tailchord + x_tailsweep + offset_vtail + locations.x_vertical_stabilizer;
 cg.x_htail = htail_xcg_metres * 3.28084
 
-htail_zcg_metres = tailplane.vertical.b + (0.84-(fuse.x_afterbody-locations.x_vertical_stabilizer)*tand(4)) + 12/((tailplane.horizontal.Ctip-tailplane.horizontal.Croot)*0.535+tailplane.horizontal.Croot);
+htail_zcg_metres = tailplane.vertical.b + (0.84-(fuse.x_afterbody-locations.x_vertical_stabilizer)*tand(4))  %12/((tailplane.horizontal.Ctip-tailplane.horizontal.Croot)*0.535+tailplane.horizontal.Croot);
 cg.z_htail = htail_zcg_metres * 3.28084
 
 %mlg
 cg.z_mlg = -33/12
-cg.x_mlg = locations.x_wing * 3.28084
+cg.x_mlg = (locations.x_wing + wing.Croot/2) * 3.28084
 
 %nlg
 cg.z_nlg = -33/12
@@ -55,7 +58,7 @@ cg.x_nlg = uc.nose_wheel.x * 3.28084
 
 %nacelle & engine
 cg.x_inl = locations.x_rear_bulkhead * 3.28084
-cg.z_inl = 1.1 * 3.28084
+cg.z_inl = metres_to_ft*0.513;
 
 %APU
 cg.x_APUinst = (fuse.total_fuselage_length-12)/12 
