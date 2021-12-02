@@ -246,12 +246,14 @@ aero_analysis.induced_drag.HLD=0.28^2.*aero_analysis.wing.HLD.delta_cl_max.^2*co
 aero_analysis.induced_drag.cd_i(3)=aero_analysis.induced_drag.cd_i(3)+aero_analysis.induced_drag.HLD(1);
 aero_analysis.induced_drag.cd_i(4)=aero_analysis.induced_drag.cd_i(4)+aero_analysis.induced_drag.HLD(2);
 
-save('aero_analysis.mat', 'aero_analysis')
-
 %% Total Drag
 
 
 aero_analysis.drag.cd_induced_total=aero_analysis.induced_drag.cd_i;
 aero_analysis.drag.cd_parasitic_total=aero_analysis.drag.cd0;
 aero_analysis.drag.cd_total=aero_analysis.drag.cd_parasitic_total+aero_analysis.drag.cd_induced_total+aero_analysis.drag.wave;
+
+save('aero_analysis.mat', 'aero_analysis')
+
+
 

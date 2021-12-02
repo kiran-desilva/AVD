@@ -199,7 +199,7 @@ wing.sweep_25 = sweep_25;
 wing.sweepTE = mainwing.sweepTE;
 [~,~,~,~,wing.Ybar,wing.Xac_from_tip] = wing_geometry_calc(sref,AR,lambda,wing.sweepLE,1);
 wing.twist = twist
-wing.i_w =i_w;
+wing.i_w = mainwing.iw_root;
 
 wing.HDL_PERC = mainwing.HDL_PERC;
 wing.HDL_Croot = mainwing.HDL_Croot;
