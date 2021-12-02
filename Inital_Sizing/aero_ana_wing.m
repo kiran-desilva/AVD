@@ -31,7 +31,7 @@ aero_analysis.wing.t_c=0.12;
 aero_analysis.wing.te_angle=wing.sweepTE; %degrees
 
 %% Mach number definition, wing
-aero_analysis.wing.stall_landing_no_safety=sqrt(2*(sizing.W0)/(1.225*wing.Sref*2.3));
+aero_analysis.wing.stall_landing_no_safety=sqrt(2*(0.8*sizing.W0)/(1.225*wing.Sref*2.3));
 aero_analysis.wing.stall_TO_no_safety=sqrt(2*(sizing.W0)/(1.225*wing.Sref*2.3));
 %NOTE: need to change the weights used for the stall speed!!!!
 aero_analysis.wing.v_landing_ms=1.3*sqrt(2*(sizing.W0-sizing.Wf)/(1.225*wing.Sref*2.3)); %units:m/s, safety margin of 1.3
