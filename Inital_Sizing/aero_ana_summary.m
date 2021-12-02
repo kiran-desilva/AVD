@@ -55,9 +55,9 @@ end
 %aero_analysis.summary.cl_loiter=
 %aero_analysis.summary.L_D_cruise=aero_analysis.summary.cl_cruise/aero_analysis.drag.cd_total(1);
 %aero_analysis.summary.L_D_loiter=aero_analysis.summary.cl_loiter/aero_analysis.drag.cd_total(5);
-
-aero_analysis.summary.e_aircraft=aero_analysis.induced_drag.e_theoretical(1)+aero_analysis.induced_drag.e_theoretical(2)*tailplane.horizontal.s/wing.Sref;
-aero_analysis.summary.e_v2=aero_analysis.induced_drag.wing.e(1)+aero_analysis.induced_drag.tail.e(1)*tailplane.horizontal.s/wing.Sref;
+aero_analysis.summary.e_wing=aero_analysis.induced_drag.e_theoretical(1);
+%aero_analysis.summary.e_aircraft=aero_analysis.induced_drag.e_theoretical(1)+aero_analysis.induced_drag.e_theoretical(2)*tailplane.horizontal.s/wing.Sref;
+%aero_analysis.summary.e_v2=aero_analysis.induced_drag.wing.e(1)+aero_analysis.induced_drag.tail.e(1)*tailplane.horizontal.s/wing.Sref;
 %sizing.fraction.before_cruise
 aero_analysis.summary.cl_cruise=(2*sizing.fraction.before_cruise*sizing.W0)/(aero_analysis.wing.rho(1)*(aero_analysis.wing.Mach(1)*aero_analysis.wing.air_velc(1))^2*aero_analysis.wing.HLD.s_ref);
 aero_analysis.summary.cl_loiter=(2*sizing.fraction.before_loiter*sizing.W0)/(aero_analysis.wing.rho(2)*(aero_analysis.wing.Mach(2)*aero_analysis.wing.air_velc(2))^2*aero_analysis.wing.HLD.s_ref);
@@ -71,6 +71,15 @@ e_polar=aero_analysis.induced_drag.e_theoretical;
 
 cd_wing_polar=(cl_wing).^2/(pi*induced_AR(1)*e_polar(1));
 cd_total_polar=aero_analysis.drag.cd0(1)+cd_wing_polar+aero_analysis.drag.wave(1);
+l_d_max_wing_cruise=12.85.*cl_wing;
+figure
+plot(cd_total_polar,cl_wing)
+hold on
+plot(cl_wing,l_d_max_wing_cruise)
+hold off
+grid on
+grid minor
+xlim([0 0.15])
 
 %l_d_cruise=aero_analysis.summary.L_D_cruise.*cl_wing_polar;
 %l_d_cruise=13.2*cl_wing_polar;
