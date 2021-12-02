@@ -13,6 +13,7 @@ load('wing.mat')
 load('fuse.mat')
 %load("aero_analysis.mat")
 load('tailplane.mat')
+load("aero_analysis.mat")
 %% Wing Lift Estimation
 
 %% Inputs from other scripts

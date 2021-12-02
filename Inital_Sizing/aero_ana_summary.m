@@ -50,9 +50,10 @@ end
 
 
 %% L/D
-
-aero_analysis.summary.L_D_cruise=aero_analysis.summary.cl_cruise/aero_analysis.drag.cd_total(1);
-aero_analysis.summary.L_D_loiter=aero_analysis.summary.cl_loiter/aero_analysis.drag.cd_total(5);
+%aero_analysis.summary.cl_cruise=
+%aero_analysis.summary.cl_loiter=
+%aero_analysis.summary.L_D_cruise=aero_analysis.summary.cl_cruise/aero_analysis.drag.cd_total(1);
+%aero_analysis.summary.L_D_loiter=aero_analysis.summary.cl_loiter/aero_analysis.drag.cd_total(5);
 
 aero_analysis.summary.e_aircraft=aero_analysis.induced_drag.e_theoretical(1)+aero_analysis.induced_drag.e_theoretical(2)*tailplane.horizontal.s/wing.Sref;
 aero_analysis.summary.e_v2=aero_analysis.induced_drag.wing.e(1)+aero_analysis.induced_drag.tail.e(1)*tailplane.horizontal.s/wing.Sref;
@@ -77,7 +78,7 @@ figure
 plot(cd_total_polar,cl_total_polar)
 hold on
 plot(cl_wing_polar,l_d_cruise)
-plot(aero_analysis.drag.cd_total(1),aero_analysis.summary.cl_cruise, 'o') 
+%plot(aero_analysis.drag.cd_total(1),aero_analysis.summary.cl_cruise, 'o') 
 hold off
 grid on
 grid minor
