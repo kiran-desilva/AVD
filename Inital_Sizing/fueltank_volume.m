@@ -1,3 +1,5 @@
+load('wing')
+load('sizing')
 
 airfoilcoords.top = [1.00000     0.00000;
 0.95033     0.00986;
@@ -89,11 +91,11 @@ t_c_rearspar = topfit(x_rearspar) - bottomfit(x_rearspar)
 plot([x_frontspar, x_frontspar],[topfit(x_frontspar),bottomfit(x_frontspar)],'linewidth',5);
 plot([x_rearspar, x_rearspar],[topfit(x_rearspar),bottomfit(x_rearspar)],'linewidth',5);
 
-span = 8.9729;
+span = wing.b;
 
 syms y
-croot = 1.7674;
-ctip = 0.5333;
+croot = wing.Croot;
+ctip = wing.Ctip;
 c(y) = (((2*(ctip-croot))/(span))*y) + croot;
 
 
@@ -104,6 +106,15 @@ area = fuel_tank.area;
 
 raw_vol = double(2*int(c^2*area, rib1, rib2))
 
-corrected_vol = raw_vol*0.975*0.975 %raymer -> fire and leak protection using foam
+required_volume = (sizing.Wf/9.81)/775
+
+uc_volume=0.0908;
+
+volume_left = raw_vol-(2*uc_volume)
+
+corrected_vol = volume_left * .975 * .975 %raymer fire protection
+
+leftover_vol = required_volume - corrected_vol
+
 
 
