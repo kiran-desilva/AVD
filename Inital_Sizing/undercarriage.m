@@ -114,7 +114,7 @@ if fail ~= 0
 	return;
 end
 M_f / B
-fail = non_blocking_assert(M_f/B < 0.2 && M_f/B > 0, 'M_f/B not in valid range', 5);
+fail = non_blocking_assert(M_f/B < 0.20 && M_f/B > 0, 'M_f/B not in valid range', 5);
 if fail ~= 0
 	return;
 end

@@ -4,27 +4,35 @@ load('wing')
 
 placer.nose_wheel.x = 0.5;
 
-nose = linspace(0, 2, 10)
-main_x = linspace(max(1, placer.nose_wheel.x), 11.736, 500)
-main_y = linspace(0, wing.b/2, 20)
+nose = linspace(0.3, 2, 5)
 
-points = [];
-for x = main_x
-	for y = main_y
-		placer.main_wheel.x = x;
-		placer.main_wheel.y = y;
+for n = nose
+	placer.nose_wheel.x = n;
+	% main_x = linspace(max(1, placer.nose_wheel.x), 11.736, 100)
+	main_x = linspace(placer.nose_wheel.x, 11.736, 300)
+	main_y = linspace(0, wing.b/2, 20)
 
-		fail = 0;
-		undercarriage;
+	points = [];
+	for x = main_x
+		for y = main_y
+			placer.main_wheel.x = x;
+			placer.main_wheel.y = y;
 
-		points = [points; x, y, fail];
+			fail = 0;
+			undercarriage;
+
+			points = [points; x, y, fail];
+		end
 	end
-end
 
-scatter3(points(:, 2), points(:, 1), points(:, 3), [], points(:, 3));
-axis equal;
-caxis([0, 5]);
-points(:, 3)
+	figure;
+	scatter3(points(:, 2), points(:, 1), points(:, 3), [], points(:, 3));
+	title(['Nose gear = ', num2str(n), ' m']);
+	axis equal;
+	caxis([0, 5]);
+	points(:, 3)
+
+end
 
 function c = transform_arr(arr)
 	c = [];
