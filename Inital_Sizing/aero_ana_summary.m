@@ -7,6 +7,7 @@ close all
 load 'aero_analysis.mat'
 load 'tailplane.mat'
 load 'wing.mat'
+load 'sizing.mat'
 
 %(1): wing
 %(2): HLD
@@ -57,7 +58,11 @@ end
 
 aero_analysis.summary.e_aircraft=aero_analysis.induced_drag.e_theoretical(1)+aero_analysis.induced_drag.e_theoretical(2)*tailplane.horizontal.s/wing.Sref;
 aero_analysis.summary.e_v2=aero_analysis.induced_drag.wing.e(1)+aero_analysis.induced_drag.tail.e(1)*tailplane.horizontal.s/wing.Sref;
-
+%sizing.fraction.before_cruise
+aero_analysis.summary.cl_cruise=(2*sizing.fraction.before_cruise*sizing.W0)/(aero_analysis.wing.rho(1)*(aero_analysis.wing.Mach(1)*aero_analysis.wing.air_velc(1))^2*aero_analysis.wing.HLD.s_ref);
+aero_analysis.summary.cl_loiter=(2*sizing.fraction.before_loiter*sizing.W0)/(aero_analysis.wing.rho(2)*(aero_analysis.wing.Mach(2)*aero_analysis.wing.air_velc(2))^2*aero_analysis.wing.HLD.s_ref);
+aero_analysis.summary.l_d_cruise=aero_analysis.summary.cl_cruise/aero_analysis.drag.cd_total(1);
+aero_analysis.summary.l_d_loiter=aero_analysis.summary.cl_loiter/aero_analysis.drag.cd_total(2);
 %% Drag polar
 
 induced_AR=[wing.Ar, tailplane.horizontal.Ar];
@@ -108,7 +113,7 @@ title 'Wing'
 xlabel '\alpha [degrees]'
 hold off
 
-save('aero_analysis.mat', 'aero_analysis')
+%save('aero_analysis.mat', 'aero_analysis')
 %Need to add annotations
 %Fix legend
 %Thicker lines

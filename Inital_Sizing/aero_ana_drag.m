@@ -230,7 +230,7 @@ aero_analysis.induced_drag.Q=1./(aero_analysis.induced_drag.e_theoretical.*ke_f)
 aero_analysis.induced_drag.P=big_k.*aero_analysis.drag.cd0;
 
 %assuming efficiency of tail (eta_h) is 1 since it's a t-tail
-angle_flight=[3.55,0.5,7,7,0.5]*pi/180;
+angle_flight=[0.01,0.5,7,7,0.5]*pi/180;
 for j=1:length(U)
     aero_analysis.induced_drag.wing.e(j)=aero_analysis.induced_drag.k_e_m(j)/(aero_analysis.induced_drag.Q(1)+aero_analysis.induced_drag.P(j)*pi*induced_AR(1));
     aero_analysis.induced_drag.wing.e_V2(j)=aero_analysis.induced_drag.e_theoretical(1)*ke_f*k_e_d0*aero_analysis.induced_drag.k_e_m(j); %without knowing Cd0
