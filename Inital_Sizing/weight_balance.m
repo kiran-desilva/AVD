@@ -193,32 +193,37 @@ cg_ec = [cg.x_inl cg.z_inl];
 cg_es = [cg.x_inl cg.z_inl];
 cg_f = [metres_to_ft*(locations.x_ac_w - wing.Xac_from_tip + fueltank.x_cg_from_tip); -33/12]; % TODO: Might need to add underbelly in
 cg_fs = [metres_to_ft*(locations.x_ac_w - wing.Xac_from_tip + fueltank.x_cg_from_tip); -33/12]; % TODO: Might need to add underbelly in
-cg_fc = [4.5 -(33/12)];
+cg_fc = [4.5 -0.66];
 cg_APUinst = [cg.x_APUinst 0]
 cg_instr = [20 0]/12;
 cg_hydr= [22 -20]/12;
 cg_el = [22 -20]/12;
-cg_en = [metres_to_ft*locations.x_rear_bulkhead metres_to_ft*0.716];
+cg_en = [metres_to_ft*locations.x_rear_bulkhead metres_to_ft*0.513];
 cg_av = [20 0]/12;
-cg_furn = [20 0]/12;
+cg_furn = [20 -(25/12)];
 %locating passenger cg in center of wing root for easy emergency access
 wing_center = convlength(((wing.Croot*0.5) + locations.x_wing),'m','ft')
 cg_pass = [wing_center 0];
 cg_pilot = [convlength(1.779,'m','ft') 0];
-cg_ac = [22 -20]/12;
-cg_ai = [22 -20]/12;
-cg_pay = [27.4508,0];
+cg_ac = [22 -20/12];
+cg_ai = [22 -20/12];
+cg_pay = [116.4/12,0];
+
+%returns wing_fuel_tank_cg in feet
+fuel_tank_cg = @(wing_ac) metres_to_ft*(wing_ac - wing.Xac_from_tip + fueltank.x_cg_from_tip);
+
 
 wandb.x_cg = (weights.W_en*cg_en(1) + weights.W_w*cg_w(1)+weights.W_ht*cg_ht(1)+weights.W_vt*cg_vt(1)+weights.W_fus*cg_fus(1)+weights.W_mlg*cg_mlg(1)+weights.W_nlg*cg_nlg(1)+weights.W_inl*cg_inl(1)+weights.W_ec*cg_es(1)+weights.W_es*cg_es(1)+weights.W_f*cg_f(1)+weights.W_fs*cg_fs(1)+weights.W_fc*cg_fc(1)+weights.W_instr*cg_instr(1)+weights.W_hydr*cg_hydr(1)+weights.W_el*cg_el(1)+weights.W_av*cg_av(1)+weights.W_furn*cg_furn(1)+weights.W_ac*cg_ac(1)+weights.W_ai*cg_ai(1)+(weights.W_p*cg_pass(1))+(weights.W_pay*cg_pay(1)))/weights.Total_weight
 
 
 %	wing_ac	-	aerodynamic centre of the wing, measured from the nose of the plane, in metres
+%   x_gear - in meters from tip
 %	wf_fuel -	fuel weight fraction, defined as current_weight/max_takeoff_weight 
 %	payload_factor -	payload fraction, varies from 0 to 1, where 0 means no passengers and no baggage (but 2 pilots)
 %						and 1 means 4 passengers, 4 bags (and 2 pilots)
 %   returns [ cg location in FEET]
 
-wandb.x_cg_function = @(wing_ac,wf_fuel,payload_factor) (weights.W_en*cg_en(1) + weights.W_w*cg.x_wing_from_ac_func(wing_ac)+weights.W_ht*cg_ht(1)+weights.W_vt*cg_vt(1)+weights.W_fus*cg_fus(1)+weights.W_mlg*cg_mlg(1)+weights.W_nlg*cg_nlg(1)+weights.W_inl*cg_inl(1)+weights.W_ec*cg_es(1)+weights.W_es*cg_es(1)+(fuel_fraction_to_fuel_weight(wf_fuel)*cg_f(1))+weights.W_fs*cg_fs(1)+weights.W_fc*cg_fc(1)+weights.W_instr*cg_instr(1)+weights.W_hydr*cg_hydr(1)+weights.W_el*cg_el(1)+weights.W_av*cg_av(1)+weights.W_furn*cg_furn(1)+weights.W_ac*cg_ac(1)+weights.W_ai*cg_ai(1)+( (payload_factor*(4/6)*weights.W_p*cg_pass(1)) + ((2/6)*weights.W_p*cg_pilot(1)) )+(payload_factor_func(payload_factor)*weights.W_pay*cg_pay(1)))./weights.Total_weight_func(wf_fuel,payload_factor);
+wandb.x_cg_function = @(wing_ac,x_gear_main,x_gear_nose,wf_fuel,payload_factor) (weights.W_en*cg_en(1) + weights.W_w*cg.x_wing_from_ac_func(wing_ac)+weights.W_ht*cg_ht(1)+weights.W_vt*cg_vt(1)+weights.W_fus*cg_fus(1)+(weights.W_mlg*x_gear_main*metres_to_ft)+(weights.W_nlg*x_gear_nose*metres_to_ft)+weights.W_inl*cg_inl(1)+weights.W_ec*cg_es(1)+weights.W_es*cg_es(1)+(fuel_fraction_to_fuel_weight(wf_fuel)*fuel_tank_cg(wing_ac))+(weights.W_fs*fuel_tank_cg(wing_ac))+weights.W_fc*cg_fc(1)+weights.W_instr*cg_instr(1)+weights.W_hydr*cg_hydr(1)+weights.W_el*cg_el(1)+weights.W_av*cg_av(1)+weights.W_furn*cg_furn(1)+weights.W_ac*cg_ac(1)+weights.W_ai*cg_ai(1)+( (payload_factor*(4/6)*weights.W_p*cg_pass(1)) + ((2/6)*weights.W_p*cg_pilot(1)) )+(payload_factor_func(payload_factor)*weights.W_pay*cg_pay(1)))./weights.Total_weight_func(wf_fuel,payload_factor);
 
 
 wandb.z_cg = (weights.W_en*cg_en(2) + weights.W_w*cg_w(2)+weights.W_ht*cg_ht(2)+weights.W_vt*cg_vt(2)+weights.W_fus*cg_fus(2)+weights.W_mlg*cg_mlg(2)+weights.W_nlg*cg_nlg(2)+weights.W_inl*cg_inl(2)+weights.W_ec*cg_es(2)+weights.W_es*cg_es(2)+weights.W_f*cg_f(2)+weights.W_fs*cg_fs(2)+weights.W_fc*cg_fc(2)+weights.W_instr*cg_instr(2)+weights.W_hydr*cg_hydr(2)+weights.W_el*cg_el(2)+weights.W_av*cg_av(2)+weights.W_furn*cg_furn(2)+weights.W_ac*cg_ac(2)+weights.W_ai*cg_ai(2)+weights.W_p+cg_pass(2))/weights.Total_weight
@@ -251,16 +256,58 @@ wandb.z_cg_drained = (wandb.z_cg*weights.Total_weight - weights.W_f*cg_f(2))/wei
 fraction = [sizing.fraction.before_take_off,sizing.fraction.before_cruise,sizing.fraction.end_cruise_1,sizing.fraction.before_alternate_cruise,sizing.fraction.before_loiter,sizing.fraction.end];
 wew0 = (1-(sizing.Wf/sizing.W0)); 
 
-empty_cg = wandb.x_cg_function(locations.x_ac_w,wew0,0);
+empty_cg = wandb.x_cg_function(locations.x_ac_w,cg.x_mlg,cg.x_nlg,wew0,0);
 empty_weight = convforce(wew0 * sizing.W0,'n','lbf') - (weights.W_pay + weights.W_p);
 
 figure
 hold on
-plot(0.3048*[empty_cg;wandb.x_cg_function(locations.x_ac_w,fraction,1)';empty_cg],4.4482*[empty_weight;weights.Total_weight_func(fraction,1)';empty_weight],'x-')
-plot(0.3048*[empty_cg;wandb.x_cg_function(locations.x_ac_w,fraction,0)';empty_cg],4.4482*[empty_weight;weights.Total_weight_func(fraction,0)';empty_weight],'x-')
+plot(0.3048*[empty_cg;wandb.x_cg_function(locations.x_ac_w,cg.x_mlg,cg.x_nlg,fraction,1)';empty_cg],4.4482*[empty_weight;weights.Total_weight_func(fraction,1)';empty_weight],'x-')
+plot(0.3048*[empty_cg;wandb.x_cg_function(locations.x_ac_w,cg.x_mlg,cg.x_nlg,fraction,0)';empty_cg],4.4482*[empty_weight;weights.Total_weight_func(fraction,0)';empty_weight],'x-')
 
 xlabel('X_{cg} [m]')
 ylabel('Weight [N]')
 grid on
 legend('Full Payload','No Payload')
 save('wandb','wandb')
+
+figure
+hold on
+
+scatter(cg_w(1),cg_w(2),weights.W_w)
+scatter(cg_ht(1),cg_ht(2),weights.W_ht)
+scatter(cg_vt(1),cg_vt(2),weights.W_vt)
+scatter(cg_fus(1),cg_fus(2),weights.W_fus)
+scatter(cg_mlg(1),cg_mlg(2),weights.W_mlg)
+scatter(cg_nlg(1),cg_nlg(2),weights.W_nlg)
+scatter(cg_inl(1),cg_inl(2),weights.W_inl)
+scatter(cg_ec(1),cg_ec(2),weights.W_ec)
+scatter(cg_es(1),cg_es(2),weights.W_es)
+scatter(cg_f(1),cg_f(2),weights.W_f)
+scatter(cg_fs(1),cg_fs(2),weights.W_fs)
+scatter(cg_fc(1),cg_fc(2),weights.W_fc)
+%scatter(cg_APUinst(1),weights.)
+scatter(cg_instr(1),cg_instr(2),weights.W_instr)
+scatter(cg_hydr(1),cg_hydr(2),weights.W_hydr)
+scatter(cg_el(1),cg_el(2),weights.W_el)
+scatter(cg_en(1),cg_en(2),weights.W_en)
+scatter(cg_av(1),cg_av(2),weights.W_av)
+scatter(cg_furn(1),cg_furn(2),weights.W_furn)
+scatter(cg_pass(1),cg_pass(2),weights.W_p * (4/6))
+scatter(cg_pilot(1),cg_pilot(2),weights.W_p * (2/6))
+scatter(cg_ac(1),cg_ac(2),weights.W_ac)
+scatter(cg_ai(1),cg_ai(2),weights.W_ai)
+scatter(cg_pay(1),cg_pay(2),weights.W_pay)
+plot(locations.x_ac_w*metres_to_ft,0,'x')
+
+xline(wandb.x_cg,'--','linewidth',1.2)
+xline(metres_to_ft*locations.x_wing)
+xline(metres_to_ft*(locations.x_wing + wing.Croot))
+
+legend('Wing','Horizontal Stabilizer','Vertical Stabilizer','Fuselage','Main Landing Gear','Nose Landing Gear','Nacelle','Engine Controls','Engine Starter','Fuel','Fuel System','Flight Controls','Instruments','Hydraulics','Electrical System','Engine','Avionics','Furnishings','Passegners','Pilots','Air Conditioning','Anti-icing','Payload');
+xlabel('X coordinate from nose [ft])')
+ylabel('Z location from fuselage center [ft]')
+
+grid on
+grid minor
+
+improvePlot(gcf)
