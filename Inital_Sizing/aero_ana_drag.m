@@ -113,7 +113,8 @@ end
 %(5): nacelle - note, there are 2 to consider (2 engines!)
 d_components=[d_fuselage,b,tailplane.horizontal.Cmac,tailplane.vertical.Cmac,sqrt(4*uc.uc_frontal_area_m_sq/pi)];
 
-aero_analysis.drag.l_components=[l_fuselage,wing.Cmac,tailplane.horizontal.Cmac,tailplane.vertical.Cmac,5]; %define characteristic length of each component
+aero_analysis.drag.l_components=[l_fuselage,wing.Cmac,tailplane.horizontal.Cmac,tailplane.vertical.Cmac,powerplant.nacelle_length_ft/3.281
+]; %define characteristic length of each component
 aero_analysis.drag.fineness=zeros(1,length(d_components));
 for i=1:length(d_components)
     aero_analysis.drag.fineness(i)=aero_analysis.drag.l_components(i)/d_components(i);
@@ -138,7 +139,7 @@ aero_analysis.drag.FF(5)=1+(0.35/aero_analysis.drag.fineness(5));
 
 Q=[1,1,1.055,1.055,1.5]; %assuming 5.5% for horizontal and vertical stabiliser
 
-S_wet=[28.252,15,3,3,5]; %wetted area, exact values to be added
+S_wet=[28.252,15,3,3,powerplant.nacelle_wetted_area_ft_sq*2/10.764]; %wetted area, exact values to be added
 %(1):fuselage
 %(2):wing
 %(3): horizontal stabiliser
@@ -228,8 +229,8 @@ aero_analysis.induced_drag.Q=1./(aero_analysis.induced_drag.e_theoretical.*ke_f)
 
 aero_analysis.induced_drag.P=big_k.*aero_analysis.drag.cd0;
 
-%assuming efficiency of tail (eta_h) is 0.9 since it's a t-tail
-angle_flight=[0.5,0.5,7,7,0.5]*pi/180;
+%assuming efficiency of tail (eta_h) is 1 since it's a t-tail
+angle_flight=[0.01,0.5,7,7,0.5]*pi/180;
 for j=1:length(U)
     aero_analysis.induced_drag.wing.e(j)=aero_analysis.induced_drag.k_e_m(j)/(aero_analysis.induced_drag.Q(1)+aero_analysis.induced_drag.P(j)*pi*induced_AR(1));
     aero_analysis.induced_drag.wing.e_V2(j)=aero_analysis.induced_drag.e_theoretical(1)*ke_f*k_e_d0*aero_analysis.induced_drag.k_e_m(j); %without knowing Cd0
