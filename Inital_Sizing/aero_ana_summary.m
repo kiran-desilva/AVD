@@ -31,11 +31,11 @@ aero_analysis.summary.cl_alpha_tail_TO=aero_analysis.tail.Cl_alpha(3);
 aero_analysis.summary.cl_alpha_tail_approach=aero_analysis.tail.Cl_alpha(4);
 aero_analysis.summary.cl_alpha_tail_loiter_clean=aero_analysis.tail.Cl_alpha(5);
 
-aero_analysis.summary.cl_alpha_loiter_clean=aero_analysis.summary.cl_alpha_wing_cruise_clean+aero_analysis.summary.cl_alpha_tail_cruise_clean*tailplane.horizontal.s/wing.Sref;
+aero_analysis.summary.cl_alpha_cruise_clean=aero_analysis.summary.cl_alpha_wing_cruise_clean+aero_analysis.summary.cl_alpha_tail_cruise_clean*tailplane.horizontal.s/wing.Sref;
 aero_analysis.summary.cl_alpha_max_clean=aero_analysis.summary.cl_alpha_wing_max_clean+aero_analysis.summary.cl_alpha_tail_max_clean*tailplane.horizontal.s/wing.Sref;
 aero_analysis.summary.cl_alpha_TO=aero_analysis.summary.cl_alpha_wing_TO+aero_analysis.summary.cl_alpha_tail_TO*tailplane.horizontal.s/wing.Sref;
 aero_analysis.summary.cl_alpha_approach=aero_analysis.summary.cl_alpha_wing_approach+aero_analysis.summary.cl_alpha_tail_approach*tailplane.horizontal.s/wing.Sref;
-aero_analysis.summary.cl_alpha_tail_loiter_clean=aero_analysis.summary.cl_alpha_wing_loiter_clean+aero_analysis.summary.cl_alpha_tail_loiter_clean*tailplane.horizontal.s/wing.Sref;
+aero_analysis.summary.cl_alpha_loiter_clean=aero_analysis.summary.cl_alpha_wing_loiter_clean+aero_analysis.summary.cl_alpha_tail_loiter_clean*tailplane.horizontal.s/wing.Sref;
 
 zero_AoA=aero_analysis.wing.zero_aoa;
 
@@ -47,6 +47,16 @@ for i=1:length(x)
     cl_alpha_wing_loiter_clean(i)=aero_analysis.summary.cl_alpha_wing_loiter_clean*x(i); %rad
 end
 
+
+%% L/D
+
+aero_analysis.summary.L_D_cruise=aero_analysis.summary.cl_cruise/aero_analysis.drag.cd_total(1);
+aero_analysis.summary.L_D_loiter=aero_analysis.summary.cl_loiter/aero_analysis.drag.cd_total(5);
+
+aero_analysis.summary.e_aircraft=aero_analysis.induced_drag.e_theoretical(1)+aero_analysis.induced_drag.e_theoretical(2)*tailplane.horizontal.s/wing.Sref;
+aero_analysis.summary.e_v2=aero_analysis.induced_drag.wing.e(1)+aero_analysis.induced_drag.tail.e(1)*tailplane.horizontal.s/wing.Sref;
+
+%% Plots
 figure
 x=x*180/pi;
 yline(aero_analysis.summary.cl_max_wing_clean, '--k')

@@ -60,9 +60,10 @@ A_UC_front=[0, 0, uc.uc_frontal_area_m_sq, uc.uc_frontal_area_m_sq,0]; %Area of 
 %% Wave drag, wing, M_dd
 %Drag divergence Mach number
 %only for wing
-cl_cruise=sizing.fraction.before_cruise*sizing.W0/(0.5*0.302*(aero_analysis.wing.Mach(2)*aero_analysis.wing.air_velc(2))^2*wing.Sref); %need to define
+aero_analysis.summary.cl_cruise=sizing.fraction.before_cruise*sizing.W0/(0.5*0.302*(aero_analysis.wing.Mach(2)*aero_analysis.wing.air_velc(2))^2*wing.Sref); %need to define
+aero_analysis.summary.cl_loiter=sizing.fraction.before_loiter*sizing.W0/(0.5*1.0552*(aero_analysis.wing.Mach(5)*aero_analysis.wing.air_velc(5))^2*wing.Sref);
 korn=0.87;
-aero_analysis.drag.M_DD=(korn/cos(sweep_angles_half))-(t_c(1)/cos(sweep_angles_half)^2)-(cl_cruise/(10*cos(sweep_angles_half)^3));
+aero_analysis.drag.M_DD=(korn/cos(sweep_angles_half))-(t_c(1)/cos(sweep_angles_half)^2)-(aero_analysis.summary.cl_cruise/(10*cos(sweep_angles_half)^3));
 aero_analysis.drag.M_cr_wing=aero_analysis.drag.M_DD-0.08;
 aero_analysis.drag.M.wing=aero_analysis.wing.Mach;
 
@@ -246,12 +247,12 @@ aero_analysis.induced_drag.HLD=0.28^2.*aero_analysis.wing.HLD.delta_cl_max.^2*co
 aero_analysis.induced_drag.cd_i(3)=aero_analysis.induced_drag.cd_i(3)+aero_analysis.induced_drag.HLD(1);
 aero_analysis.induced_drag.cd_i(4)=aero_analysis.induced_drag.cd_i(4)+aero_analysis.induced_drag.HLD(2);
 
-save('aero_analysis.mat', 'aero_analysis')
+
 
 %% Total Drag
-
 
 aero_analysis.drag.cd_induced_total=aero_analysis.induced_drag.cd_i;
 aero_analysis.drag.cd_parasitic_total=aero_analysis.drag.cd0;
 aero_analysis.drag.cd_total=aero_analysis.drag.cd_parasitic_total+aero_analysis.drag.cd_induced_total+aero_analysis.drag.wave;
 
+save('aero_analysis.mat', 'aero_analysis')

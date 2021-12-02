@@ -93,7 +93,7 @@ aero_analysis.wing.HLD.s_flapped=6.6422;
 aero_analysis.wing.HLD.delta_hl=wing.sweepTE; %hinge lift surface
 
 %calculations
-aero_analysis.wing.HLD.delta_cl_device=1.3*(aero_analysis.wing.HLD.c_fraction); %assumed Fowler. Can change - pg 415 Raymer
+aero_analysis.wing.HLD.delta_cl_device=1.6*(aero_analysis.wing.HLD.c_fraction); %assumed double-slotted TE. Can change - pg 415 Raymer
 %initialise vectors
 aero_analysis.wing.HLD.delta_cl_max=[0,0];
 aero_analysis.wing.HLD.delta_cl_max(2)=0.9*aero_analysis.wing.HLD.delta_cl_device*(aero_analysis.wing.HLD.s_flapped/aero_analysis.wing.HLD.s_ref)*cos(aero_analysis.wing.HLD.delta_hl);
