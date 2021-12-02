@@ -62,8 +62,8 @@ performance.SL  = 1.666 * (performance.Sa + performance.Sf + performance.Sfr + p
 %% Range and Endurance
 %calculate new weight fractions for cruise and loiter segments
 %performance.frac_cruise1 = exp(-(parameters.cruise_range_km * 1000 * cruise1_c / 3600) / (parameters.cruise_mach * 295.07 * cruise_LoverD));  %cruise 1 using breguet range
-performance.frac_cruise2 = exp(-(parameters.alternate_range_km * 1000 * cruise2_c / 3600) / (parameters.cruise_mach * 295.07 * aero_analysis.wing.cruise_LoverD));  %cruise 2
-performance.frac_loiter = exp(-(parameters.loiter_duration * 60 * loiter_c / 3600) / (aero_analysis.wing.loiter_LoverD)); % loiter using endurance eqn
+performance.frac_cruise2 = exp(-(parameters.alternate_range_km * 1000 * cruise2_c / 3600) / (parameters.cruise_mach * 295.07 * aero_analysis.summary.l_d_cruise));  %cruise 2
+performance.frac_loiter = exp(-(parameters.loiter_duration * 60 * loiter_c / 3600) / (aero_analysis.summary.l_d_loiter)); % loiter using endurance eqn
 new_Wx_W0 = 1; %initialise 
 
 for i = 1:9
@@ -77,7 +77,7 @@ new_Wx_W0_ext = new_Wx_W0;
 Wx_W0 = (wandb.W0 - wandb.Wf) / wandb.W0; 
 new_Wx_W0 = new_Wx_W0 * performance.frac_cruise2 * performance.frac_loiter; % not including cruise 1 segment
 performance.frac_cruise1 = Wx_W0 / (new_Wx_W0); 
-performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * aero_analysis.wing.cruise_LoverD * log(performance.frac_cruise1);
+performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * aero_analysis.summary.l_d_cruise * log(performance.frac_cruise1);
 
 %extended range
 Wx_W0_ext = (wandb.W0 - (wandb.Wf + 15 * 9.81)) / wandb.W0; %extended range replacing all pld weight (15kg) with fuel
