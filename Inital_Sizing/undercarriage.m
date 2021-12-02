@@ -36,7 +36,7 @@ end
 
 
 try
-	% disp()
+	disp()
 	uc.nose_wheel.x = placer.nose_wheel.x; % TODO:
 	uc.main_wheel.y = placer.main_wheel.y;
 	uc.main_wheel.x = placer.main_wheel.x; % TODO:
@@ -45,9 +45,9 @@ catch
 	% uc.nose_wheel.x = 0.5; % TODO:
 	% uc.main_wheel.y = 3.54;%66*2.54/100;
 	% uc.main_wheel.x = 5.6513; % TODO:
-	uc.nose_wheel.x = 0.5; % TODO:
-	uc.main_wheel.y = 3.54;%66*2.54/100;
-	uc.main_wheel.x = 11.84; % TODO:
+	uc.nose_wheel.x = 0.51; % TODO:
+	uc.main_wheel.y = 1.18;%66*2.54/100;
+	uc.main_wheel.x = 5.39; % TODO:
 end
 init_gear_length = 0.7;
 uc.main_wheel.z = -0.635 -0.704 - init_gear_length;
@@ -114,7 +114,7 @@ if fail ~= 0
 	return;
 end
 M_f / B
-fail = non_blocking_assert(M_f/B < 0.20 && M_f/B > 0, 'M_f/B not in valid range', 5);
+fail = non_blocking_assert(M_f/B < 0.15 && M_f/B > 0, 'M_f/B not in valid range', 5);
 if fail ~= 0
 	return;
 end
@@ -128,13 +128,13 @@ far25_safety_margin = 1.07;
 max_static_load = @(W) far25_safety_margin*W*N_a/B;
 max_static_load_nose = @(W) far25_safety_margin*W*M_f/B;
 min_static_load_nose = @(W) far25_safety_margin*W*M_a/B;
-dynamic_breaking_load_nose = @(W) 10*far25_safety_margin*wandb.z_cg*W/(g*B);
+dynamic_breaking_load_nose = @(W) 10*far25_safety_margin*(wandb.z_cg - uc.main_wheel.z)*W/(g*B);
 
 W0_lbs = sizing.W0*newtons_to_lbs;
 max_main_wheel_load_lbs = max_static_load(W0_lbs) / 2;
-max_nose_wheel_load_lbs = max_static_load_nose(W0_lbs) / 2;
-min_nose_wheel_load_lbs = min_static_load_nose(W0_lbs) / 2;
-dynamic_nose_load_lbs = dynamic_breaking_load_nose(W0_lbs) / 2;
+max_nose_wheel_load_lbs = max_static_load_nose(W0_lbs);
+min_nose_wheel_load_lbs = min_static_load_nose(W0_lbs);
+dynamic_nose_load_lbs = dynamic_breaking_load_nose(W0_lbs);
 %{
 max_main_wheel_load_lbs = max_static_load(main_wheel_load)
 max_nose_wheel_load_lbs = max_static_load_nose(nose_wheel_load);
@@ -142,10 +142,10 @@ min_nose_wheel_load_lbs = min_static_load_nose(nose_wheel_load)
 dynamic_nose_load_lbs = dynamic_breaking_load_nose(nose_wheel_load);
 %}
 
-max_nose_wheel_load_lbs = max_nose_wheel_load_lbs + dynamic_nose_load_lbs
+max_nose_wheel_load_lbs = (max_nose_wheel_load_lbs + dynamic_nose_load_lbs)/1.4
 
-uc.main_wheel.tyres.name = "Type III - 8.50-10"
-uc.nose_wheel.tyres.name = "Type III - 5.00-4"
+uc.main_wheel.tyres.name = "Metric 450x190-5"
+uc.nose_wheel.tyres.name = "Metric 450x190-5"
 
 % Initial wheel size from Raymer pg. 344
 %% Calculate main wheel diamater based on Raymer regression
@@ -159,12 +159,12 @@ wheel_width_in = uc.main_wheel.width_cm/2.54
 %}
 
 uc.main_gear_shock_struts = 1;
-uc.main_wheel.diameter_cm = 26.3*2.54;
-uc.main_wheel.width_cm = 5; % TODO:
-uc.main_wheel.rolling_radius_cm = 10.4*2.54;
-uc.nose_wheel.diameter_cm = 13.25*2.54;
-uc.nose_wheel.width_cm = 5; % TODO:
-uc.nose_wheel.rolling_radius_cm = 5.2*2.54;
+uc.main_wheel.diameter_cm = 47;
+uc.main_wheel.width_cm = 19.51; % TODO:
+uc.main_wheel.rolling_radius_cm = 7.09*2.54;
+uc.nose_wheel.diameter_cm = uc.main_wheel.diameter_cm;
+uc.nose_wheel.width_cm = uc.main_wheel.width_cm; % TODO:
+uc.nose_wheel.rolling_radius_cm = uc.main_wheel.rolling_radius_cm;
 
 % Oleo sizing
 landing_speed_ms = 10*0.3048;
@@ -200,6 +200,18 @@ nose_wheel_box_area_m_sq = uc.nose_gear_length_in*2.54/100*nose_wheel_box_width_
 
 uc.uc_frontal_area_m_sq = nose_wheel_box_area_m_sq + 2*main_wheel_box_area_m_sq;
 uc.ratio_ngear = gear_load_factor;
+
+
+%% Calculate undercarriage retraction box
+main_box_width = 1.5*uc.main_wheel.diameter_cm / 100;
+main_box_length = 1.1*uc.main_wheel.oleo.min_overall_length_m;
+main_box_thickness = 1.2 * uc.main_wheel.width_cm / 100;
+single_main_box_volume = main_box_length * main_box_width * main_box_thickness;
+
+nose_box_height = 1.5*uc.main_wheel.diameter_cm / 100;
+nose_box_length = 1.1*uc.main_wheel.oleo.min_overall_length_m;
+nose_box_width = 1.2 * uc.main_wheel.width_cm / 100;
+single_nose_box_volume = nose_box_length * nose_box_width * nose_box_height;
 
 save('uc', 'uc')
 
