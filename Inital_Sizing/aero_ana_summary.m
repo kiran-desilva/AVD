@@ -60,7 +60,7 @@ aero_analysis.summary.e_wing=aero_analysis.induced_drag.e_theoretical(1);
 %aero_analysis.summary.e_v2=aero_analysis.induced_drag.wing.e(1)+aero_analysis.induced_drag.tail.e(1)*tailplane.horizontal.s/wing.Sref;
 %sizing.fraction.before_cruise
 aero_analysis.summary.cl_cruise=(2*sizing.fraction.before_cruise*sizing.W0)/(aero_analysis.wing.rho(1)*(aero_analysis.wing.Mach(1)*aero_analysis.wing.air_velc(1))^2*aero_analysis.wing.HLD.s_ref);
-aero_analysis.summary.cl_loiter=(2*sizing.fraction.before_loiter*sizing.W0)/(aero_analysis.wing.rho(2)*(aero_analysis.wing.Mach(2)*aero_analysis.wing.air_velc(2))^2*aero_analysis.wing.HLD.s_ref);
+aero_analysis.summary.cl_loiter=(2*sizing.fraction.before_loiter*sizing.W0)/(aero_analysis.wing.rho(5)*(aero_analysis.wing.Mach(5)*aero_analysis.wing.air_velc(5))^2*aero_analysis.wing.HLD.s_ref);
 aero_analysis.summary.l_d_cruise=aero_analysis.summary.cl_cruise/aero_analysis.drag.cd_total(1);
 aero_analysis.summary.l_d_loiter=aero_analysis.summary.cl_loiter/aero_analysis.drag.cd_total(2);
 %% Drag polar
@@ -122,13 +122,13 @@ plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha(2),cl_alpha_wing_approach, 'k
 plot(x+zero_AoA,cl_alpha_wing_loiter_clean)
 legend('Cl_max clean', 'Cl_max_approach', 'Cl_max_TO', 'Clean Cruise', 'Max Cruise', 'Takeoff', 'Approach', 'Loiter')
 
-aero_analysis.summary.zero_aoa.TO=zero_AoA+aero_analysis.wing.HLD.delta_alpha(1);
-aero_analysis.summary.zero_aoa.landing=zero_AoA+aero_analysis.wing.HLD.delta_alpha(2);
+aero_analysis.summary.zero_aoa.TO_deg=zero_AoA+aero_analysis.wing.HLD.delta_alpha(1);
+aero_analysis.summary.zero_aoa.landing_deg=zero_AoA+aero_analysis.wing.HLD.delta_alpha(2);
 
 aero_analysis.summary.y_intercept_approach=0.3538;
 aero_analysis.summary.y_intercept_TO=0.3488;
-aero_analysis.summary.zero_AoA_TO=(zero_AoA+aero_analysis.wing.HLD.delta_alpha(1))*pi/180;
-aero_analysis.summary.zero_AoA_Land=(zero_AoA+aero_analysis.wing.HLD.delta_alpha(2))*pi/180;
+aero_analysis.summary.zero_AoA_TO=(zero_AoA+aero_analysis.wing.HLD.delta_alpha(1))*pi/180; %[rad]
+aero_analysis.summary.zero_AoA_Land=(zero_AoA+aero_analysis.wing.HLD.delta_alpha(2))*pi/180; %[rad]
 
 
 aero_analysis.summary.cl_transition=0.9*aero_analysis.summary.cl_max_TO;
