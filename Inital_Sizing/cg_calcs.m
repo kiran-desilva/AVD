@@ -26,7 +26,7 @@ cg.x_fuse = (0.47 * fuse.total_fuselage_length)/12
 
 %vertical tail cg
 offset_55_c = 0.55*tailplane.vertical.b*tand(tailplane.vertical.sweepLE);
-vtail_xcg_metres = locations.+offset_55_c+((tailplane.vertical.Croot - ((tailplane.vertical.Croot-tailplane.vertical.Ctip)*0.55))*.42);
+vtail_xcg_metres = locations.x_vertical_stabilizer+offset_55_c+((tailplane.vertical.Croot - ((tailplane.vertical.Croot-tailplane.vertical.Ctip)*0.55))*.42);
 cg.x_vtail = vtail_xcg_metres * 3.28084
 
 vtail_zcg_metres = 0.55*tailplane.vertical.b + (0.84-(locations.x_vertical_stabilizer-fuse.x_afterbody)*tand(4))
