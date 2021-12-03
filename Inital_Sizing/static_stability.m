@@ -103,7 +103,7 @@ region.fuel_fraction = [sizing.fraction.before_take_off,sizing.fraction.before_a
 region.cl_alpha_w = [ aero_analysis.wing.HLD.cl_alpha_flaps([1 2]) aero_analysis.wing.Cl_alpha([1 1]) ];
 region.cl_alpha_h = [aero_analysis.tail.Cl_alpha([3 4 1 1])];
 region.Cm0w = double(subs(Cm0w,cla_eta_syms,region.cla_eta));
-region.alpha_0_w = [aero_analysis.summary.zero_AoA_TO,aero_analysis.summary.zero_AoA_TO,degtorad(-3),degtorad(-3)]
+region.alpha_0_w = [aero_analysis.summary.zero_AoA_TO*(pi/180),aero_analysis.summary.zero_AoA_TO*(pi/180),degtorad(-3),degtorad(-3)]
 
 
 region.rho = [1.225,1.225,0.3016,0.3016];
@@ -327,7 +327,7 @@ for idx = 1:length(region.regions)
     region.aoa_ideal(idx) = res(1) * (180/pi);
     region.ih_ideal(idx) = res(2) * (180/pi);
 
-    region.Cl_w_ideal(idx) = double(CL_w(region.aoa_ideal(idx)*(pi/180),iw_required* (pi/180),region.cl_alpha_w(idx),region.alpha_0_w(idx)))
+    region.Cl_w_ideal(idx) = double(CL_w(region.aoa_ideal(idx)*(pi/180),iw_required*(pi/180),region.cl_alpha_w(idx),region.alpha_0_w(idx)))
     region.Cl_h_ideal(idx) = double(CL_h(region.aoa_ideal(idx)*(pi/180),region.ih_ideal(idx)*(pi/180),iw_required* (pi/180),region.cla_eta(idx),region.alpha_0_w(idx)))
 
 end
