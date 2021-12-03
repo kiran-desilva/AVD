@@ -45,9 +45,9 @@ catch
 	% uc.nose_wheel.x = 0.5; % TODO:
 	% uc.main_wheel.y = 3.54;%66*2.54/100;
 	% uc.main_wheel.x = 5.6513; % TODO:
-	uc.nose_wheel.x = 1.5; % TODO:
+	uc.nose_wheel.x = 0.4; % TODO:
 	uc.main_wheel.y = 1.18;%66*2.54/100;
-	uc.main_wheel.x = 5.1; % TODO:
+	uc.main_wheel.x = 5.31; % TODO:
 end
 init_gear_length = 0.7;
 uc.main_wheel.z = -0.635 -0.704 - init_gear_length;
@@ -89,7 +89,7 @@ end
 tipback_angle = atand((-uc.main_wheel.z + tailstrike_point.z)/(tailstrike_point.x - uc.main_wheel.x))
 cg_main_wheel_angle_min = atand((uc.main_wheel.x - wandb.x_cg_aft)/(wandb.z_cg - uc.main_wheel.z))
 
-fail = non_blocking_assert(cg_main_wheel_angle_min < max(15, tipback_angle), 'angle between cg and main wheel not sufficiently large', 3)
+fail = non_blocking_assert(cg_main_wheel_angle_min > max(15, tipback_angle), 'angle between cg and main wheel not sufficiently large', 3)
 % fail = non_blocking_assert(cg_main_wheel_angle_min > max(0, tipback_angle), 'angle between cg and main wheel not sufficiently large', 3)
 
 if fail ~= 0
@@ -114,7 +114,7 @@ if fail ~= 0
 	return;
 end
 M_f / B
-fail = non_blocking_assert(M_f/B < 0.15 && M_f/B > 0, 'M_f/B not in valid range', 5);
+fail = non_blocking_assert(M_f/B < 0.2 && M_f/B > 0, 'M_f/B not in valid range', 5);
 if fail ~= 0
 	return;
 end

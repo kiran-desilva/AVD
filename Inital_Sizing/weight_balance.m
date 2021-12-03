@@ -1,6 +1,5 @@
 clc
 clear
-
 metres_to_ft = 3.28084;
 
 load('uc.mat')
