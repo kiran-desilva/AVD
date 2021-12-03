@@ -6,7 +6,7 @@ load("parameters.mat");
 load("aero_analysis.mat");
 load("wing.mat");
 load("powerplant.mat");
-
+powerplant.sfc = 0.6545;
 %% Takeoff 
 
 Vinit = 0;
@@ -74,7 +74,8 @@ performance.frac_loiter = exp(-(parameters.loiter_duration * 60 * powerplant.sfc
 new_Wx_W0 = 1; %initialise 
 
 for i = 1:9
-    if i ~= 3 || 6 || 7
+    if i ~= 3 && i ~= 6 && i ~= 7
+        disp(i)
         new_Wx_W0 = new_Wx_W0 * sizing.roskam.fuelfrac(i);
     end
 end
@@ -84,13 +85,13 @@ new_Wx_W0_ext = new_Wx_W0;
 Wx_W0 = (sizing.W0 - sizing.Wf) / sizing.W0; 
 new_Wx_W0 = new_Wx_W0 * performance.frac_cruise2 * performance.frac_loiter; % not including cruise 1 segment
 performance.frac_cruise1 = Wx_W0 / (new_Wx_W0); 
-performance.cruise1_Range = (parameters.cruise_mach * 295.07 / powerplant.sfc) * aero_analysis.summary.l_d_cruise * log(1/performance.frac_cruise1);
+performance.cruise1_Range = (parameters.cruise_mach * 295.07 / (powerplant.sfc/3600)) * aero_analysis.summary.l_d_cruise * log(1/performance.frac_cruise1);
 
 %extended range
 Wx_W0_ext = (sizing.W0 - (sizing.Wf + 15 * 9.81)) / sizing.W0; %extended range replacing all pld weight (15kg) with fuel
 new_Wx_W0_ext = new_Wx_W0_ext * performance.frac_cruise2 * performance.frac_loiter; % not including cruise 1 segment
 performance.frac_cruise1_ext = Wx_W0_ext / (new_Wx_W0_ext); % calculate new cruise fuel frac using original wx/w0 and the new loiter and crusie 2 fractions
-performance.cruise1_Range = (parameters.cruise_mach * 295.07 / powerplant.sfc) * aero_analysis.summary.l_d_cruise * log(performance.frac_cruise1_ext);
+performance.cruise1_Range_exted = (parameters.cruise_mach * 295.07 / (powerplant.sfc/3600)) * aero_analysis.summary.l_d_cruise * log(1/performance.frac_cruise1_ext);
 
 %% Point performance
 
@@ -100,10 +101,28 @@ performance.cruise1_Range = (parameters.cruise_mach * 295.07 / powerplant.sfc) *
 %Drag = @(V,h,W);
 Ps_fts = 0; %initialise
 
+figure;
+hold on
+
+M = linspace(0, 1, 1000);
+h = linspace(0, 13800, 5000);
+Ps_wanted = linspace(0, 600, 600);
+
+[M_mat, h_mat] = meshgrid(M, h);
+f = @(M, h) M .* atmos(h,2) .* ((powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0)) ./ (sizing.fraction.before_cruise * sizing.W0));
+Ps = f(M_mat, h_mat);
+contour(M_mat, h_mat, Ps, \p)
+
+%{
 for i = 1:10
     Ps_fts = Ps_fts + 500; 
     Ps = Ps_fts * 0.3048; %ft/s to m/s
-    f = @(M,h) M * atmos(h,2) * ((thrust_lapse(h*3.28084,M,powerplant.BPR) * powerplant.installed_thrust_lbf * 0.4482 * 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0) / (sizing.fraction.before_cruise * sizing.W0))) - Ps;
-    fimplicit(f, [0 1 0 13800])
-    hold on
+    f = @(M, h) M .* atmos(h,2) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0)) ./ (sizing.fraction.before_cruise * sizing.W0)) - Ps;
+    fimplicit(@(M,h) f(M,h), [0, 1, 0, 13800]);
+    %fimplicit(f);
+    %fimplicit(f, [0 1 0 13800])
 end
+%}
+hold off
+
+performance
