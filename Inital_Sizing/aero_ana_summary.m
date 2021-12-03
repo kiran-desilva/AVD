@@ -123,18 +123,18 @@ yline(aero_analysis.summary.cl_max_TO, '--', 'Color', '#A2142F','LineWidth', 1)
 %xline(0, '--m')
 plot(x+zero_AoA,cl_alpha_wing_cruise_clean,'k', 'LineWidth', 1)
 plot(x+zero_AoA, cl_alpha_wing_max_clean, 'b', 'LineWidth', 1)
-plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha(1),cl_alpha_wing_TO, 'Color', '#A2142F', 'LineWidth', 1)
-plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha(2),cl_alpha_wing_approach, 'c', 'LineWidth', 1)
+plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha_deg(1),cl_alpha_wing_TO, 'Color', '#A2142F', 'LineWidth', 1)
+plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha_deg(2),cl_alpha_wing_approach, 'c', 'LineWidth', 1)
 plot(x+zero_AoA,cl_alpha_wing_loiter_clean, 'm', 'LineWidth', 1)
 legend({'C_{L_{max,clean}}', 'C_{L_{max,landing}}', 'Cl_{L_{max,take-off}}', 'Clean Cruise', 'Max Cruise', 'Take-off', 'Landing', 'Loiter'}, 'Location', 'northwest' )
 
-aero_analysis.summary.zero_aoa.TO_deg=zero_AoA+aero_analysis.wing.HLD.delta_alpha(1);
-aero_analysis.summary.zero_aoa.landing_deg=zero_AoA+aero_analysis.wing.HLD.delta_alpha(2);
+aero_analysis.summary.zero_aoa.TO_deg=zero_AoA+aero_analysis.wing.HLD.delta_alpha_deg(1);
+aero_analysis.summary.zero_aoa.landing_deg=zero_AoA+aero_analysis.wing.HLD.delta_alpha_deg(2);
 
 aero_analysis.summary.y_intercept_approach=1.42;
 aero_analysis.summary.y_intercept_TO=1.06;
-aero_analysis.summary.zero_AoA_TO=(zero_AoA+aero_analysis.wing.HLD.delta_alpha(1))*pi/180; %[rad]
-aero_analysis.summary.zero_AoA_Land=(zero_AoA+aero_analysis.wing.HLD.delta_alpha(2))*pi/180; %[rad]
+aero_analysis.summary.zero_AoA_TO_rad=(zero_AoA+aero_analysis.wing.HLD.delta_alpha_deg(1))*pi/180; %[rad]
+aero_analysis.summary.zero_AoA_Land_rad=(zero_AoA+aero_analysis.wing.HLD.delta_alpha_deg(2))*pi/180; %[rad]
 
 aero_analysis.summary.cl_transition=0.9*aero_analysis.summary.cl_max_TO;
 
