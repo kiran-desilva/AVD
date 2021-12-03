@@ -16,6 +16,7 @@ x_rear_bulkhead = total_length - convlength(100,'in','m'); % this needs to be ch
 x_engine = x_rear_bulkhead;
 
 x_vertical_stabilizer = x_rear_bulkhead - vertical_stabalizer_fs; % align vert stablizer front spar with x_rear_bulkhead
+% x_vertical_stabilizer =  11.73 - tailplane.vertical.Croot 
 x_ac_v = x_vertical_stabilizer + tailplane.vertical.Xac_from_tip;
 
 x_horizontal_stabilizer = x_vertical_stabilizer + (tailplane.vertical.b * tand(tailplane.vertical.sweepLE)) + (tailplane.vertical.Ctip/2) - (tailplane.horizontal.Croot /2 ); % align center of horizontal stab with cetner of vertical tailplane

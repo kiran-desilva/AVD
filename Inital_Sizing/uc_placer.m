@@ -4,7 +4,7 @@ load('wing')
 
 placer.nose_wheel.x = 0.5;
 
-nose = linspace(0.3, 0.725, 5)
+nose = linspace(0.3, 1.5, 10)
 % nose = 0.3;
 for n = nose
 	placer.nose_wheel.x = n;

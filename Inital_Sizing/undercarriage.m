@@ -45,9 +45,9 @@ catch
 	% uc.nose_wheel.x = 0.5; % TODO:
 	% uc.main_wheel.y = 3.54;%66*2.54/100;
 	% uc.main_wheel.x = 5.6513; % TODO:
-	uc.nose_wheel.x = 0.406; % TODO:
+	uc.nose_wheel.x = 0.4; % TODO:
 	uc.main_wheel.y = 1.18;%66*2.54/100;
-	uc.main_wheel.x = 5.6; % TODO:
+	uc.main_wheel.x = 5.31; % TODO:
 end
 init_gear_length = 0.7;
 uc.main_wheel.z = -0.635 -0.704 - init_gear_length;
@@ -114,7 +114,7 @@ if fail ~= 0
 	return;
 end
 M_f / B
-fail = non_blocking_assert(M_f/B < 0.15 && M_f/B > 0, 'M_f/B not in valid range', 5);
+fail = non_blocking_assert(M_f/B < 0.2 && M_f/B > 0, 'M_f/B not in valid range', 5);
 if fail ~= 0
 	return;
 end
