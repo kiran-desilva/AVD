@@ -1,10 +1,12 @@
+clear 
+clc
 
 load("sizing.mat");
 load("parameters.mat");
 load("aero_analysis.mat");
 load("wing.mat");
 load("powerplant.mat");
-
+powerplant.sfc = 0.6545;
 %% Takeoff 
 
 Vinit = 0;
@@ -13,8 +15,8 @@ V_TO = aero_analysis.wing.v_takeoff_ms; %FAR-25
 mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
 
-Cl_gr = aero_analysis.summary.cl_alpha_TO * wing.i_w + aero_analysis.summary.y_intercept_TO;
-performance.Ka = (1.225 / (2 * sizing.W0 / wing.Sref)) * (mu * Cl_gr - aero_analysis.drag.cd0(3) - (Cl_gr^2) / (pi * wing.Ar * aero_analysis.summary.e_wing));
+Cl_gr = aero_analysis.summary.cl_alpha_TO * (wing.i_w*(pi/180) - aero_analysis.summary.zero_AoA_TO);
+performance.Ka = (1.225 / (2 * sizing.W0 / wing.Sref)) * (mu * Cl_gr - aero_analysis.drag.cd0(3) - ((Cl_gr^2) / (pi * wing.Ar * aero_analysis.summary.e_wing)));
 performance.Kt = (2 * powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - mu;
 performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + performance.Ka * V_TO^2) / (performance.Kt + performance.Ka * Vinit^2)));
 
@@ -26,12 +28,12 @@ performance.Str = sqrt(R^2 - (R - H_obs)^2); %transition distance
 
 transition_CD = aero_analysis.drag.cd0(3) + (aero_analysis.summary.cl_transition^2) /  (pi * wing.Ar *  aero_analysis.summary.e_wing); 
 LoverD_TR = aero_analysis.summary.cl_transition / transition_CD; 
-gamma_climb = asin((powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR);
+gamma_climb = asin((2 * powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR);
 H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed CHECK THIS
 
 performance.Sto = 1.15 * (performance.Sg + performance.Sr + performance.Str); %FAR25 15% safety factor all engines operative
 
-gamma_climb_1eng =  asin(0.5 * (powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR); %one engine inoperative
+gamma_climb_1eng =  asin((powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR); %one engine inoperative
 gamma_min = 0.024; %FAR25 minimum climb for 2-engine a/c
 G = gamma_climb_1eng - gamma_min;
 CL_climb = 0.694 * sizing.takeoff.cl_max; %Gudmundsson
@@ -54,25 +56,26 @@ H_f = R_land * (1 - cosd(theta_apprch)); %errikos slides
 mul = 0.5; %raymer
 H_obs_land = 50 / 3.2808; %meters
 
-Cl_brakedist = aero_analysis.summary.cl_alpha_approach * wing.i_w + aero_analysis.summary.y_intercept_approach;
+Cl_brakedist = aero_analysis.summary.cl_alpha_approach * (wing.i_w*(pi/180) - aero_analysis.summary.zero_AoA_Land);
 performance.Sa = (H_obs_land - H_f) / tand(theta_apprch);
-performance.Sf = 0.1512 * v_stall_landing^2 * sind(theta_apprch); 
+performance.Sf = R_land * sind(theta_apprch); 
 performance.Sfr = tfr * V_td; 
-performance.Ktl = ((2 * 0.15 * powerplant.installed_thrust_lbf * 4.44822) / sizing.W0) - mul; %0.15 max takeoff thrust setting 2 engines -  note mjst be neative
-performance.Ka_l = (1.225 / (2 * sizing.W0 / wing.Sref)) * (mul * Cl_brakedist - aero_analysis.drag.cd0(4) - (Cl_brakedist^2) / (pi * wing.Ar *aero_analysis.summary.e_wing));
-performance.Sb = (1 / 2 * 9.81 * performance.Ka_l) * log((performance.Ktl + performance.Ka_l * 0) / (performance.Ktl + performance.Ka_l * V_td^2)); 
+performance.Ktl = ((2 * 0.15 * powerplant.installed_thrust_lbf * 4.44822) / (0.8*sizing.W0)) - mul; %0.15 max takeoff thrust setting 2 engines -  note mjst be neative
+performance.Ka_l = (1.225 / (2 * 0.8*sizing.W0 / wing.Sref)) * (mul * Cl_brakedist - aero_analysis.drag.cd0(4) - (Cl_brakedist^2) / (pi * wing.Ar *aero_analysis.summary.e_wing));
+performance.Sb = (1 / (2 * 9.81 * performance.Ka_l)) * log((performance.Ktl + performance.Ka_l * 0) / (performance.Ktl + performance.Ka_l * V_td^2)); 
 
 performance.SL  = 1.666 * (performance.Sa + performance.Sf + performance.Sfr + performance.Sb); %FAR25
 
 %% Range and Endurance
 %calculate new weight fractions for cruise and loiter segments
 %performance.frac_cruise1 = exp(-(parameters.cruise_range_km * 1000 * cruise1_c / 3600) / (parameters.cruise_mach * 295.07 * cruise_LoverD));  %cruise 1 using breguet range
-performance.frac_cruise2 = exp(-(parameters.alternate_range_km * 1000 * cruise2_c / 3600) / (parameters.cruise_mach * 295.07 * aero_analysis.summary.l_d_cruise));  %cruise 2
-performance.frac_loiter = exp(-(parameters.loiter_duration * 60 * loiter_c / 3600) / (aero_analysis.summary.l_d_loiter)); % loiter using endurance eqn
+performance.frac_cruise2 = exp(-(parameters.alternate_range_km * 1000 * powerplant.sfc / 3600) / (parameters.cruise_mach * 295.07 * aero_analysis.summary.l_d_cruise));  %cruise 2
+performance.frac_loiter = exp(-(parameters.loiter_duration * 60 * powerplant.sfc / 3600) / (aero_analysis.summary.l_d_loiter)); % loiter using endurance eqn
 new_Wx_W0 = 1; %initialise 
 
 for i = 1:9
-    if i ~= 3 || 6 || 7
+    if i ~= 3 && i ~= 6 && i ~= 7
+        disp(i)
         new_Wx_W0 = new_Wx_W0 * sizing.roskam.fuelfrac(i);
     end
 end
@@ -82,13 +85,13 @@ new_Wx_W0_ext = new_Wx_W0;
 Wx_W0 = (sizing.W0 - sizing.Wf) / sizing.W0; 
 new_Wx_W0 = new_Wx_W0 * performance.frac_cruise2 * performance.frac_loiter; % not including cruise 1 segment
 performance.frac_cruise1 = Wx_W0 / (new_Wx_W0); 
-performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * aero_analysis.summary.l_d_cruise * log(performance.frac_cruise1);
+performance.cruise1_Range = (parameters.cruise_mach * 295.07 / (powerplant.sfc/3600)) * aero_analysis.summary.l_d_cruise * log(1/performance.frac_cruise1);
 
 %extended range
 Wx_W0_ext = (sizing.W0 - (sizing.Wf + 15 * 9.81)) / sizing.W0; %extended range replacing all pld weight (15kg) with fuel
 new_Wx_W0_ext = new_Wx_W0_ext * performance.frac_cruise2 * performance.frac_loiter; % not including cruise 1 segment
 performance.frac_cruise1_ext = Wx_W0_ext / (new_Wx_W0_ext); % calculate new cruise fuel frac using original wx/w0 and the new loiter and crusie 2 fractions
-performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * aero_analysis.summary.l_d_cruise * log(performance.frac_cruise1_ext);
+performance.cruise1_Range_exted = (parameters.cruise_mach * 295.07 / (powerplant.sfc/3600)) * aero_analysis.summary.l_d_cruise * log(1/performance.frac_cruise1_ext);
 
 %% Point performance
 
@@ -98,10 +101,28 @@ performance.cruise1_Range = (parameters.cruise_mach * 295.07 / cruise1_c) * aero
 %Drag = @(V,h,W);
 Ps_fts = 0; %initialise
 
+figure;
+hold on
+%{
+M__ = linspace(0, 1, 1000);
+h__ = linspace(0, 13800, 1000);
+Ps_wanted = linspace(0, 60, 100);
+
+[M_mat, h_mat] = meshgrid(M__, h__);
+f = @(M, h) M .* atmos(h,2) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0)) ./ (sizing.fraction.before_cruise * sizing.W0));
+Ps = f(M_mat, h_mat);
+contour(M_mat, h_mat, Ps, Ps_wanted)
+%}
+
 for i = 1:10
     Ps_fts = Ps_fts + 500; 
     Ps = Ps_fts * 0.3048; %ft/s to m/s
-    f = @(M,h) M .* atmos(h,2) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 0.4482 * 2 - Drag_model(M,h,sizing.fraction.before_cruise .* sizing.W0) ./ (sizing.fraction.before_cruise .* sizing.W0))) - Ps;
-    fimplicit(f, [0 1 0 13800])
-    hold on
+    f = @(M, h) ((M .* atmos(h,2))./ (sizing.fraction.before_cruise * sizing.W0)) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0))) - Ps;
+    %fimplicit(@(M,h) f(M,h), [0, 1, 0, 13800]);
+    fimplicit(f);
+    %fimplicit(f, [0 1 0 13800])
 end
+
+hold off
+
+performance

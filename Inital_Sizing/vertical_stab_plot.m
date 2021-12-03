@@ -4,8 +4,8 @@ function [fig] = vertical_stab_plot(struct)
     % z x
     wing = [0,0;
             0,struct.Croot;
-            struct.b/2,struct.Croot - (0.5*struct.b * tand(struct.sweepLE));
-            struct.b/2,(struct.Croot - (0.5*struct.b * tand(struct.sweepLE)) - struct.Ctip);
+            struct.b,struct.Croot - (struct.b * tand(struct.sweepLE));
+            struct.b,(struct.Croot - (struct.b * tand(struct.sweepLE)) - struct.Ctip);
             0,0;
     ];
 
