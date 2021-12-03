@@ -251,8 +251,8 @@ aero_analysis.induced_drag.cd_i(4)=aero_analysis.induced_drag.cd_i(4)+aero_analy
 
 
 aero_analysis.drag.cd_induced_total=aero_analysis.induced_drag.cd_i;
-aero_analysis.drag.cd_parasitic_total=aero_analysis.drag.cd0;
-aero_analysis.drag.cd_total=aero_analysis.drag.cd_parasitic_total+aero_analysis.drag.cd_induced_total+aero_analysis.drag.wave;
+aero_analysis.drag.cd_parasitic_total=aero_analysis.drag.cd0+aero_analysis.drag.wave;
+aero_analysis.drag.cd_total=aero_analysis.drag.cd_parasitic_total+aero_analysis.drag.cd_induced_total;
 
 save('aero_analysis.mat', 'aero_analysis')
 
