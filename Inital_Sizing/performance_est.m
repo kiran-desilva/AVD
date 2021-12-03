@@ -15,7 +15,7 @@ V_TO = aero_analysis.wing.v_takeoff_ms; %FAR-25
 mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
 
-Cl_gr = aero_analysis.summary.cl_alpha_TO * (wing.i_w*(pi/180) - aero_analysis.summary.zero_AoA_TO);
+Cl_gr = aero_analysis.summary.cl_alpha_TO * (wing.i_w*(pi/180) - aero_analysis.summary.zero_AoA_TO_rad);
 performance.Ka = (1.225 / (2 * sizing.W0 / wing.Sref)) * (mu * Cl_gr - aero_analysis.drag.cd0(3) - ((Cl_gr^2) / (pi * wing.Ar * aero_analysis.summary.e_wing)));
 performance.Kt = (2 * powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - mu;
 performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + performance.Ka * V_TO^2) / (performance.Kt + performance.Ka * Vinit^2)));
@@ -56,7 +56,7 @@ H_f = R_land * (1 - cosd(theta_apprch)); %errikos slides
 mul = 0.5; %raymer
 H_obs_land = 50 / 3.2808; %meters
 
-Cl_brakedist = aero_analysis.summary.cl_alpha_approach * (wing.i_w*(pi/180) - aero_analysis.summary.zero_AoA_Land);
+Cl_brakedist = aero_analysis.summary.cl_alpha_approach * (wing.i_w*(pi/180) - aero_analysis.summary.zero_AoA_Land_rad);
 performance.Sa = (H_obs_land - H_f) / tand(theta_apprch);
 performance.Sf = R_land * sind(theta_apprch); 
 performance.Sfr = tfr * V_td; 
@@ -105,7 +105,7 @@ hold on
 
 M__ = linspace(0, 1, 100);
 h__ = linspace(0, 13800, 100);
-Ps_wanted = linspace(0, 10, 10);
+Ps_wanted = [0:1:10];
 
 Drag_model(0.75, 12300, sizing.fraction.before_cruise * sizing.W0)
 [M_mat, h_mat] = meshgrid(M__, h__);
@@ -120,10 +120,26 @@ for i = 1:length(M__)
         
         Ps(j,i) = f(M__(i),h__(j));
     end
+    Ms(i) = sqrt((2 * sizing.fraction.before_cruise * sizing.W0)/(atmos(h__(i),4) * wing.Sref * aero_analysis.summary.cl_max_wing_clean)) / atmos(h__(i),2);%stall
 end
 
-contour(M_mat,h_mat,Ps,Ps_wanted)
+Vx_TAS = sqrt(1.225/atmos(13716,4)) * sqrt((2 * 1 * sizing.fraction.before_cruise * sizing.W0)/(1.225 * wing.Sref)) * (1 / ( pi * aero_analysis.summary.e_wing * wing.Ar * aero_analysis.drag.cd0(1)))^0.25;
+Mx = Vx_TAS / atmos(13716,2);
 
+contour(M_mat,h_mat,Ps,Ps_wanted,'Showtext', 'on')
+hold on
+plot(Ms,h__,'r')
+hold on
+plot(0.78,12192,'xb', 'MarkerSize', 12)
+hold on
+plot(Mx,13716,'or', 'MarkerSize', 12)
+hold off
+xlabel("Mach number",'interpreter','Latex')
+ylabel("Altitude (m)",'interpreter','Latex')
+grid on
+
+legend("Ps","Stall line", "M = 0.78 at cruise alt", "$V_x$ at 45000ft requirement", "interpreter","Latex")
+%{
 for i = 1:10
     Ps_fts = Ps_fts + 500; 
     Ps = Ps_fts * 0.3048; %ft/s to m/s
@@ -132,7 +148,7 @@ for i = 1:10
     %fimplicit(f);
     %fimplicit(f, [0 1 0 13800])
 end
-
+%}
 hold off
 
 performance

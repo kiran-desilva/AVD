@@ -120,9 +120,14 @@ volume_coefficent_corrected = [tailplane.vertical.v;tailplane.horizontal.v];
 tail_sref = [tailplane.vertical.s;tailplane.horizontal.s];
 AR = [tailplane.vertical.Ar;tailplane.horizontal.Ar];
 taper = [tailplane.vertical.lambda;tailplane.horizontal.lambda];
+sweep25 = [tailplane.vertical.sweep_25;tailplane.horizontal.sweep_25];
+airfoil = ['NACA 64015','NACA 64012'];
+
 initial_sizing_table = table(names,lever,initial_volume_coefficent,volume_coefficent_corrected,tail_sref,AR,taper)
 table2latex(initial_sizing_table,'initial_sizing_table.tex')
 
+
+cols = ['']
 
 horizontal_stab_plot(tailplane.horizontal);
 vertical_stab_plot(tailplane.vertical);

@@ -36,7 +36,7 @@ end
 
 
 try
-	disp()
+	%disp()
 	uc.nose_wheel.x = placer.nose_wheel.x; % TODO:
 	uc.main_wheel.y = placer.main_wheel.y;
 	uc.main_wheel.x = placer.main_wheel.x; % TODO:
