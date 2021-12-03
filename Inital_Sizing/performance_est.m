@@ -36,7 +36,7 @@ performance.Sto = 1.15 * (performance.Sg + performance.Sr + performance.Str); %F
 gamma_climb_1eng =  asin((powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR); %one engine inoperative
 gamma_min = 0.024; %FAR25 minimum climb for 2-engine a/c
 G = gamma_climb_1eng - gamma_min;
-CL_climb = 0.694 * sizing.takeoff.cl_max; %Gudmundsson
+CL_climb = 0.694 * aero_analysis.summary.cl_max_TO; %Gudmundsson
 T_av = 0.75 * powerplant.installed_thrust_lbf * 4.44822 * ((5 + parameters.BPR) / (4 + parameters.BPR));
 U = 0.01 * aero_analysis.summary.cl_max_TO + 0.02;  
 performance.BFL = (0.863 / (1 + 2.3 * G)) * (((powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) / (1.225 * 9.81 * CL_climb)) + H_obs) * (1 / (T_av / sizing.W0 - U) + 2.7) + 655;
@@ -93,33 +93,43 @@ new_Wx_W0_ext = new_Wx_W0_ext * performance.frac_cruise2 * performance.frac_loit
 performance.frac_cruise1_ext = Wx_W0_ext / (new_Wx_W0_ext); % calculate new cruise fuel frac using original wx/w0 and the new loiter and crusie 2 fractions
 performance.cruise1_Range_exted = (parameters.cruise_mach * 295.07 / (powerplant.sfc/3600)) * aero_analysis.summary.l_d_cruise * log(1/performance.frac_cruise1_ext);
 
+
 %% Point performance
 
-%performance.sigma_maxalt = (2 * sizing.fraction.before_cruise / (beta * T0)) * sqrt(
+%performance.sigma_maxalt = (2 * (sizing.fraction.before_cruise * sizing.W0) / (1.439 * powerplant.installed_thrust_lbf .* 4.482 .* 2)) * sqrt(
 
-%Trust_lapse = @(V,h) ; %Thrust lapse model
-%Drag = @(V,h,W);
 Ps_fts = 0; %initialise
 
 figure;
 hold on
-%{
-M__ = linspace(0, 1, 1000);
-h__ = linspace(0, 13800, 1000);
-Ps_wanted = linspace(0, 60, 100);
 
+M__ = linspace(0, 1, 100);
+h__ = linspace(0, 13800, 100);
+Ps_wanted = linspace(0, 10, 10);
+
+Drag_model(0.75, 12300, sizing.fraction.before_cruise * sizing.W0)
 [M_mat, h_mat] = meshgrid(M__, h__);
 f = @(M, h) M .* atmos(h,2) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0)) ./ (sizing.fraction.before_cruise * sizing.W0));
-Ps = f(M_mat, h_mat);
-contour(M_mat, h_mat, Ps, Ps_wanted)
-%}
+
+for i = 1:length(M__)
+    for j = 1:length(h__)
+        %f = @(M, h) M .* atmos(h,2) .* ((((atmos(h,4)./1.225).^0.7).* 1.439 .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0)) ./ (sizing.fraction.before_cruise * sizing.W0));
+
+        %Ps = f(M_mat, h_mat);
+        %contour(M_mat, h_mat, Ps, Ps_wanted)
+        
+        Ps(j,i) = f(M__(i),h__(j));
+    end
+end
+
+contour(M_mat,h_mat,Ps,Ps_wanted)
 
 for i = 1:10
     Ps_fts = Ps_fts + 500; 
     Ps = Ps_fts * 0.3048; %ft/s to m/s
-    f = @(M, h) ((M .* atmos(h,2))./ (sizing.fraction.before_cruise * sizing.W0)) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0))) - Ps;
+    %f = @(M, h) ((M .* atmos(h,2))./ (sizing.fraction.before_cruise * sizing.W0)) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0))) - Ps;
     %fimplicit(@(M,h) f(M,h), [0, 1, 0, 13800]);
-    fimplicit(f);
+    %fimplicit(f);
     %fimplicit(f, [0 1 0 13800])
 end
 
