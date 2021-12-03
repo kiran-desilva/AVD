@@ -14,7 +14,7 @@ load('cg.mat')
 load('aero_analysis.mat')
 
 %%%WING FUELTANK CG%%%%%
-fueltank.x_cg_from_tip = 1.15; % m
+fueltank.x_cg_from_tip = 1.3; % m
 fueltank.z_cg_from_tip = 0.027; % m up 
 
 
@@ -100,25 +100,25 @@ I_y = (sizing.W0/9.81)*2.20462*K_y^2   % Pitching moment of inertia; ≈ W_o*Ky^
 L_over_D = fuse.L_D_f
 
 % Aircraft wings
-weights.W_w = 0.0051*((((W_dg*N_z)^0.557)*(S_w^0.649)*(AR^0.5)*((1+lambda)^0.1)*(S_csw^0.1)) / ((cosd(cap_lambda))*(tc_root^0.4)));
+weights.W_w = 0.0051*((((W_dg*N_z)^0.557)*(S_w^0.649)*(AR^0.5)*((1+lambda)^0.1)*(S_csw^0.1)) / ((cosd(cap_lambda))*(tc_root^0.4)))*0.78;
 
 % Horizontal tailplane
-weights.W_ht = 0.0379*(K_uht*(W_dg^0.639)*(N_z^0.1)*(S_ht^0.75)*(K_y^0.704)*(AR_h^0.166)*((1+S_e/S_ht)^0.1)) / (((1+F_w/B_h)^0.25)*L_ht*cosd(cap_lambda_ht));
+weights.W_ht = 0.75*0.0379*(K_uht*(W_dg^0.639)*(N_z^0.1)*(S_ht^0.75)*(K_y^0.704)*(AR_h^0.166)*((1+S_e/S_ht)^0.1)) / (((1+F_w/B_h)^0.25)*L_ht*cosd(cap_lambda_ht));
 
 % Vertical tailplane
-weights.W_vt = 0.0026*(((1+H_t_H_v)^0.225)*(W_dg^0.556)*(N_z^0.536)*(S_vt^0.5)*(K_z^0.875)*(AR_v^0.35)) / ((L_vt^0.5)*cosd(cap_lambda_vt)*(tc_rootv^0.5));
+weights.W_vt = 0.75*0.0026*(((1+H_t_H_v)^0.225)*(W_dg^0.556)*(N_z^0.536)*(S_vt^0.5)*(K_z^0.875)*(AR_v^0.35)) / ((L_vt^0.5)*cosd(cap_lambda_vt)*(tc_rootv^0.5));
 
 % Fuselage
-weights.W_fus = 0.328*K_door*K_Lg*((W_dg*N_z)^0.5)*(L^0.25)*(S_f^0.302)*((1+K_ws)^0.04)*(L_over_D^0.1);
+weights.W_fus = 0.85*0.328*K_door*K_Lg*((W_dg*N_z)^0.5)*(L^0.25)*(S_f^0.302)*((1+K_ws)^0.04)*(L_over_D^0.1);
 
 % Main landing gear 
-weights.W_mlg = 0.0106*K_mp*(W_l^0.888)*(N_l^0.25)*(L_m^0.4)*(N_mw^0.321)*(V_s^0.1)/(N_mss^0.5);
+weights.W_mlg = 0.88*0.0106*K_mp*(W_l^0.888)*(N_l^0.25)*(L_m^0.4)*(N_mw^0.321)*(V_s^0.1)/(N_mss^0.5);
 
 % Nose landing gear
-weights.W_nlg = 0.032*K_np*(W_l^0.646)*(N_l^0.2)*(L_n^0.5)*(N_nw^0.45);
+weights.W_nlg = 0.88*0.032*K_np*(W_l^0.646)*(N_l^0.2)*(L_n^0.5)*(N_nw^0.45);
 
 % Nacelle
-weights.W_inl = 0.6724*K_ng*(N_Lt^0.1)*(N_w^0.294)*(N_z^0.119)*(W_enc^0.611)*(N_en^0.984)*(S_n^0.224);
+weights.W_inl = 0.85*0.6724*K_ng*(N_Lt^0.1)*(N_w^0.294)*(N_z^0.119)*(W_enc^0.611)*(N_en^0.984)*(S_n^0.224);
 
 % Engine controls
 weights.W_ec = 5*N_en + 0.8*L_ec;
@@ -166,7 +166,7 @@ weights.W_pay = convmass((15 * 6),"kg","lbm")
 
 
 % Total weight with use of fudge factors -> MTOW
-weights.Total_weight = weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_en + weights.W_f +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_p + weights.W_pay
+weights.Total_weight = weights.W_w + (weights.W_ht + weights.W_vt) + weights.W_fus + (weights.W_mlg + weights.W_nlg) + weights.W_inl + weights.W_ec + weights.W_es + weights.W_en + weights.W_f +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_p + weights.W_pay
 weights.Total_weight_no_fucking = weights.W_w + (weights.W_ht + weights.W_vt) + weights.W_fus + (weights.W_mlg + weights.W_nlg) + weights.W_inl + weights.W_ec + weights.W_es + weights.W_en + weights.W_f +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_p + weights.W_pay
 
 
@@ -174,6 +174,7 @@ fuel_fraction_to_fuel_weight = @(wf_fuel) ((wf_fuel*sizing.W0)-(sizing.W0-sizing
 
 payload_factor_func = @(payload_factor) (2+(4*payload_factor))/6;
 weights.Total_weight_func = @(wf_fuel,payload_factor) weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_en + fuel_fraction_to_fuel_weight(wf_fuel) +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + (payload_factor_func(payload_factor)*(weights.W_p + weights.W_pay))
+weights.Total_weight_func = @(wf_fuel,payload_factor) weights.W_w + (weights.W_ht + weights.W_vt) + weights.W_fus + (weights.W_mlg + weights.W_nlg) + weights.W_inl + weights.W_ec + weights.W_es + weights.W_en + fuel_fraction_to_fuel_weight(wf_fuel) +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + (payload_factor_func(payload_factor)*(weights.W_p + weights.W_pay))
 weights.Total_weight = weights.Total_weight_func(1,1);
 
 save('weights','weights')
@@ -196,7 +197,8 @@ cg_fc = [4.5 -0.66];
 cg_APUinst = [cg.x_APUinst 0]
 cg_instr = [20 -12]/12;
 cg_hydr= [22 -20]/12;
-cg_el = [22 -20]/12;
+% cg_el = [22 -20]/12;
+cg_el = [60 -20]/12;
 cg_en = [metres_to_ft*locations.x_rear_bulkhead metres_to_ft*0];
 cg_av = [20 -12]/12;
 cg_furn = [20 -(30/12)];
@@ -207,7 +209,8 @@ cg_pilot = [convlength(1.779,'m','ft') -15/12];
 cg_ac = [22 -20/12];
 cg_ai = [22 -20/12];
 cg_pay = [107/12,-15/12];
-
+% cg_pay = [333/12,-15/12];
+%
 %returns wing_fuel_tank_cg in feet
 fuel_tank_cg = @(wing_ac) metres_to_ft*(wing_ac - wing.Xac_from_tip + fueltank.x_cg_from_tip);
 
