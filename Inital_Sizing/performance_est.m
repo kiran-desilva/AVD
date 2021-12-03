@@ -28,12 +28,12 @@ performance.Str = sqrt(R^2 - (R - H_obs)^2); %transition distance
 
 transition_CD = aero_analysis.drag.cd0(3) + (aero_analysis.summary.cl_transition^2) /  (pi * wing.Ar *  aero_analysis.summary.e_wing); 
 LoverD_TR = aero_analysis.summary.cl_transition / transition_CD; 
-gamma_climb = asin((powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR);
+gamma_climb = asin((2 * powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR);
 H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed CHECK THIS
 
 performance.Sto = 1.15 * (performance.Sg + performance.Sr + performance.Str); %FAR25 15% safety factor all engines operative
 
-gamma_climb_1eng =  asin(0.5 * (powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR); %one engine inoperative
+gamma_climb_1eng =  asin((powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR); %one engine inoperative
 gamma_min = 0.024; %FAR25 minimum climb for 2-engine a/c
 G = gamma_climb_1eng - gamma_min;
 CL_climb = 0.694 * sizing.takeoff.cl_max; %Gudmundsson
