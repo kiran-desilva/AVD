@@ -9,7 +9,8 @@ struct = wing;
 offset_from_center = 1.18;
 
 
-uc_lim = [5.31];
+% uc_lim = [4.95];
+uc_lim=[5.16];
 
 
 

@@ -11,7 +11,8 @@ initial_tailplane_sizing
 fuselage
 
 initial_placement
-change_wing_ac(3.6*wing.Cmac)
+% change_wing_ac(3.3*wing.Cmac)
+change_wing_ac(3.46*wing.Cmac)
 % horizontal_placement_graph
 % load('tailplane')
 % load('wing')
