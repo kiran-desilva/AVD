@@ -103,7 +103,7 @@ Ps_fts = 0; %initialise
 
 figure;
 hold on
-
+%{
 M__ = linspace(0, 1, 1000);
 h__ = linspace(0, 13800, 1000);
 Ps_wanted = linspace(0, 60, 100);
@@ -112,17 +112,17 @@ Ps_wanted = linspace(0, 60, 100);
 f = @(M, h) M .* atmos(h,2) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0)) ./ (sizing.fraction.before_cruise * sizing.W0));
 Ps = f(M_mat, h_mat);
 contour(M_mat, h_mat, Ps, Ps_wanted)
+%}
 
-%{
 for i = 1:10
     Ps_fts = Ps_fts + 500; 
     Ps = Ps_fts * 0.3048; %ft/s to m/s
-    f = @(M, h) M .* atmos(h,2) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0)) ./ (sizing.fraction.before_cruise * sizing.W0)) - Ps;
-    fimplicit(@(M,h) f(M,h), [0, 1, 0, 13800]);
-    %fimplicit(f);
+    f = @(M, h) ((M .* atmos(h,2))./ (sizing.fraction.before_cruise * sizing.W0)) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0))) - Ps;
+    %fimplicit(@(M,h) f(M,h), [0, 1, 0, 13800]);
+    fimplicit(f);
     %fimplicit(f, [0 1 0 13800])
 end
-%}
+
 hold off
 
 performance
