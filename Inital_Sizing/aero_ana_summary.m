@@ -47,6 +47,12 @@ for i=1:length(x)
     cl_alpha_wing_TO(i)=aero_analysis.summary.cl_alpha_wing_TO*x(i); %rad
     cl_alpha_wing_approach(i)=aero_analysis.summary.cl_alpha_wing_approach*x(i); %rad
     cl_alpha_wing_loiter_clean(i)=aero_analysis.summary.cl_alpha_wing_loiter_clean*x(i); %rad
+    cl_alpha_tail_cruise_clean(i)=aero_analysis.tail.Cl_alpha(1)*x(i); %rad
+    cl_alpha_tail_max_clean(i)=aero_analysis.tail.Cl_alpha(2)*x(i); %rad
+    cl_alpha_tail_TO(i)=aero_analysis.tail.Cl_alpha(3)*x(i); %rad
+    cl_alpha_tail_approach(i)=aero_analysis.tail.Cl_alpha(4)*x(i); %rad
+    cl_alpha_tail_loiter_clean(i)=aero_analysis.tail.Cl_alpha(5)*x(i); %rad
+    
 end
 
 
@@ -110,35 +116,58 @@ xlim([0 0.15])
 %% Plots
 figure
 x=x*180/pi;
-yline(aero_analysis.summary.cl_max_wing_clean, '--k')
+yline(aero_analysis.summary.cl_max_wing_clean, '--k', 'LineWidth', 1)
 hold on
-yline(aero_analysis.summary.cl_max_approach, '--b')
-yline(aero_analysis.summary.cl_max_TO, '--r')
+yline(aero_analysis.summary.cl_max_approach, '--b','LineWidth', 1)
+yline(aero_analysis.summary.cl_max_TO, '--', 'Color', '#A2142F','LineWidth', 1)
 %xline(0, '--m')
-plot(x+zero_AoA,cl_alpha_wing_cruise_clean)
-plot(x+zero_AoA, cl_alpha_wing_max_clean)
-plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha(1),cl_alpha_wing_TO, 'm')
-plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha(2),cl_alpha_wing_approach, 'k')
-plot(x+zero_AoA,cl_alpha_wing_loiter_clean)
-legend('Cl_max clean', 'Cl_max_approach', 'Cl_max_TO', 'Clean Cruise', 'Max Cruise', 'Takeoff', 'Approach', 'Loiter')
+plot(x+zero_AoA,cl_alpha_wing_cruise_clean,'k', 'LineWidth', 1)
+plot(x+zero_AoA, cl_alpha_wing_max_clean, 'b', 'LineWidth', 1)
+plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha(1),cl_alpha_wing_TO, 'Color', '#A2142F', 'LineWidth', 1)
+plot(x+zero_AoA+aero_analysis.wing.HLD.delta_alpha(2),cl_alpha_wing_approach, 'c', 'LineWidth', 1)
+plot(x+zero_AoA,cl_alpha_wing_loiter_clean, 'm', 'LineWidth', 1)
+legend({'C_{L_{max,clean}}', 'C_{L_{max,landing}}', 'Cl_{L_{max,take-off}}', 'Clean Cruise', 'Max Cruise', 'Take-off', 'Landing', 'Loiter'}, 'Location', 'northwest' )
 
 aero_analysis.summary.zero_aoa.TO_deg=zero_AoA+aero_analysis.wing.HLD.delta_alpha(1);
 aero_analysis.summary.zero_aoa.landing_deg=zero_AoA+aero_analysis.wing.HLD.delta_alpha(2);
 
-aero_analysis.summary.y_intercept_approach=0.3538;
-aero_analysis.summary.y_intercept_TO=0.3488;
+aero_analysis.summary.y_intercept_approach=1.42;
+aero_analysis.summary.y_intercept_TO=1.06;
 aero_analysis.summary.zero_AoA_TO=(zero_AoA+aero_analysis.wing.HLD.delta_alpha(1))*pi/180; %[rad]
 aero_analysis.summary.zero_AoA_Land=(zero_AoA+aero_analysis.wing.HLD.delta_alpha(2))*pi/180; %[rad]
 
-
 aero_analysis.summary.cl_transition=0.9*aero_analysis.summary.cl_max_TO;
+
 ylim ([0 3])
-xlim([-15 25])
-title 'Wing'
+xlim([-15 20])
+%title 'Lift Characteristics of Wing'
 xlabel '\alpha [degrees]'
+ylabel 'C_{L_{W}}'
 hold off
 grid on
 grid minor
+set(gca,'FontSize',12)
+
+
+%% Tail plot
+figure
+plot(x,cl_alpha_tail_cruise_clean,'k', 'LineWidth', 1)
+hold on
+plot(x,cl_alpha_tail_cruise_clean, 'b', 'LineWidth', 1)
+plot(x,cl_alpha_tail_TO, 'Color', '#A2142F', 'LineWidth', 1)
+plot(x,cl_alpha_tail_approach, 'c', 'LineWidth', 1)
+plot(x,cl_alpha_tail_loiter_clean, 'm', 'LineWidth', 1)
+legend({'Clean Cruise', 'Max Cruise', 'Take-off', 'Landing', 'Loiter'}, 'Location', 'southeast' )
+
+%ylim ([0 3])
+xlim([0 20])
+%title 'Lift Characteristics of Horizontal Tailplane'
+xlabel '\alpha [degrees]'
+ylabel 'C_{L_{H}}'
+hold off
+grid on
+grid minor
+set(gca,'FontSize',12)
 
 
 
