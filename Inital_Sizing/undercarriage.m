@@ -45,9 +45,9 @@ catch
 	% uc.nose_wheel.x = 0.5; % TODO:
 	% uc.main_wheel.y = 3.54;%66*2.54/100;
 	% uc.main_wheel.x = 5.6513; % TODO:
-	uc.nose_wheel.x = 0.406; % TODO:
+	uc.nose_wheel.x = 1.5; % TODO:
 	uc.main_wheel.y = 1.18;%66*2.54/100;
-	uc.main_wheel.x = 5.3; % TODO:
+	uc.main_wheel.x = 5.1; % TODO:
 end
 init_gear_length = 0.7;
 uc.main_wheel.z = -0.635 -0.704 - init_gear_length;
