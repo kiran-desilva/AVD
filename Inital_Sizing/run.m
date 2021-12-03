@@ -11,7 +11,7 @@ initial_tailplane_sizing
 fuselage
 
 initial_placement
-change_wing_ac(3.51*wing.Cmac)
+change_wing_ac(3.6*wing.Cmac)
 % horizontal_placement_graph
 % load('tailplane')
 % load('wing')
@@ -22,4 +22,4 @@ change_wing_ac(3.51*wing.Cmac)
 cg_calcs
 weight_balance
 static_stability
-undercarriage
+% undercarriage

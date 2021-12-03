@@ -58,7 +58,7 @@ cg.x_nlg = uc.nose_wheel.x * 3.28084
 
 %nacelle & engine
 cg.x_inl = locations.x_rear_bulkhead * 3.28084
-cg.z_inl = metres_to_ft*0.513;
+cg.z_inl = metres_to_ft*0;
 
 %APU
 cg.x_APUinst = (fuse.total_fuselage_length-12)/12 
