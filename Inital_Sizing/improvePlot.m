@@ -9,8 +9,8 @@ function [] = improvePlot(figure)
     marker_outline = 'matching'; % could be 'black' or 'matching'
     box_thickness = 1;
     axis_tick_font_size = 15;
-    axis_label_font_size = 12;
-    legend_font_size = 10;
+    axis_label_font_size = 20;
+    legend_font_size = 15;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Use h as handle for current figure

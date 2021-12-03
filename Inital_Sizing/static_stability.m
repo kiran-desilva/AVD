@@ -103,7 +103,7 @@ region.fuel_fraction = [sizing.fraction.before_take_off,sizing.fraction.before_a
 region.cl_alpha_w = [ aero_analysis.wing.HLD.cl_alpha_flaps([1 2]) aero_analysis.wing.Cl_alpha([1 1]) ];
 region.cl_alpha_h = [aero_analysis.tail.Cl_alpha([3 4 1 1])];
 region.Cm0w = double(subs(Cm0w,cla_eta_syms,region.cla_eta));
-region.alpha_0_w = [aero_analysis.summary.zero_AoA_TO*(pi/180),aero_analysis.summary.zero_AoA_TO*(pi/180),degtorad(-3),degtorad(-3)]
+region.alpha_0_w = [aero_analysis.summary.zero_AoA.TO_rad,aero_analysis.summary.zero_AoA.TO_rad,degtorad(-3),degtorad(-3)]
 
 
 region.rho = [1.225,1.225,0.3016,0.3016];
@@ -190,7 +190,7 @@ plot(xacw/Cmac,Sh/Sw,'x','linewidth',1.5,'markersize',6,'color','black')
 legend('Takeoff - Passengers','','','','Landing - Passengers','','','','Cruise Start - Passengers','','','','Cruise End - Passengers','','','','Design Point')
 
 ylabel('{S_h}/{S_w}')
-xlabel('{Xac}_{w}}/{Cmac}')
+xlabel('{Xac}_{w}/{Cmac}')
 grid on
 grid minor
 xlim([xmin,xmax])
@@ -225,7 +225,7 @@ plot(xacw/Cmac,Sh/Sw,'x','linewidth',1.5,'markersize',6,'color','black')
 legend('Takeoff - No Passengers','','','','Landing - No Passengers','','','','Cruise Start - No Passengers','','','','Cruise End - No Passengers','','','','Design Point')
 
 ylabel('{S_h}/{S_w}')
-xlabel('{Xac}_{w}}/{Cmac}')
+xlabel('{Xac}_{w}/{Cmac}')
 grid on
 grid minor
 xlim([xmin,xmax])
