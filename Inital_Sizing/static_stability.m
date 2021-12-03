@@ -46,7 +46,7 @@ Lf = convlength(fuse.total_fuselage_length,'in','m'); %fueselage length
 Wf = convlength(fuse.d_f,'in','m'); % fueslage max width ( diameter)
 
 % +ve if thrustline under cg
-Zt = -0.716;
+Zt = 0;
 
 required_static_margin = .05*Cmac;
 
