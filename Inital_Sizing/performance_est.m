@@ -28,12 +28,12 @@ performance.Str = sqrt(R^2 - (R - H_obs)^2); %transition distance
 
 transition_CD = aero_analysis.drag.cd0(3) + (aero_analysis.summary.cl_transition^2) /  (pi * wing.Ar *  aero_analysis.summary.e_wing); 
 LoverD_TR = aero_analysis.summary.cl_transition / transition_CD; 
-gamma_climb = asin((powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR);
+gamma_climb = asin((2 * powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR);
 H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed CHECK THIS
 
 performance.Sto = 1.15 * (performance.Sg + performance.Sr + performance.Str); %FAR25 15% safety factor all engines operative
 
-gamma_climb_1eng =  asin(0.5 * (powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR); %one engine inoperative
+gamma_climb_1eng =  asin((powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR); %one engine inoperative
 gamma_min = 0.024; %FAR25 minimum climb for 2-engine a/c
 G = gamma_climb_1eng - gamma_min;
 CL_climb = 0.694 * sizing.takeoff.cl_max; %Gudmundsson
@@ -103,7 +103,7 @@ Ps_fts = 0; %initialise
 
 figure;
 hold on
-
+%{
 M__ = linspace(0, 1, 1000);
 h__ = linspace(0, 13800, 1000);
 Ps_wanted = linspace(0, 60, 100);
@@ -112,17 +112,17 @@ Ps_wanted = linspace(0, 60, 100);
 f = @(M, h) M .* atmos(h,2) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0)) ./ (sizing.fraction.before_cruise * sizing.W0));
 Ps = f(M_mat, h_mat);
 contour(M_mat, h_mat, Ps, Ps_wanted)
+%}
 
-%{
 for i = 1:10
     Ps_fts = Ps_fts + 500; 
     Ps = Ps_fts * 0.3048; %ft/s to m/s
-    f = @(M, h) M .* atmos(h,2) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0)) ./ (sizing.fraction.before_cruise * sizing.W0)) - Ps;
-    fimplicit(@(M,h) f(M,h), [0, 1, 0, 13800]);
-    %fimplicit(f);
+    f = @(M, h) ((M .* atmos(h,2))./ (sizing.fraction.before_cruise * sizing.W0)) .* ((thrust_lapse(h*3.28084,M,powerplant.BPR) .* powerplant.installed_thrust_lbf .* 4.482 .* 2 - Drag_model(M,h,sizing.fraction.before_cruise * sizing.W0))) - Ps;
+    %fimplicit(@(M,h) f(M,h), [0, 1, 0, 13800]);
+    fimplicit(f);
     %fimplicit(f, [0 1 0 13800])
 end
-%}
+
 hold off
 
 performance

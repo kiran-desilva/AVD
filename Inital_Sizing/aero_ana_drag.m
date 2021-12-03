@@ -139,7 +139,7 @@ aero_analysis.drag.FF(5)=1+(0.35/aero_analysis.drag.fineness(5));
 
 Q=[1,1,1.055,1.055,1.5]; %assuming 5.5% for horizontal and vertical stabiliser
 
-S_wet=[28.252,15,3,3,powerplant.nacelle_wetted_area_ft_sq*2/10.764]; %wetted area, exact values to be added
+S_wet=[28.252,14,2.5,2.5,powerplant.nacelle_wetted_area_ft_sq*2/10.764]; %wetted area, exact values to be added
 %(1):fuselage
 %(2):wing
 %(3): horizontal stabiliser
@@ -199,7 +199,7 @@ end
 % Skin friction, Misc, Leakage
 %accounting for 4% of leakage
 for j=1:length(U)
-    aero_analysis.drag.cd0(j)=1.04*(aero_analysis.drag.skin_friction(j)+aero_analysis.drag.cd_misc(j));
+    aero_analysis.drag.cd0(j)=1.02*(aero_analysis.drag.skin_friction(j)+aero_analysis.drag.cd_misc(j));
 end
 
 %% Induced drag

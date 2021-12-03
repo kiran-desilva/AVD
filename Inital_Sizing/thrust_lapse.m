@@ -5,7 +5,7 @@ function beta = thrust_lapse(height_ft, mach_number, bypass_ratio)
 
 
 	% From Errikos' notes
-	beta_altitude = 1.438*rho./rho0;
+	beta_altitude = 1.439*rho./rho0;
 
 	% From https://www.fzt.haw-hamburg.de/pers/Scholz/arbeiten/TextSchulzDipl.pdf page 22 (Ultimately references Torenbeek)
 	G = 0.9; % For low BPR engine
