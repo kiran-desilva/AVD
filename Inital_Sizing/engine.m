@@ -19,7 +19,7 @@ pressure_recovery_percent_loss = C_ram*(1 - F)
 
 % Bleed air
 C_bleed = 2;
-bleed_fraction = 0.02; % 1-5% range
+bleed_fraction = 0.04; % 1-5% range
 bleed_air_percent_loss = C_bleed*(bleed_fraction);
 
 total_percent_loss = bleed_air_percent_loss + pressure_recovery_percent_loss
