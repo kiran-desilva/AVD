@@ -133,8 +133,8 @@ aero_analysis.summary.zero_aoa.landing_deg=zero_AoA+aero_analysis.wing.HLD.delta
 
 aero_analysis.summary.y_intercept_approach=1.42;
 aero_analysis.summary.y_intercept_TO=1.06;
-aero_analysis.summary.zero_AoA_TO_rad=(zero_AoA+aero_analysis.wing.HLD.delta_alpha_deg(1))*pi/180; %[rad]
-aero_analysis.summary.zero_AoA_Land_rad=(zero_AoA+aero_analysis.wing.HLD.delta_alpha_deg(2))*pi/180; %[rad]
+aero_analysis.summary.zero_AoA.TO_rad=(zero_AoA+aero_analysis.wing.HLD.delta_alpha_deg(1))*pi/180; %[rad]
+aero_analysis.summary.zero_AoA.Land_rad=(zero_AoA+aero_analysis.wing.HLD.delta_alpha_deg(2))*pi/180; %[rad]
 
 aero_analysis.summary.cl_transition=0.9*aero_analysis.summary.cl_max_TO;
 
