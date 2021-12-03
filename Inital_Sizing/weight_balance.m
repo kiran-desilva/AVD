@@ -171,7 +171,7 @@ weights.Total_weight = weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + w
 weights.Total_weight_no_fucking = weights.W_w + (weights.W_ht + weights.W_vt) + weights.W_fus + (weights.W_mlg + weights.W_nlg) + weights.W_inl + weights.W_ec + weights.W_es + weights.W_en + weights.W_f +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + weights.W_p + weights.W_pay
 
 
-fuel_fraction_to_fuel_weight = @(wf_fuel) (1-wf_fuel)*sizing.W0*0.2248089431; % conversion from newton to lbf
+fuel_fraction_to_fuel_weight = @(wf_fuel) ((wf_fuel*sizing.W0)-(sizing.W0-sizing.Wf))*0.2248089431; % conversion from newton to lbf
 
 payload_factor_func = @(payload_factor) (2+(4*payload_factor))/6;
 weights.Total_weight_func = @(wf_fuel,payload_factor) weights.W_w*0.78 + (weights.W_ht + weights.W_vt)*0.75 + weights.W_fus*0.85 + (weights.W_mlg + weights.W_nlg)*0.88 + weights.W_inl*0.85 + weights.W_ec + weights.W_es + weights.W_en + fuel_fraction_to_fuel_weight(wf_fuel) +weights.W_fs + weights.W_fc + weights.W_APUinst + weights.W_instr + weights.W_hydr + weights.W_el + weights.W_av + weights.W_furn + weights.W_ac + weights.W_ai + (payload_factor_func(payload_factor)*(weights.W_p + weights.W_pay))

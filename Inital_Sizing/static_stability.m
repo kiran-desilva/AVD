@@ -103,6 +103,7 @@ region.fuel_fraction = [sizing.fraction.before_take_off,sizing.fraction.before_a
 region.cl_alpha_w = [ aero_analysis.wing.HLD.cl_alpha_flaps([1 2]) aero_analysis.wing.Cl_alpha([1 1]) ];
 region.cl_alpha_h = [aero_analysis.tail.Cl_alpha([3 4 1 1])];
 region.Cm0w = double(subs(Cm0w,cla_eta_syms,region.cla_eta));
+region.alpha_0_w = [aero_analysis.summary.zero_AoA_TO,aero_analysis.summary.zero_AoA_TO,degtorad(-3),degtorad(-3)]
 
 
 region.rho = [1.225,1.225,0.3016,0.3016];
@@ -180,7 +181,7 @@ plot_sm_constraints(f3,'green')
 f4 = matlabFunction(subs(sm,[tail_h_xac_bar_syms,wing_Cl_alpha_syms,tail_Cl_alpha_syms,cla_eta_syms,wf_fuel_syms,payload_factor_syms],[tail_h_xac_bar,region.cl_alpha_w(4),region.cl_alpha_h(4),region.cla_eta(4),sizing.fraction.end_cruise_1,1]));
 plot_sm_constraints(f4,'magenta')
 
-plot(xacw/Cmac,Sh/Sw,'x',,'linewidth',1.5,'markersize',6)
+plot(xacw/Cmac,Sh/Sw,'x','linewidth',1.5,'markersize',6,'color','black')
 
 % yline(Sh/Sw,'--','linewidth',1.5)
 % xline(xacw/Cmac,'--','linewidth',1.5)
@@ -189,7 +190,7 @@ plot(xacw/Cmac,Sh/Sw,'x',,'linewidth',1.5,'markersize',6)
 legend('Takeoff - Passengers','','','','Landing - Passengers','','','','Cruise Start - Passengers','','','','Cruise End - Passengers','','','','Design Point')
 
 ylabel('{S_h}/{S_w}')
-xlabel('{x_ac_w}/{Cmac}')
+xlabel('{Xac}_{w}}/{Cmac}')
 grid on
 grid minor
 xlim([xmin,xmax])
@@ -216,7 +217,7 @@ plot_sm_constraints(f3,'green')
 f4 = matlabFunction(subs(sm,[tail_h_xac_bar_syms,wing_Cl_alpha_syms,tail_Cl_alpha_syms,cla_eta_syms,wf_fuel_syms,payload_factor_syms],[tail_h_xac_bar,region.cl_alpha_w(4),region.cl_alpha_h(4),region.cla_eta(4),sizing.fraction.end_cruise_1,0]));
 plot_sm_constraints(f4,'magenta')
 
-plot(xacw/Cmac,Sh/Sw,'x',,'linewidth',1.5,'markersize',6)
+plot(xacw/Cmac,Sh/Sw,'x','linewidth',1.5,'markersize',6,'color','black')
 % yline(Sh/Sw,'--','linewidth',1.5)
 % xline(xacw/Cmac,'--','linewidth',1.5)
 
@@ -224,7 +225,7 @@ plot(xacw/Cmac,Sh/Sw,'x',,'linewidth',1.5,'markersize',6)
 legend('Takeoff - No Passengers','','','','Landing - No Passengers','','','','Cruise Start - No Passengers','','','','Cruise End - No Passengers','','','','Design Point')
 
 ylabel('{S_h}/{S_w}')
-xlabel('{x_ac_w}/{Cmac}')
+xlabel('{Xac}_{w}}/{Cmac}')
 grid on
 grid minor
 xlim([xmin,xmax])
@@ -236,26 +237,26 @@ improvePlot(gcf)
 
 %% TRIMMED CG ANALYSIS
 
-syms CL_w CL_h alpha iw_syms ih_syms C_thrust_syms
+syms CL_w CL_h alpha iw_syms ih_syms C_thrust_syms alpha_0_w_syms
 
 
 
 % Cmalphaf = fuselage_Cm_alpha(wing_xac_bar);
 sh_sw = Sh/Sw;
 
-CL_w(alpha,iw_syms,wing_Cl_alpha_syms) = wing_Cl_alpha_syms.*(alpha + iw_syms - alpha_0_w);
-CL_h(alpha,ih_syms,iw_syms,cla_eta_syms) = tail_h_Cl_alpha.*( ((alpha + iw_syms - alpha_0_w).*(1-deda(lh,cla_eta_syms))) + (ih_syms-iw_syms) - (alpha_0_h - alpha_0_w));
+CL_w(alpha,iw_syms,wing_Cl_alpha_syms,alpha_0_w_syms) = wing_Cl_alpha_syms.*(alpha + iw_syms - alpha_0_w_syms);
+CL_h(alpha,ih_syms,iw_syms,cla_eta_syms,alpha_0_w_syms) = tail_h_Cl_alpha.*( ((alpha + iw_syms - alpha_0_w_syms).*(1-deda(lh,cla_eta_syms))) + (ih_syms-iw_syms) - (alpha_0_h - alpha_0_w_syms));
 
 
-Cmcg(alpha,ih_syms,iw_syms) = -CL_w(alpha,iw_syms,wing_Cl_alpha_syms).*(wing_xac_bar_syms - xcg_bar_eq(wing_xac_bar_syms,wf_fuel_syms,payload_factor_syms)) + Cm0w(cla_eta_syms) + (fuselage_Cm_alpha(wing_xac_bar_syms).*alpha) - (eta_h.*CL_h(alpha,ih_syms,iw_syms,cla_eta_syms).*sh_sw.*(tail_h_xac_bar - xcg_bar_eq(wing_xac_bar_syms,wf_fuel_syms,payload_factor_syms))) + (Zt.*C_thrust_syms);
-CL(alpha,ih_syms,iw_syms) = CL_w(alpha,iw_syms,wing_Cl_alpha_syms) + (eta_h.*sh_sw.*CL_h(alpha,ih_syms,iw_syms,cla_eta_syms));
+Cmcg(alpha,ih_syms,iw_syms) = -CL_w(alpha,iw_syms,wing_Cl_alpha_syms,alpha_0_w_syms).*(wing_xac_bar_syms - xcg_bar_eq(wing_xac_bar_syms,wf_fuel_syms,payload_factor_syms)) + Cm0w(cla_eta_syms) + (fuselage_Cm_alpha(wing_xac_bar_syms).*alpha) - (eta_h.*CL_h(alpha,ih_syms,iw_syms,cla_eta_syms,alpha_0_w_syms).*sh_sw.*(tail_h_xac_bar - xcg_bar_eq(wing_xac_bar_syms,wf_fuel_syms,payload_factor_syms))) + (Zt.*C_thrust_syms);
+CL(alpha,ih_syms,iw_syms) = CL_w(alpha,iw_syms,wing_Cl_alpha_syms,alpha_0_w_syms) + (eta_h.*sh_sw.*CL_h(alpha,ih_syms,iw_syms,cla_eta_syms,alpha_0_w_syms));
 
 % load('optimized_incidence')
 % wing.i_w = iw_required;
 for idx = 1:length(region.regions)
 
     %sub in aerodymaic constants
-    Cmcg_function = subs(Cmcg,[cla_eta_syms,wing_Cl_alpha_syms,wing_xac_bar_syms,tail_h_xac_bar_syms],[region.cla_eta(idx),region.cl_alpha_w(idx),wing_xac_bar,tail_h_xac_bar]);
+    Cmcg_function = subs(Cmcg,[cla_eta_syms,wing_Cl_alpha_syms,wing_xac_bar_syms,tail_h_xac_bar_syms,alpha_0_w_syms],[region.cla_eta(idx),region.cl_alpha_w(idx),wing_xac_bar,tail_h_xac_bar,region.alpha_0_w(i)]);
     % sub in for weight configuration -> assuming always fully loaded with payload
     Cmcg_function = subs(Cmcg_function,[wf_fuel_syms,payload_factor_syms],[region.fuel_fraction(idx),1]);
     % sub in thrust settings
@@ -263,7 +264,7 @@ for idx = 1:length(region.regions)
     % expose the variables we want
     Cmcg_function(alpha,ih_syms,iw_syms) = matlabFunction(Cmcg_function,'vars',[alpha,ih_syms,iw_syms]);
 
-    CL_function = subs(CL,[cla_eta_syms,wing_Cl_alpha_syms],[region.cla_eta(idx),region.cl_alpha_w(idx)]);
+    CL_function = subs(CL,[cla_eta_syms,wing_Cl_alpha_syms,alpha_0_w_syms],[region.cla_eta(idx),region.cl_alpha_w(idx),region.alpha_0_w(i)]);
     CL_function(alpha,ih_syms,iw_syms) = matlabFunction(CL_function,'vars',[alpha,ih_syms,iw_syms]);
 
     %x(1) = alpha, x(2) = ih
@@ -275,21 +276,23 @@ for idx = 1:length(region.regions)
 
     region.aoa(idx) = res(1) * (180/pi);
     region.ih(idx) = res(2) * (180/pi);
+    region.Cl_w(idx) = double(CL_w(region.aoa(idx)*(pi/180),wing.i_w * (pi/180),region.cl_alpha_w(idx),region.alpha_0_w(idx)))
+    region.Cl_h(idx) = double(CL_h(region.aoa(idx)*(pi/180),region.ih(idx)*(pi/180),wing.i_w * (pi/180),region.cla_eta(idx),region.alpha_0_w(idx)))
 
 end
 
 region
 
 %sub in aerodymaic constants
-Cmcg_function = subs(Cmcg,[cla_eta_syms,wing_Cl_alpha_syms,wing_xac_bar_syms,tail_h_xac_bar_syms],[region.cla_eta(3),region.cl_alpha_w(3),wing_xac_bar,tail_h_xac_bar]);
+Cmcg_function = subs(Cmcg,[cla_eta_syms,wing_Cl_alpha_syms,wing_xac_bar_syms,tail_h_xac_bar_syms,alpha_0_w_syms],[region.cla_eta(3),region.cl_alpha_w(3),wing_xac_bar,tail_h_xac_bar,region.alpha_0_w(3)]);
 % sub in for weight configuration -> assuming always fully loaded with payload
-Cmcg_function = subs(Cmcg_function,[wf_fuel_syms,payload_factor_syms],[region.fuel_fraction(idx),1]);
+Cmcg_function = subs(Cmcg_function,[wf_fuel_syms,payload_factor_syms],[region.fuel_fraction(3),1]);
 % sub in thrust settings
 Cmcg_function = subs(Cmcg_function,[C_thrust_syms],[region.C_thrust(3)]);
 % expose the variables we want
 Cmcg_function(alpha,ih_syms,iw_syms) = matlabFunction(Cmcg_function,'vars',[alpha,ih_syms,iw_syms]);
 
-CL_function = subs(CL,[cla_eta_syms,wing_Cl_alpha_syms],[region.cla_eta(3),region.cl_alpha_w(3)]);
+CL_function = subs(CL,[cla_eta_syms,wing_Cl_alpha_syms,alpha_0_w_syms],[region.cla_eta(3),region.cl_alpha_w(3),region.alpha_0_w(3)]);
 CL_function(alpha,ih_syms,iw_syms) = matlabFunction(CL_function,'vars',[alpha,ih_syms,iw_syms]);
 
 
@@ -303,7 +306,7 @@ iw_required = res(2) * (180/pi)
 for idx = 1:length(region.regions)
 
     %sub in aerodymaic constants
-    Cmcg_function = subs(Cmcg,[cla_eta_syms,wing_Cl_alpha_syms,wing_xac_bar_syms,tail_h_xac_bar_syms],[region.cla_eta(idx),region.cl_alpha_w(idx),wing_xac_bar,tail_h_xac_bar]);
+    Cmcg_function = subs(Cmcg,[cla_eta_syms,wing_Cl_alpha_syms,wing_xac_bar_syms,tail_h_xac_bar_syms,alpha_0_w_syms],[region.cla_eta(idx),region.cl_alpha_w(idx),wing_xac_bar,tail_h_xac_bar,region.alpha_0_w(i)]);
     % sub in for weight configuration -> assuming always fully loaded with payload
     Cmcg_function = subs(Cmcg_function,[wf_fuel_syms,payload_factor_syms],[region.fuel_fraction(idx),1]);
     % sub in thrust settings
@@ -311,7 +314,7 @@ for idx = 1:length(region.regions)
     % expose the variables we want
     Cmcg_function(alpha,ih_syms,iw_syms) = matlabFunction(Cmcg_function,'vars',[alpha,ih_syms,iw_syms]);
 
-    CL_function = subs(CL,[cla_eta_syms,wing_Cl_alpha_syms],[region.cla_eta(idx),region.cl_alpha_w(idx)]);
+    CL_function = subs(CL,[cla_eta_syms,wing_Cl_alpha_syms,alpha_0_w_syms],[region.cla_eta(idx),region.cl_alpha_w(idx),region.alpha_0_w(i)]);
     CL_function(alpha,ih_syms,iw_syms) = matlabFunction(CL_function,'vars',[alpha,ih_syms,iw_syms]);
 
     %x(1) = alpha, x(2) = ih
@@ -323,6 +326,9 @@ for idx = 1:length(region.regions)
 
     region.aoa_ideal(idx) = res(1) * (180/pi);
     region.ih_ideal(idx) = res(2) * (180/pi);
+
+    region.Cl_w_ideal(idx) = double(CL_w(region.aoa_ideal(idx)*(pi/180),iw_required* (pi/180),region.cl_alpha_w(idx),region.alpha_0_w(idx)))
+    region.Cl_h_ideal(idx) = double(CL_h(region.aoa_ideal(idx)*(pi/180),region.ih_ideal(idx)*(pi/180),iw_required* (pi/180),region.cla_eta(idx),region.alpha_0_w(idx)))
 
 end
 
