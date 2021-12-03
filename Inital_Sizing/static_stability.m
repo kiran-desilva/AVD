@@ -284,19 +284,19 @@ end
 region
 
 %sub in aerodymaic constants
-Cmcg_function = subs(Cmcg,[cla_eta_syms,wing_Cl_alpha_syms,wing_xac_bar_syms,tail_h_xac_bar_syms,alpha_0_w_syms],[region.cla_eta(3),region.cl_alpha_w(3),wing_xac_bar,tail_h_xac_bar,region.alpha_0_w(3)]);
+Cmcg_function = subs(Cmcg,[cla_eta_syms,wing_Cl_alpha_syms,wing_xac_bar_syms,tail_h_xac_bar_syms,alpha_0_w_syms],[region.cla_eta(4),region.cl_alpha_w(4),wing_xac_bar,tail_h_xac_bar,region.alpha_0_w(4)]);
 % sub in for weight configuration -> assuming always fully loaded with payload
-Cmcg_function = subs(Cmcg_function,[wf_fuel_syms,payload_factor_syms],[region.fuel_fraction(3),1]);
+Cmcg_function = subs(Cmcg_function,[wf_fuel_syms,payload_factor_syms],[region.fuel_fraction(4),1]);
 % sub in thrust settings
-Cmcg_function = subs(Cmcg_function,[C_thrust_syms],[region.C_thrust(3)]);
+Cmcg_function = subs(Cmcg_function,[C_thrust_syms],[region.C_thrust(4)]);
 % expose the variables we want
 Cmcg_function(alpha,ih_syms,iw_syms) = matlabFunction(Cmcg_function,'vars',[alpha,ih_syms,iw_syms]);
 
-CL_function = subs(CL,[cla_eta_syms,wing_Cl_alpha_syms,alpha_0_w_syms],[region.cla_eta(3),region.cl_alpha_w(3),region.alpha_0_w(3)]);
+CL_function = subs(CL,[cla_eta_syms,wing_Cl_alpha_syms,alpha_0_w_syms],[region.cla_eta(4),region.cl_alpha_w(4),region.alpha_0_w(4)]);
 CL_function(alpha,ih_syms,iw_syms) = matlabFunction(CL_function,'vars',[alpha,ih_syms,iw_syms]);
 
 
-F = @(x) [double(Cmcg_function(0,x(1),x(2))); double(CL_function(0,x(1),x(2))) - region.CL(3)];
+F = @(x) [double(Cmcg_function(0,x(1),x(2))); double(CL_function(0,x(1),x(2))) - region.CL(4)];
 x0 = [0,0];
 res = fsolve(F,x0);
 ih_required = res(1) * (180/pi)

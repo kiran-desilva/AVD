@@ -9,7 +9,7 @@ struct = wing;
 offset_from_center = 1.18;
 
 
-uc_lim = [5.56];
+uc_lim = [5.3];
 
 
 
@@ -18,7 +18,7 @@ chord_offset = wing.Croot - ((wing.Croot-wing.Ctip )* span_percent);
 LE_offset = offset_from_center*tand(wing.sweepLE);
 TE_offset = offset_from_center*tand(wing.sweepTE);
 
-uc_lim_transformed = uc_lim-(locations.x_wing+chord_offset);
+uc_lim_transformed = wing.Croot - (uc_lim-(locations.x_wing));
 
 figure 
 hold on

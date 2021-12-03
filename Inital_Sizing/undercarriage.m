@@ -47,7 +47,7 @@ catch
 	% uc.main_wheel.x = 5.6513; % TODO:
 	uc.nose_wheel.x = 0.406; % TODO:
 	uc.main_wheel.y = 1.18;%66*2.54/100;
-	uc.main_wheel.x = 5.6; % TODO:
+	uc.main_wheel.x = 5.3; % TODO:
 end
 init_gear_length = 0.7;
 uc.main_wheel.z = -0.635 -0.704 - init_gear_length;
@@ -89,7 +89,7 @@ end
 tipback_angle = atand((-uc.main_wheel.z + tailstrike_point.z)/(tailstrike_point.x - uc.main_wheel.x))
 cg_main_wheel_angle_min = atand((uc.main_wheel.x - wandb.x_cg_aft)/(wandb.z_cg - uc.main_wheel.z))
 
-fail = non_blocking_assert(cg_main_wheel_angle_min > max(15, tipback_angle), 'angle between cg and main wheel not sufficiently large', 3)
+fail = non_blocking_assert(cg_main_wheel_angle_min < max(15, tipback_angle), 'angle between cg and main wheel not sufficiently large', 3)
 % fail = non_blocking_assert(cg_main_wheel_angle_min > max(0, tipback_angle), 'angle between cg and main wheel not sufficiently large', 3)
 
 if fail ~= 0
