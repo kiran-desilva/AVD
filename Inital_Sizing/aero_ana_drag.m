@@ -199,7 +199,7 @@ end
 % Skin friction, Misc, Leakage
 %accounting for 4% of leakage
 for j=1:length(U)
-    aero_analysis.drag.cd0(j)=1.04*(aero_analysis.drag.skin_friction(j)+aero_analysis.drag.cd_misc(j));
+    aero_analysis.drag.cd0(j)=1.02*(aero_analysis.drag.skin_friction(j)+aero_analysis.drag.cd_misc(j));
 end
 
 %% Induced drag
