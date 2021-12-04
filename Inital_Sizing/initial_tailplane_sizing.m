@@ -25,7 +25,7 @@ tailplane.initial.vertical.l = 0.45*fuselage_length;
 
 
 %from aero tn tailsizing pdf
-tailplane.initial.horizontal.v = 0.7 * .95 * .9; % howe
+tailplane.initial.horizontal.v = 0.7 * .95 ; % howe
 tailplane.initial.vertical.v = 0.065 * .95; 
 
 tailplane.initial.horizontal.s = ( tailplane.initial.horizontal.v * cmac * sref ) / (tailplane.initial.horizontal.l);

@@ -4,7 +4,7 @@ clc
 syms sweep_5 Cl_design Mdd Cl_cruise t_c sweep_25 t_c_eff
 
 
-design_cl = 0
+design_cl = 0.2
 
 % design_cl = 0;
 
@@ -42,7 +42,7 @@ required_sweep_10 = fsolve(@(x) double(Cl_cruise(x,0.10)) - design_cl, 20,option
 required_sweep_12 = fsolve(@(x) double(Cl_cruise(x,0.12)) - design_cl, 20,options)
 required_sweep_15 = fsolve(@(x) double(Cl_cruise(x,0.15)) - design_cl, 20,options)
 
-required_sweep_12 = 18.1692+5
+% required_sweep_12 = 18.1692+5
 
 Mdd_08 = double(subs(Mdd,sweep_25,required_sweep_08))
 Mdd_09 = double(subs(Mdd,sweep_25,required_sweep_09))

@@ -50,8 +50,8 @@ function [h_tail_place_fit,fig] = horizontal_placement_graph()
 
     plot(xrange,h_tail_place_fit(xrange))
     legend("Extracted Points","Fit")
-    xlabel("Tail Arm / C_mac")
-    ylabel("Height / C_mac")
+    xlabel("l_{H}/C_{mac}")
+    ylabel("Height/C_{mac}")
     xlim([0 6])
     ylim([-1 2])
 
