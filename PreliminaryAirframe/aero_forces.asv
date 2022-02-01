@@ -59,19 +59,19 @@ figure(2)
 plot(cruise.y_le, cruise.shear)
 
 %% Bending Moment
-cruise.sectional_moment=cruise.cm_c_4.*cruise.area.*cruise.chord*cruise.q.*cruise.chord;
+cruise.sectional_moment=cruise.cm_c_4.*cruise.area.*cruise.chord*cruise.q*cruise.chord;
 cruise.moment(length(cruise.j),1)=cruise.sectional_moment(length(cruise.j),1);
 cruise.moment(length(cruise.j)-1,1)=cruise.moment(length(cruise.j),1)+cruise.sectional_moment((length(cruise.j)-1),1);
 for i=1:length(t)-2
     cruise.moment(length(t)-(i+1),1)=cruise.sectional_moment(length(t)-(i+1),1)+cruise.moment(length(t)-(i),1);
 end
 
-% %% Bending moment V2
-% 
-% 
-% for i=1:length(t)-2
-%     moment(length(t)-(i+1),1)=(
-% end
+%% Bending moment V2
+
+
+for i=1:length(t)-2
+    moment(length(t)-(i+1),1)=(
+end
 
 figure(3)
 plot(cruise.y_le,cruise.moment)
