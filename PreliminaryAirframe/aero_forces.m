@@ -13,7 +13,7 @@ close all
 
 %% CRUISE
 
-a=importfile("C:\Users\izzye\OneDrive\Documents\GitHub\AVD\PreliminaryAirframe\AVL Data Files\AVD_AVL_CRUISE_V2.dat", [21, 84]);
+a=importfile("C:\Users\izzye\OneDrive\Documents\GitHub\AVD\PreliminaryAirframe\AVL Data Files\AVD_AVL_CRUISE_FINAL.dat", [21, 84]);
 
 
 % Parameters from AVL
@@ -34,8 +34,10 @@ cruise.c_p_x_c=table2array(a(:,35))+table2array(a(:,36));
 
 % Flight conditions
 cruise.Mach=0.75;
-cruise.rho=0.302; 
-cruise.air_vel=294.9; 
+%cruise.rho=0.302; 
+%cruise.air_vel=294.9; 
+cruise.rho=1.225;
+cruise.air_vel=340.3;
 cruise.vel=cruise.air_vel*cruise.Mach; %m/s
 cruise.q=0.5*cruise.rho*cruise.vel^2; %dynamic pressure, SI
 
@@ -88,3 +90,5 @@ xlabel 'Spanwise displacement [m]'
 ylabel 'Bending moment [Nm]'
 grid on
 grid minor
+
+disp cruise.total_lift

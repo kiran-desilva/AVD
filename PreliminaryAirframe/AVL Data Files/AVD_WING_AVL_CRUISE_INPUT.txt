@@ -1,0 +1,39 @@
+3D AVL 
+#Mach
+ 0.75
+#IYsym   IZsym   Zsym
+ 0       0       0.0
+#Sref    Cref    Bref
+10.32  1.261  8.94
+#Xref    Yref    Zref
+0.0     0.0	  0.0
+#CDp
+0.0
+#
+#====================================================================
+SURFACE 
+Wing 
+#Nchordwise  Cspace   Nspanwise   Sspace
+8          1.0       64      1.0
+#
+YDUPLICATE
+0.0
+#
+ANGLE
+-3
+#-------------------------------------------------------------
+SECTION
+#Xle    Yle    Zle     Chord   	    Ainc  Nspanwise  Sspace
+0.0     0.0    0.0     1.767      0.0   0          0
+AFILE
+C:\Users\izzye\Downloads\NACA-65412.dat
+#CDCL
+#-0.6378 0.00833 0.25 0.00576 0.95 0.00824
+#-------------------------------------------------------------
+SECTION
+#Xle    Yle    	 Zle    Chord        Ainc  Nspanwise  Sspace
+1.441   3.63    0.0    0.533     0.0   0          0
+AFILE
+C:\Users\izzye\Downloads\NACA-65412.dat
+#CDCL
+#-1.4235 0.0322 0.4302 0.0058 1.6676 0.0432
