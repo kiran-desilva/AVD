@@ -15,7 +15,7 @@ V_TO = aero_analysis.wing.v_takeoff_ms; %FAR-25
 mu = 0.03; % raymer dry asphalt runway 
 rolltime = 3; %raymer
 
-Cl_gr = aero_analysis.summary.cl_alpha_TO * (wing.i_w*(pi/180) - aero_analysis.summary.zero_AoA_TO_rad);
+Cl_gr = aero_analysis.summary.cl_alpha_TO * (wing.i_w*(pi/180) - aero_analysis.summary.zero_AoA.TO_rad);
 performance.Ka = (1.225 / (2 * sizing.W0 / wing.Sref)) * (mu * Cl_gr - aero_analysis.drag.cd0(3) - ((Cl_gr^2) / (pi * wing.Ar * aero_analysis.summary.e_wing)));
 performance.Kt = (2 * powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - mu;
 performance.Sg = (1 / (2 * 9.81 * performance.Ka)) * log(abs((performance.Kt + performance.Ka * V_TO^2) / (performance.Kt + performance.Ka * Vinit^2)));
@@ -33,7 +33,7 @@ H_TR = R * (1 - cos(gamma_climb)); %no climb segment needed CHECK THIS
 
 performance.Sto = 1.15 * (performance.Sg + performance.Sr + performance.Str); %FAR25 15% safety factor all engines operative
 
-gamma_climb_1eng =  asin((powerplant.installed_thrust_lbf * 4.44822 / sizing.W0) - 1 / LoverD_TR); %one engine inoperative
+gamma_climb_1eng =  asin((powerplant.installed_thrust_lbf* 4.44822 - Drag_model_TO(V_TO,0,sizing.W0) )/ sizing.W0); %one engine inoperative
 gamma_min = 0.024; %FAR25 minimum climb for 2-engine a/c
 G = gamma_climb_1eng - gamma_min;
 CL_climb = 0.694 * aero_analysis.summary.cl_max_TO; %Gudmundsson
@@ -56,7 +56,7 @@ H_f = R_land * (1 - cosd(theta_apprch)); %errikos slides
 mul = 0.5; %raymer
 H_obs_land = 50 / 3.2808; %meters
 
-Cl_brakedist = aero_analysis.summary.cl_alpha_approach * (wing.i_w*(pi/180) - aero_analysis.summary.zero_AoA_Land_rad);
+Cl_brakedist = aero_analysis.summary.cl_alpha_approach * (wing.i_w*(pi/180) - aero_analysis.summary.zero_AoA.Land_rad);
 performance.Sa = (H_obs_land - H_f) / tand(theta_apprch);
 performance.Sf = R_land * sind(theta_apprch); 
 performance.Sfr = tfr * V_td; 
@@ -92,7 +92,11 @@ Wx_W0_ext = (sizing.W0 - (sizing.Wf + 15 * 9.81)) / sizing.W0; %extended range r
 new_Wx_W0_ext = new_Wx_W0_ext * performance.frac_cruise2 * performance.frac_loiter; % not including cruise 1 segment
 performance.frac_cruise1_ext = Wx_W0_ext / (new_Wx_W0_ext); % calculate new cruise fuel frac using original wx/w0 and the new loiter and crusie 2 fractions
 performance.cruise1_Range_exted = (parameters.cruise_mach * 295.07 / (powerplant.sfc/3600)) * aero_analysis.summary.l_d_cruise * log(1/performance.frac_cruise1_ext);
+extrange = [0,performance.cruise1_Range,performance.cruise1_Range_exted];
+pld = [90,90,0];
 
+figure
+plot(extrange,pld)
 
 %% Point performance
 
@@ -126,19 +130,25 @@ end
 Vx_TAS = sqrt(1.225/atmos(13716,4)) * sqrt((2 * 1 * sizing.fraction.before_cruise * sizing.W0)/(1.225 * wing.Sref)) * (1 / ( pi * aero_analysis.summary.e_wing * wing.Ar * aero_analysis.drag.cd0(1)))^0.25;
 Mx = Vx_TAS / atmos(13716,2);
 
+Ps_serv = [2.54 10000];
+
 contour(M_mat,h_mat,Ps,Ps_wanted,'Showtext', 'on')
 hold on
 plot(Ms,h__,'r')
 hold on
-plot(0.78,12192,'xb', 'MarkerSize', 12)
+plot(0.75, 12192,'*m', 'MarkerSize', 12)
+hold on
+plot(0.78,12192,'xm', 'MarkerSize', 12)
 hold on
 plot(Mx,13716,'or', 'MarkerSize', 12)
+hold on
+contour(M_mat,h_mat,Ps,Ps_serv,'--')
 hold off
-xlabel("Mach number",'interpreter','Latex')
-ylabel("Altitude (m)",'interpreter','Latex')
+xlabel("Mach number",'interpreter','Latex', "Fontsize",25)
+ylabel("Altitude (m)",'interpreter','Latex', "Fontsize",25)
 grid on
 
-legend("Ps","Stall line", "M = 0.78 at cruise alt", "$V_x$ at 45000ft requirement", "interpreter","Latex")
+legend("Specific Excess Power","Stall line","Cruise", "M = 0.78 at cruise alt", "$V_x$ at 45000ft requirement","Service ceiling", "interpreter","Latex", "Fontsize",15,'location','southeast')
 %{
 for i = 1:10
     Ps_fts = Ps_fts + 500; 
