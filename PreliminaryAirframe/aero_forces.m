@@ -96,37 +96,26 @@ ylabel 'Bending moment [Nm]'
 grid on
 grid minor
 
-%% curve fit
-y_LE=cruise.y_le;
-p1=cruise.sectional_lift;
-p2=cruise.shear;
-p3=cruise.moment;
-
-pp1=spline(y_LE,p1);
-pp2=ppval(pp1,y_LE);
-% plot(y_LE,pp2);
-
-
 %%
-[fitobject1]=fit(y_LE,p1,'fourier8');
-a0 = fitobject1.a0;
-a1 = fitobject1.a1;
-b1 = fitobject1.b1;
-a2 = fitobject1.a2;
-b2 = fitobject1.b2;
-a3 = fitobject1.a3;
-b3= fitobject1.b3;
-a4 = fitobject1.a4;
-b4= fitobject1.b4;
-a5 = fitobject1.a5;
-b5= fitobject1.b5;
-a6 = fitobject1.a6;
-b6= fitobject1.b6;
-a7 = fitobject1.a7;
-b7= fitobject1.b7;
-a8 = fitobject1.a8;
-b8= fitobject1.b8;
-w  = fitobject1.w;
+% [fitobject1]=fit(y_LE,p1,'fourier8');
+% a0 = fitobject1.a0;
+% a1 = fitobject1.a1;
+% b1 = fitobject1.b1;
+% a2 = fitobject1.a2;
+% b2 = fitobject1.b2;
+% a3 = fitobject1.a3;
+% b3= fitobject1.b3;
+% a4 = fitobject1.a4;
+% b4= fitobject1.b4;
+% a5 = fitobject1.a5;
+% b5= fitobject1.b5;
+% a6 = fitobject1.a6;
+% b6= fitobject1.b6;
+% a7 = fitobject1.a7;
+% b7= fitobject1.b7;
+% a8 = fitobject1.a8;
+% b8= fitobject1.b8;
+% w  = fitobject1.w;
 
 %[fitresult,gof]=fitobject1(a0,a1,b1)
 
