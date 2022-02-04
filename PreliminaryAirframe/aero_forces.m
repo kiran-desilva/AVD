@@ -9,6 +9,8 @@
 %cruise.cl_scaled: the scaled Cl for each strip section which produces the
 %overall CL required for the aircraft in cruise (0.2689)
 
+%p1: 64th order polynomial terms for Cl distribution. used air properties
+%at 40 000 ft for air in order to obtain the necessary Cl.
 
 %% Housekeeping
 clear
@@ -125,12 +127,12 @@ z=sum(cruise.lift_no_dynamic_p); %L/(dynamic pressure); for whole aircraft
 cruise.total_area=sum(cruise.area); %total area of wing, verification that it is 4.1745 m^2
 cruise.cl_total_dim=z/cruise.total_area; %CL of wing. CL=sum(Cl(i)*S(i))/S_total
 %scale cl to be equal to Cl necessary at cruise (0.2689)
-cruise.cl_req=(sizing.W0*sizing.fraction.before_cruise*0.5)/(0.5*0.302*294.9^2*cruise.total_area); %calculate the required CL (=W/(q*s))
+cruise.cl_req=(sizing.W0*sizing.fraction.before_cruise*0.5)/(0.5*0.302*294.9^2*cruise.total_area); %calculate the required CL (=W*0.5/(q*s)); using conditions of air at cruise; 0.5 since for 1 wing
 cruise.ratio_cl=cruise.cl_req/cruise.cl_total_dim; %scaling factor
 %% mutliply lift coefficient distribution by necessary factor
 
 cruise.cl_scaled=cruise.cl*cruise.ratio_cl;
-
+p1=polyfit(cruise.y_le,cruise.cl_scaled,64);
 
 % test=[0:0.001:3.63]
 % %plot(cruise.y_le,cruise.lift_no_dynamic_p)

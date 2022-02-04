@@ -9,6 +9,7 @@
 %cruise.cl_scaled: the scaled Cl for each strip section which produces the
 %overall CL required for the aircraft in cruise (0.2689)
 
+%p1: 64th order polynomial terms for Cl distribution.
 
 %% Housekeeping
 clear
@@ -96,37 +97,26 @@ ylabel 'Bending moment [Nm]'
 grid on
 grid minor
 
-%% curve fit
-y_LE=cruise.y_le;
-p1=cruise.sectional_lift;
-p2=cruise.shear;
-p3=cruise.moment;
-
-pp1=spline(y_LE,p1);
-pp2=ppval(pp1,y_LE);
-% plot(y_LE,pp2);
-
-
 %%
-[fitobject1]=fit(y_LE,p1,'fourier8');
-a0 = fitobject1.a0;
-a1 = fitobject1.a1;
-b1 = fitobject1.b1;
-a2 = fitobject1.a2;
-b2 = fitobject1.b2;
-a3 = fitobject1.a3;
-b3= fitobject1.b3;
-a4 = fitobject1.a4;
-b4= fitobject1.b4;
-a5 = fitobject1.a5;
-b5= fitobject1.b5;
-a6 = fitobject1.a6;
-b6= fitobject1.b6;
-a7 = fitobject1.a7;
-b7= fitobject1.b7;
-a8 = fitobject1.a8;
-b8= fitobject1.b8;
-w  = fitobject1.w;
+% [fitobject1]=fit(y_LE,p1,'fourier8');
+% a0 = fitobject1.a0;
+% a1 = fitobject1.a1;
+% b1 = fitobject1.b1;
+% a2 = fitobject1.a2;
+% b2 = fitobject1.b2;
+% a3 = fitobject1.a3;
+% b3= fitobject1.b3;
+% a4 = fitobject1.a4;
+% b4= fitobject1.b4;
+% a5 = fitobject1.a5;
+% b5= fitobject1.b5;
+% a6 = fitobject1.a6;
+% b6= fitobject1.b6;
+% a7 = fitobject1.a7;
+% b7= fitobject1.b7;
+% a8 = fitobject1.a8;
+% b8= fitobject1.b8;
+% w  = fitobject1.w;
 
 %[fitresult,gof]=fitobject1(a0,a1,b1)
 
@@ -137,11 +127,11 @@ cruise.total_area=sum(cruise.area); %total area of wing, verification that it is
 cruise.cl_total_dim=z/cruise.total_area; %CL of wing. CL=sum(Cl(i)*S(i))/S_total
 %scale cl to be equal to Cl necessary at cruise (0.2689)
 cruise.cl_req=(sizing.W0*sizing.fraction.before_cruise*0.5)/(0.5*0.302*294.9^2*cruise.total_area); %calculate the required CL (=W/(q*s))
-cruise.ratio_cl=cruise.cl_req/cruise.cl_total_dim; %scaling 
+cruise.ratio_cl=cruise.cl_req/cruise.cl_total_dim; %scaling factor
 %% mutliply lift coefficient distribution by necessary factor
 
 cruise.cl_scaled=cruise.cl*cruise.ratio_cl;
-
+p1=polyfit(cruise.y_le,cruise.cl_scaled,64);
 
 % test=[0:0.001:3.63]
 % %plot(cruise.y_le,cruise.lift_no_dynamic_p)
