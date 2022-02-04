@@ -13,7 +13,7 @@ close all
 
 %% CRUISE
 
-a=importfile("C:\Users\izzye\OneDrive\Documents\GitHub\AVD\PreliminaryAirframe\AVL Data Files\AVD_AVL_CRUISE_FINAL.dat", [21, 84]);
+a=importfile("C:\Users\izzye\OneDrive\Documents\GitHub\AVD\PreliminaryAirframe\AVL Data Files\AVD_AVL_CRUISE_VB.dat", [21, 84]);
 
 
 % Parameters from AVL
@@ -42,7 +42,7 @@ cruise.vel=cruise.air_vel*cruise.Mach; %m/s
 cruise.q=0.5*cruise.rho*cruise.vel^2; %dynamic pressure, SI
 
 %% Lift
-cruise.sectional_lift=cruise.q.*cruise.area.*cruise.cl; % lift of each segment
+cruise.sectional_lift=cruise.q.*cruise.area.*cruise.c_cl./cruise.chord; % lift of each segment
 figure(1)
 plot(cruise.y_le,cruise.sectional_lift, 'k', 'Linewidth', 1.25)
 xlabel 'Spanwise displacement [m]'
@@ -90,8 +90,6 @@ xlabel 'Spanwise displacement [m]'
 ylabel 'Bending moment [Nm]'
 grid on
 grid minor
-
-disp cruise.total_lift
 
 %% curve fit
 y_LE=cruise.y_le;

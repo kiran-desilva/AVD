@@ -14,7 +14,7 @@
 SURFACE 
 Wing 
 #Nchordwise  Cspace   Nspanwise   Sspace
-8          1.0       64      1.0
+8          0.0       64      0.0
 #
 YDUPLICATE
 0.0
