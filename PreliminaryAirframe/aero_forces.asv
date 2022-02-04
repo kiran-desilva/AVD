@@ -137,7 +137,7 @@ cruise.total_area=sum(cruise.area); %total area of wing, verification that it is
 cruise.cl_total_dim=z/cruise.total_area; %CL of wing. CL=sum(Cl(i)*S(i))/S_total
 %scale cl to be equal to Cl necessary at cruise (0.2689)
 cruise.cl_req=(sizing.W0*sizing.fraction.before_cruise*0.5)/(0.5*0.302*294.9^2*cruise.total_area); %calculate the required CL (=W/(q*s))
-cruise.ratio_cl=cruise.cl_req/cruise.cl_total_dim; %scaling factor
+cruise.ratio_cl=cruise.cl_req/cruise.cl_total_dim; %scaling 
 %% mutliply lift coefficient distribution by necessary factor
 
 cruise.cl_scaled=cruise.cl*cruise.ratio_cl;
