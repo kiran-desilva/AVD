@@ -69,9 +69,9 @@ Ude_Vb = 47*fts_to_ms;
 Ude_Vb_0 = 20;
 
 % using uref, density and cl_alpha at sealevel , idk if this is right ngl 
-% Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb_0)));
-Vb_sym = solve(n == 1 + delta_n(v,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb_0),v);
-Vb = pos_solution(double(subs(Vb_sym,cl,cl_max_pos)));
+Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_cruise,ws_tow,rho_c,uref_func(0))));
+% Vb_sym = solve(n == 1 + delta_n(v,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb_0),v);
+% Vb = pos_solution(double(subs(Vb_sym,cl,cl_max_pos)));
 
 % Vb_delta_n = double(delta_n(Vb,cl_alpha_w_cruise,ws_end_cruise,rho_c,Ude_Vb));
 Vb_delta_n  = double(delta_n(Vb,cl_alpha_w_cruise,ws_tow,rho_c,Ude_Vb));
