@@ -64,10 +64,11 @@ ylabel( 'areas', 'Interpreter', 'none' );
 grid on
 
 
-integrand = integrate(fitresult,xData,start)
+integrand = integrate(fitresult,range,start);
 
 voldist.areas = areas;
 voldist.fit = fitresult;
 voldist.totalvol = abs(integrand);
+voldist.range = range;
 
 save('voldist.mat','voldist');
