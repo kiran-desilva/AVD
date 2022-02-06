@@ -26,11 +26,10 @@ plot(z, ShearForce_vt(z))
 xlabel("z (m)", 'interpreter', 'Latex')
 ylabel("Shear Force (N)", 'interpreter', 'Latex')
 grid on
-
 figure
 plot(z, BendingMoment_vt(z))
 xlabel("z (m)", 'interpreter', 'Latex')
 ylabel("Bending Moment (Nm)", 'interpreter', 'Latex')
-grid on
+
 
 
