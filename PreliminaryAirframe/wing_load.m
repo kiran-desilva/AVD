@@ -87,10 +87,10 @@
 	hold off
 
 	%% Wing aero loading
-	gamma0 = 4*semispan*Vinf_eas*1.3/(pi*7.8);
-	gamma(x) = gamma0*sqrt(1 - (x/semispan)^2);
-	L(x) = 1.225*Vinf_eas*gamma(x);
-	L_dist = L(spanwise_disc);
+	lift.gamma0 = 4*semispan*Vinf_eas*1.3/(pi*7.8);
+	lift.gamma(x) = gamma0*sqrt(1 - (x/semispan)^2);
+	lift.L(x) = 1.225*Vinf_eas*gamma(x);
+	lift.L_dist = L(spanwise_disc);
 	% L_dist = 0.5*n*rho0*Vinf_eas^2*c(spanwise_disc).*cl_dist;
 
 	%% Wing weight loading
@@ -115,19 +115,70 @@
 
 	%% Fuel loading
 	% fuel.volume_in_wings_m3 = 0.5341;
-	% fuel.density = 775; % kg/m^3
 	% fuel.fuel_weight = g*fuel.density*fuel.volume_in_wings_m3;
-	fuel.loading(x) = piecewise((x >= bottom_edge_intercept) & (x <= 0.95*semispan), -wing_fuel_weight_kg*g*n, 0);
+	fuel.density = 775; % kg/m^3
+	fuel.full_wing_mass = fuel.density*V(bottom_edge_intercept, 0.95*semispan);
+	fuel.percent_full = wing_fuel_weight_kg/fuel.full_wing_mass;
+	fuel.loading(x1, x2) = piecewise((x1 >= bottom_edge_intercept) & (x2 <= 0.95*semispan), -g*n*fuel.density*fuel.percent_full*V(x1, x2)/delta_s, 0);
 
-	combined_loading = double(uc.loading(spanwise_disc) + fuel.loading(spanwise_disc) + L_dist + wing.inertial_loading);
-	
+	combined_loading = double(uc.loading(spanwise_disc) + fuel.loading(x1_arr, x2_arr) + lift.L_dist + wing.inertial_loading);
+
+	%% Torsion dist
+	% Positive torque clockwise
+	% Needs to include:
+	%	1.	Lift force at x_ac
+	%	2.	Pitching moment coeff
+	%	3.	Fuel force (assume at 0.5 x/c??) MIGHT BE BETTER TO ASSUME CoM of aerofoil
+	%	4.	Wing weight at CoM of aerofoil
+	%	5.	Undercarriage weight
+
+	% Calculating shear force location
+	x_front_spar_percent_c = 0.1;
+	x_rear_spar_percent_c = 0.77;
+	x_sc_assumption_percent_c = (0.1 + 0.77)/2;
+
+	% Lift force calc
+	x_ac_percent_c = 0.25;
+	lift.torsional_load = -lift.L_dist*.(x_ac_percent_c - x_sc_assumption_percent_c)*.c(spanwise_disc);
+
+	% Pitching moment inclusion
+	lift.pitching_moment_load = ...;
+
+	% Fuel tank contribution
+	x_fuel_percent_c = 0.5; % DOES THIS ASSUMPTION MAKE SENSE
+	fuel.torque(x1, x2) = -fuel.loading(x1, x2)*(x_fuel_percent_c - x_sc_assumption_percent_c)*(c(x1) + c(x2))/2;
+
+	% Wing weight contribution
+	wing.centroid_x_percent_c = 0.4136;
+	wing.torsional_load = -wing.inertial_loading.*(wing.centroid_x_percent_c - x_sc_assumption_percent_c).*(c(x1_arr) + c(x2_arr))/2; % dimensionalise by avg cord between x1 and x2
+
+	% UC weight contribution (update if isLanding)
+	uc.attachment_point_percent_c = ...;
+	uc.torsional_load(x) = -uc.loading(x)*(uc.attachment_point_percent_c - x_sc_assumption_percent_c)*c(x);
+
+	if (isLanding)
+		xcg = 4.55; % measured from the nose in m
+		xG = 5.16;
+		xT = 10.3474;
+		W = 3128.2*newtons_to_lbs*0.85; % landing weight is 85% of mass takeoff weight
+		F_uc = W*g*(xcg - xT)/(xG - xT);
+
+		uc.loading(x) = piecewise((x >= uc.spanwise_start) & (x <= uc.spanwise_end), F_uc, 0);
+		uc.torsional_load(x) = -uc.loading(x)*(uc.attachment_point_percent_c - x_sc_assumption_percent_c)*c(x);
+
+		lift.L_dist = 0;
+		lift.torsional_load = 0;
+
+		lift.pitching_moment_load = 0;
+	end
+
+		
 	shear_dist = sum(combined_loading) - cumsum(combined_loading) + combined_loading;
 
 	temp = movsum(shear_dist, 2)*delta_s/2;
 	dM = [temp(2:end), 0];
 
 	bm_dist = sum(dM) - cumsum(dM) + dM;
-
 
 	figure;
 	hold on;
@@ -162,12 +213,12 @@
 
 	figure;
 	hold on;
-	plot(spanwise_disc, L_dist);
+	plot(spanwise_disc, lift.L_dist);
 	xline(bottom_edge_intercept, 'r')
 	grid on;
 	title("Lift Distribution")
 	xlim([0 semispan]);
-	ylim([0 max(L_dist)*1.1])
+	ylim([0 max(lift.L_dist)*1.1])
 	hold off;
 
 	figure;
