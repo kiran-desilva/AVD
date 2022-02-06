@@ -138,6 +138,7 @@
 	x_sc_assumption_percent_c = (0.1 + 0.77)/2;
 
 	% Lift force calc
+	x_ac_percent_c = 0.25;
 	lift.torsional_load = -lift.L_dist*.(x_ac_percent_c - x_sc_assumption_percent_c)*.c(spanwise_disc);
 
 	% Pitching moment inclusion
