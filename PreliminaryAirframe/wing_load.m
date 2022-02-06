@@ -120,14 +120,29 @@
 	fuel.loading(x) = piecewise((x >= bottom_edge_intercept) & (x <= 0.95*semispan), -wing_fuel_weight_kg*g*n, 0);
 
 	combined_loading = double(uc.loading(spanwise_disc) + fuel.loading(spanwise_disc) + L_dist + wing.inertial_loading);
-	
+
+	%% Torsion dist
+	x_front_spar_percent_c = 0.1;
+	x_rear_spar_percent_c = 0.77;
+	x_sc_assumption_percent_c = (0.1 + 0.77)/2;
+
+	x_fuel_percent_c = 0.5; % DOES THIS ASSUMPTION MAKE SENSE
+
+	if (isLanding)
+		xcg = 4.55; % measured from the nose in m
+		xG = 5.16;
+		xT = 10.3474;
+		W = 3128.2*newtons_to_lbs*0.85; % landing weight is 85% of mass takeoff weight
+		F_uc = W*(xcg - xT)/(xG - xT);
+	end
+
+		
 	shear_dist = sum(combined_loading) - cumsum(combined_loading) + combined_loading;
 
 	temp = movsum(shear_dist, 2)*delta_s/2;
 	dM = [temp(2:end), 0];
 
 	bm_dist = sum(dM) - cumsum(dM) + dM;
-
 
 	figure;
 	hold on;
