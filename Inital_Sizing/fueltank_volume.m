@@ -90,6 +90,8 @@ t_c_rearspar = topfit(x_rearspar) - bottomfit(x_rearspar)
 
 plot([x_frontspar, x_frontspar],[topfit(x_frontspar),bottomfit(x_frontspar)],'linewidth',5);
 plot([x_rearspar, x_rearspar],[topfit(x_rearspar),bottomfit(x_rearspar)],'linewidth',5);
+[x_bar, y_bar] = centroid(fuel_tank);
+scatter(x_bar, y_bar);
 
 span = wing.b;
 
@@ -116,5 +118,4 @@ corrected_vol = volume_left * .975 * .975 %raymer fire protection
 
 leftover_vol = required_volume - corrected_vol
 
-
-
+hold off;
