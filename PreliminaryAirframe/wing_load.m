@@ -161,7 +161,15 @@
 		xG = 5.16;
 		xT = 10.3474;
 		W = 3128.2*newtons_to_lbs*0.85; % landing weight is 85% of mass takeoff weight
-		F_uc = W*(xcg - xT)/(xG - xT);
+		F_uc = W*g*(xcg - xT)/(xG - xT);
+
+		uc.loading(x) = piecewise((x >= uc.spanwise_start) & (x <= uc.spanwise_end), F_uc, 0);
+		uc.torsional_load(x) = -uc.loading(x)*(uc.attachment_point_percent_c - x_sc_assumption_percent_c)*c(x);
+
+		lift.L_dist = 0;
+		lift.torsional_load = 0;
+
+		lift.pitching_moment_load = 0;
 	end
 
 		
