@@ -157,3 +157,16 @@ ylim([-3 4])
 improvePlotNOLINE(gcf);
 
 saveas(gcf,"Figures/Vndiagram",'epsc')
+
+vn.Va = Va;
+vn.Vd = Vd;
+vn.cl_alpha_w = cl_alpha_w_cruise;
+vn.cl_max = cl_max_pos;
+vn.Mtow = Mtow;
+vn.cmac = cmac;
+vn.Sref = Sref;
+vn.ws_tow = ws_tow;
+vn.cruisealt_m = cruisealt_m;
+vn.n_max = n_max;
+
+save('vn.mat','vn')
