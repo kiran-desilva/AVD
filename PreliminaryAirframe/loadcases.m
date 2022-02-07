@@ -9,7 +9,6 @@ alpha_0 = -3*(pi/180); % radians
 cl_0 = vn.cl_alpha_w*alpha_0;% this is unused 
 cl_w = @(aoa) vn.cl_alpha_w.*(aoa+alpha_0); % cl of wing
 
-
 cm_alpha = 0;
 cm_0 = -0.0266;
 cm = @(aoa) cm_0; %looking at thoery of wing sections, cm changes negligibly with aoa as naca 65412 is a cambered airfoil 
