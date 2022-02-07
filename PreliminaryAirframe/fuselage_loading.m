@@ -110,7 +110,7 @@ component.cg(i,2) = -2.5;
 % component.cg(i,2) = -2.75;
 
 %%PAYLOAD AND CREW%% -> maybe model these as distributed loads?
-payload_factor = 0;
+payload_factor = 1;
 
 i = i + 1;
 component.weight(i) = 1243.4*payload_factor; % full passengers and crew??
@@ -131,7 +131,7 @@ component.cg = component.cg*ft_to_m;
 %%FUEL%%
 
 %aux fuel tank cg in line with the main wing fuel tanks
-fuel_weight_percent = 0;
+fuel_weight_percent = 1;
 
 aux_fuel_tank_vol = 0.3087; %m^3
 aux_full_fuel_mass = aux_fuel_tank_vol*775;%kg
@@ -176,6 +176,7 @@ x_ac_h = 10.3474;
 
 %LOAD DISTRIBUTION%
 
+
 %!!!! POSITIVE DIRECTION DOWNWARDS!!!!
 
 %%Calculating sectional loading of fuselage 
@@ -190,7 +191,8 @@ for i=1:length(component.weight)
     load_dist.load = add_point_load(load_dist.load,load_dist.x,component.weight(i),component.cg(i,1)); % gravity is down
 end
 
-total_weight = sum(load_dist.load);
+[load_dist.Fi,load_dist.Fi_cg] = point_load_from_dist(load_dist.x,load_dist.load);
+
 %CALCULATE TAIL LOAD
 
 %force equilbrium
@@ -200,11 +202,11 @@ force_eq = @(Ff,Fr,Ft) sum(load_dist.load) - Ff - Fr - Ft;
 moment_eq = @(Ff,Fr,Ft) (-sum((load_dist.load).*(load_dist.x))) + (Ff*front_spar_x) + (Fr*rear_spar_x) + (Ft*x_ac_h);
 
 shear_force = @(Ff,Fr,Ft) cumsum(load_dist.load + dist_from_point(load_dist.x,-Ff,front_spar_x) + dist_from_point(load_dist.x,-Fr,rear_spar_x) + dist_from_point(load_dist.x,-Ft,x_ac_h));
+
 bending_moment = @(Ff,Fr,Ft) cumtrapz(load_dist.x,shear_force(Ff,Fr,Ft));
 
 %enforce BC at end of bending moment distribution
 index_at = @(expr,idx) expr(idx);
-
 
 F = @(x) [force_eq(x(1),x(2),x(3)); moment_eq(x(1),x(2),x(3)); index_at(bending_moment(x(1),x(2),x(3)),end)]
 
@@ -214,46 +216,49 @@ Fr = res(2);
 Ft = res(3);
 
 
-load_dist.load = add_point_load(load_dist.load,load_dist.x,Ff,front_spar_x);
-load_dist.load = add_point_load(load_dist.load,load_dist.x,Fr,rear_spar_x);
-load_dist.load = add_point_load(load_dist.load,load_dist.x,Ft,x_ac_h);
+sym_flight.x = load_dist.x;
+sym_flight.load = load_dist.load + dist_from_point(load_dist.x,Ff,front_spar_x) + dist_from_point(load_dist.x,Fr,rear_spar_x) + dist_from_point(load_dist.x,Ft,x_ac_h);
+sym_flight.Fi = load_dist.Fi;
+sym_flight.Fi_cg = load_dist.Fi_cg;
+sym_flight.shear = shear_force(Ff,Fr,Ft);
+sym_flight.bending_moment = bending_moment(Ff,Fr,Ft);
+sym_flight.shear_fit = fit(sym_flight.x,sym_flight.shear,'linearinterp');
+sym_flight.bending_moment_fit = fit(sym_flight.x,sym_flight.bending_moment,'linearinterp');
 
-%%Sectional Loading
+fuselage_load_plots(sym_flight);
 
-figure
-hold on
 
-plot(load_dist.x,load_dist.load)
+fuselageLoading.sym_flight = sym_flight;
 
-xlabel('X coordinate from Tip (m)')
-ylabel('Sectional Loading (N/m)')
-grid on
-grid minor
+%%SOLVE FOR FRONT OFF CASE -> NO AERO LOADS 
+% constants for offset
+x_gear = 4.6941;
+a = x_gear - front_spar_x;
+b = x_gear - rear_spar_x;
 
-%%Shear force
+Ff_frontoff = @(Fuc) Fuc*(1-(a/(b-a)));
+Fr_frontoff = @(Fuc) Fuc*(a/(b-a));
 
-discretized_shear_force = shear_force(Ff,Fr,Ft);
+F = @(x) [force_eq(Ff_frontoff(x(1)),Fr_frontoff(x(1)),x(2));moment_eq(Ff_frontoff(x(1)),Fr_frontoff(x(1)),x(2))];
 
-figure
-hold on
+res = fsolve(@(x) F(x),[0 0]);
+Fuc = res(1);
+Ft = res(2);
+Ff = Ff_frontoff(Fuc);
+Fr = Fr_frontoff(Fuc);
 
-plot(load_dist.x,discretized_shear_force)
+front_off.x = load_dist.x;
+front_off.load = load_dist.load + dist_from_point(load_dist.x,Ff,front_spar_x) + dist_from_point(load_dist.x,Fr,rear_spar_x) + dist_from_point(load_dist.x,Ft,x_ac_h);
+front_off.Fi = load_dist.Fi;
+front_off.Fi_cg = load_dist.Fi_cg;
+front_off.shear = shear_force(Ff,Fr,Ft);
+front_off.bending_moment = bending_moment(Ff,Fr,Ft);
+front_off.shear_fit = fit(front_off.x,front_off.shear,'linearinterp');
+front_off.bending_moment_fit = fit(front_off.x,front_off.bending_moment,'linearinterp');
 
-xlabel('X coordinate from Tip (m)')
-ylabel('Shear Force (N)')
-grid on
-grid minor
+fuselage_load_plots(front_off);
 
-%%Bending Moment
+fuselageLoading.front_off = front_off;
 
-discretized_bending_moment = bending_moment(Ff,Fr,Ft);
 
-figure
-hold on
-
-plot(load_dist.x,discretized_bending_moment)
-
-xlabel('X coordinate from Tip (m)')
-ylabel('Bending Moment (Nm)')
-grid on
-grid minor
+save('fuselageLoading.mat','fuselageLoading');
