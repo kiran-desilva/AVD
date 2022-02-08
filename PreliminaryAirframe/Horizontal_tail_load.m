@@ -13,6 +13,7 @@ Sref_w = 10.32;
 X_cg = 14.94 * 0.3048; %ft to m ref point nose
 X_acHtail = 10.3474; 
 X_acWing = 4.3620; 
+WH = 17.5 * 0.453592 * 9.81; %horizontal tail weight
 ULF = 3.75; % ultimate load factor
 W0 = 3128.2 * 9.81; %takeoff weight
 Lwing = ULF * W0;
@@ -32,7 +33,36 @@ TailLoad = @(y) L_Htail * rho * U * gamma(y) / TailLoadintegral; %unit overall t
 figure
 plot(y, TailLoad(y))
 xlabel("y (m)", 'interpreter', 'Latex')
-ylabel("Load (N)", 'interpreter', 'Latex')
+ylabel("Horizontal Tail Load (N)", 'interpreter', 'Latex')
+grid on
+
+R = WH - L_Htail; %vertical reaction from vertical stab
+TailMoments = @(y) TailLoad(y) .* y;
+
+[shearforce, bendingmoment] = ShearBending(y,s_h,R,TailLoad,TailMoments,WH);
+
+figure
+plot(y, shearforce)
+xlabel("y (m)", 'interpreter', 'Latex')
+ylabel("Horizontal Tail Shear Force (N)", 'interpreter', 'Latex')
+grid on
+
+figure
+plot(y, bendingmoment)
+xlabel("y (m)", 'interpreter', 'Latex')
+ylabel("Horizontal Tail Bending Moments (Nm)", 'interpreter', 'Latex')
 grid on
 
 
+function [ShearforceH,BendingmomentH] = ShearBending(y,s_h,R,TailLoad,TailMoments,WH)
+    for i = 1:length(y)
+        Y = linspace(-s_h/2, y(i), 1000);
+        if y(i) > 0 
+             ShearforceH(i) = -(R - WH +  trapz(Y, TailLoad(Y))); 
+             BendingmomentH(i) = -((-R + WH)*y(i) +  trapz(Y, TailMoments(Y)));
+        else
+            ShearforceH(i) = -(trapz(Y, TailLoad(Y))); 
+            BendingmomentH(i) = -(trapz(Y, TailMoments(Y)));
+        end
+    end
+end
