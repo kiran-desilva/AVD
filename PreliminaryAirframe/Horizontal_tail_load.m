@@ -12,15 +12,15 @@ Sref_w = 10.32;
 
 X_cg = 14.94 * 0.3048; %ft to m ref point nose
 X_acHtail = 10.3474; 
-X_acWing = 4.3620
-ULF = ? % ultimate load factor
+X_acWing = 4.3620; 
+ULF = 3.75; % ultimate load factor
 W0 = 3128.2 * 9.81; %takeoff weight
 Lwing = ULF * W0;
-Vdive = ?;
+Vdive = 137.25;
 Cm0 = -0.0266;
 M0w = 0.5 * rho * Vdive^2 * Sref_w * Cm0;
 
-L_Htail = (Lwing * (X_cg - XacWing) + M0w) / (X_acHtail - X_cg); 
+L_Htail = (Lwing * (X_cg - X_acWing) + M0w) / (X_acHtail - X_cg); 
 
 y = linspace(-s_h/2,s_h/2,100);
 gamma0 = (8 * s_h * 1) / (pi * AR_h * rho * U * Sref_h); %L = 1
