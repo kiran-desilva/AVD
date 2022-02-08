@@ -37,32 +37,37 @@ ylabel("Horizontal Tail Load (N)", 'interpreter', 'Latex')
 grid on
 
 R = WH - L_Htail; %vertical reaction from vertical stab
-TailMoments = @(y) TailLoad(y) * y;
 
-
+[shearforce, bendingmoment] = ShearBending(y,s_h,R,TailLoad,TailMoments,WH);
 
 figure
-plot(y, ShearForce(y,s_h,R,TailLoad,TailMoments,WH))
+plot(y, shearforce)
 xlabel("y (m)", 'interpreter', 'Latex')
 ylabel("Horizontal Tail Shear Force (N)", 'interpreter', 'Latex')
 grid on
 
 figure
-plot(y, ShearForce(y,s_h,R,TailLoad,TailMoments,WH))
+plot(y, bendingmoment)
 xlabel("y (m)", 'interpreter', 'Latex')
-ylabel("Horizontal Tail Shear Force (N)", 'interpreter', 'Latex')
+ylabel("Horizontal Tail Bending Moments (Nm)", 'interpreter', 'Latex')
 grid on
 
 
 function [ShearforceH,BendingmomentH] = ShearBending(y,s_h,R,TailLoad,TailMoments,WH)
     for i = 1:length(y)
         Y = linspace(-s_h/2, y(i), 1000);
+        Moments = TailMoments(Y, (y(i) - y));
         if y(i) > 0 
              ShearforceH(i) = -(R - WH +  trapz(Y, TailLoad(Y))); 
-             BendingmomentH(i) = -((-R + WH)*y(i) +  trapz(Y, TailMoments(Y)));
+             BendingmomentH(i) = -((-R + WH)*y(i) +  trapz(Y, Moments(Y)));
         else
             ShearforceH(i) = -(trapz(Y, TailLoad(Y))); 
-            BendingmomentH(i) = -(trapz(Y, TailMoments(Y)));
+            BendingmomentH(i) = -(trapz(Y, Moments(Y)));
         end
     end
+     
+end
+
+function [TailMoments] = TailMoments(y, momentarms)
+    TailMoments = TailLoad(y) .* momentarms;
 end
