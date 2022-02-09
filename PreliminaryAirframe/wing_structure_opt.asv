@@ -8,6 +8,8 @@
 % URL: https://www.sciencedirect.com/science/article/pii/S1270963809001072?via%3Dihub
 %% Inputs, to initialise the script
 
+% take initial value of t_s and b_s from data available for other aircraft
+% (to initalise)
 t_s=0.1; % thickness of the skin [inches]
 b_s=5; %panel width/ stringer pitch [inches]
 A_sk=t_s*b_s; %area of skin [inches^2]
@@ -44,8 +46,34 @@ elseif equal_flang==2
     b_w=sqrt((b_e/t_s)*((A_st-2*b_a*t_a)/1.327));  
 end
         
-
 t_w=b_w*(t_s/b_e);
 b_f=0.327*b_w;
 t_f=t_w;
 
+%mass_1=(A_sk*rho_sk+A_st*rho_st)
+
+%% Material properties of stringer
+E_st=1000;  % elastic modulus of stringer
+%sigma_cy_st=100;    % allowable compression yield stress, stringer
+m_st=1; % material characteristic index, stringer
+
+%% Material properties of skin
+E_sk=1000;  % elastic modulus of skin
+sigma_cy_sk=100;    % allowable compression yield stress, skin
+m_sk=1; % material characteristic index, skin
+
+%% Design optimisation
+%   column buckling load of skin-stringer panel;
+%   compression load intensity
+%       - compression in skin
+%       - compression in stringer outstanding flange
+
+N=[1,1,1,1,1]; % axial load intensity [lbs/in)
+L=[1,1,1,1,1]; % panel length [inches]
+n=length(L); % number of panels/ segments
+sigma_e_panel=(N./(t_s*(1+SR)))*(b_s/b_e);  %effective stress in the skin-stringer panel
+
+%% Buckling
+% Only last panel has a free edge
+for i=1:n-1
+    sigmaa_ccn=1.1819*sigma_cy_skin*(b_n
