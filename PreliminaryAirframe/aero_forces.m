@@ -132,12 +132,12 @@ cruise.ratio_cl=cruise.cl_req/cruise.cl_total_dim; %scaling factor
 %% mutliply lift coefficient distribution by necessary factor
 
 cruise.cl_scaled=cruise.cl*cruise.ratio_cl;
-p1=polyfit(cruise.y_le,cruise.cl_scaled,20);
+fit.poly_cl=polyfit(cruise.y_le,cruise.cl_scaled,20);
 
 x = linspace(min(cruise.y_le), max(cruise.y_le), 1000);
 figure;
 hold on
-plot(x, polyval(p1, x))
+plot(x, polyval(fit.poly_cl, x))
 plot(cruise.y_le, cruise.cl_scaled)
 hold off
 % test=[0:0.001:3.63]
