@@ -20,7 +20,7 @@ load sizing.mat
 
 %% CRUISE
 
-a=importfile("C:\Users\izzye\OneDrive\Documents\GitHub\AVD\PreliminaryAirframe\AVL Data Files\AVD_AVL_CRUISE_normal_dist.dat", [21, 84]);
+a=importfile("C:\Users\izzye\OneDrive\Documents\GitHub\AVD\PreliminaryAirframe\AVL Data Files\AVL_10th_feb.dat", [21, 84]);
 
 
 % Parameters from AVL

@@ -24,7 +24,7 @@ ANGLE
 #-------------------------------------------------------------
 SECTION
 #Xle    Yle    Zle     Chord   	    Ainc  Nspanwise  Sspace
-0.0     0.0    0.0     1.767      0.0   0          0
+0.0     0.0    0.0     2.161      0.0   0          0
 AFILE
 C:\Users\izzye\Downloads\NACA-65412.dat
 #CDCL
@@ -32,7 +32,7 @@ C:\Users\izzye\Downloads\NACA-65412.dat
 #-------------------------------------------------------------
 SECTION
 #Xle    Yle    	 Zle    Chord        Ainc  Nspanwise  Sspace
-1.441   3.63    0.0    0.533     0.0   0          0
+1.7743   4.47    0.0    0.533     0.0   0          0
 AFILE
 C:\Users\izzye\Downloads\NACA-65412.dat
 #CDCL
