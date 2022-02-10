@@ -119,11 +119,13 @@ axis equal
 ctip = 0.4083;
 croot = 0.8166;
 ytip = 2.3887/2; 
-c_H = @(y) ((ctip - croot)/ytip) * (abs(y) - ytip) - ctip; 
+c_H = @(y) ((ctip - croot)/ytip) * (abs(y) - ytip) + ctip; 
 
 HTorsion = Torsion(y, c_H, TailLoad, xbar, WH); 
 plot(y, HTorsion)
-
+xlabel("y (m)", 'interpreter', 'Latex')
+ylabel("Horizontal Tail Torsion (Nm)", 'interpreter', 'Latex')
+grid on
 
 function [Torsion] = Torsion(y, c_H, TailLoad, xbar, WH)
     CoF = (0.68-0.15) .* c_H(y) / 2 + 0.15 .* c_H(y);
