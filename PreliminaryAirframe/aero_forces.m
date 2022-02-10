@@ -132,7 +132,7 @@ cruise.ratio_cl=cruise.cl_req/cruise.cl_total_dim; %scaling factor
 %% mutliply lift coefficient distribution by necessary factor
 
 cruise.cl_scaled=cruise.cl*cruise.ratio_cl;
-p1=polyfit(cruise.y_le,cruise.cl_scaled,64);
+% p1=polyfit(cruise.y_le,cruise.cl_scaled,63);
 
 % test=[0:0.001:3.63]
 % %plot(cruise.y_le,cruise.lift_no_dynamic_p)
