@@ -2,8 +2,10 @@ clear
 clc
 load('voldist.mat')
 
+%Constants
 lbs_to_n = 4.4482216153;
 ft_to_m = 0.3048;
+ulf = 1.5*2.5;
 
 %%Weights and CG from Report UNITS IN LBS AND FT
 
@@ -149,6 +151,7 @@ fuel_cg(2) = -2.75*ft_to_m;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+
 %%Fuselage Weight Distribution%%
 fuselage_total_weight = 723.9*lbs_to_n;
 
@@ -160,103 +163,129 @@ offset = min(fsolve(@(x) voldist.fit(x), min(voldist.range)));
 fuse_unit_dist = @(x) (voldist.fit(x+offset)./max(voldist.totalvol));
 fuse_weight_dist = @(x) fuse_unit_dist(x) * fuselage_total_weight;
 
-%%WING SPAR CONSTANTS%% -> assuming chord at root - this needs to be changed later
-x_wing = 3.3156;
-croot = 1.7674;
+%%MAIN WING%% -> assuming chord at root - this needs to be changed later
+wing.weight = 189.6*lbs_to_n;
+wing.cg = 15.32*ft_to_m;
+wing.x = 3.3156;
+wing.croot = 1.7674;
+x_ac_w = 4.3620;
 
 front_spar_c = 0.1;
-rear_spar_c = .77;
+rear_spar_c = 0.77;
 
-front_spar_x = x_wing + front_spar_c*croot;
-rear_spar_x = x_wing + rear_spar_c*croot;
+front_spar_x = wing.x + front_spar_c*wing.croot;
+rear_spar_x = wing.x + rear_spar_c*wing.croot;
 
 
 %%Horizontal Tailplane CONSTANTS%%
 x_ac_h = 10.3474;
 
+%%MAIN LANDING GEAR%%
+mlg.weight = 160*lbs_to_n;
+mlg.cg= 5.16305;
+
 %LOAD DISTRIBUTION%
 
-
-%!!!! POSITIVE DIRECTION DOWNWARDS!!!!
-
 %%Calculating sectional loading of fuselage 
-load_dist.x =  linspace(0,11.73,10000)';
+load_dist.x =  linspace(0,11.73,1000)';
+load_dist.spacing = abs(load_dist.x(2)-load_dist.x(1));
 load_dist.load = zeros(size(load_dist.x));
-%add fuselage distributed load
-load_dist.load = load_dist.load + (fuse_weight_dist(load_dist.x)); 
+
+%%load distribution for Fuselage Only%%
+
+%add fuselage distributed load modelled as a distributuion of point loads i.e multiplied by discretization
+load_dist.load = load_dist.load + (fuse_weight_dist(load_dist.x) * load_dist.spacing); 
 %add aux fuel tank load
 load_dist.load = add_point_load(load_dist.load,load_dist.x,aux_fuel_weight,fuel_cg(1));
 %add component weights
 for i=1:length(component.weight)
-    load_dist.load = add_point_load(load_dist.load,load_dist.x,component.weight(i),component.cg(i,1)); % gravity is down
+    load_dist.load = add_point_load(load_dist.load,load_dist.x,component.weight(i),component.cg(i,1)); 
 end
 
-[load_dist.Fi,load_dist.Fi_cg] = point_load_from_dist(load_dist.x,load_dist.load);
+%intertial weight acts downards so make load negative
+load_dist.load = -load_dist.load;
 
-%CALCULATE TAIL LOAD
+[load_dist.Fi,load_dist.Fi_cg] = point_load_from_dist(load_dist.x,load_dist.load); % calculate the effective total load and cg of the distributed load
+%%%%%%%%%%%
 
-%force equilbrium
-force_eq = @(Ff,Fr,Ft) sum(load_dist.load) - Ff - Fr - Ft;
-%define ccw as positive
-%moments taken from ac datum i.e the nose
-moment_eq = @(Ff,Fr,Ft) (-sum((load_dist.load).*(load_dist.x))) + (Ff*front_spar_x) + (Fr*rear_spar_x) + (Ft*x_ac_h);
+%functors for force and moment distributions 
+sectional_load = @(Ff,Fr,Ft) load_dist.load + dist_from_point(load_dist.x,Ff,front_spar_x) + dist_from_point(load_dist.x,Fr,rear_spar_x) + dist_from_point(load_dist.x,Ft,x_ac_h);
+%shear force is simply addtion of the point load distribution
+shear_force = @(s_load) cumsum(s_load);
+bending_moment = @(x_dist,s_force) cumtrapz(x_dist,s_force);
 
-shear_force = @(Ff,Fr,Ft) cumsum(load_dist.load + dist_from_point(load_dist.x,-Ff,front_spar_x) + dist_from_point(load_dist.x,-Fr,rear_spar_x) + dist_from_point(load_dist.x,-Ft,x_ac_h));
+%find required tail force for trim by taking global equilbrium of aircraft
+%add wing weight, fuel in wing,main landing gear note the negative signs as wieght acts downwards
+load_dist.global.load = load_dist.load + dist_from_point(load_dist.x,-wing.weight,wing.cg) + dist_from_point(load_dist.x,-wing_fuel_weight,fuel_cg(1)) + dist_from_point(load_dist.x,-mlg.weight,mlg.cg);
+[load_dist.global.Fi,load_dist.global.Fi_cg] = point_load_from_dist(load_dist.x,load_dist.global.load);
 
-bending_moment = @(Ff,Fr,Ft) cumtrapz(load_dist.x,shear_force(Ff,Fr,Ft));
+%force eq
+% Lw + Lt + gFi = 0
+%moment eq
+% x_ac_w*Lw + x_ac_h*Lt + gFi_cg * gFi = 0
+res = [1 1;x_ac_w x_ac_h]\[-load_dist.global.Fi;-load_dist.global.Fi*load_dist.global.Fi_cg];
+sym_flight.Lw = res(1); % wing lift force
+sym_flight.Lt = res(2); %tail lift force
 
-%enforce BC at end of bending moment distribution
-index_at = @(expr,idx) expr(idx);
+%calculating local equilbirum considering only the fuselage loads now
+%force eq
+%Ff + Fr + Lt + Fi = 0
+%moment eq
+%f_x * Ff + r_x * Fr + x_ac_h*Lt + Fi_cg * cg = 0
+res = [1 1;front_spar_x rear_spar_x]\[-load_dist.Fi-sym_flight.Lt;(-load_dist.Fi*load_dist.Fi_cg) + (-sym_flight.Lt * x_ac_h)];
+sym_flight.Ff = res(1);
+sym_flight.Fr = res(2);
 
-F = @(x) [force_eq(x(1),x(2),x(3)); moment_eq(x(1),x(2),x(3)); index_at(bending_moment(x(1),x(2),x(3)),end)]
 
-res = fsolve(@(x) F(x),[0 0 0]);
-Ff = res(1);
-Fr = res(2);
-Ft = res(3);
+% %calculating local equilbirum considering only the fuselage loads now
+% %force eq
+% %Ff + Fr + Lt + Fi = 0
+% %moment eq
+% %f_x * Ff + r_x * Fr + x_ac_h*Lt + Fi_cg * cg = 0
+% res = [1 1;front_spar_x rear_spar_x]\[-load_dist.Fi-sym_flight.Lt;(-load_dist.Fi*load_dist.Fi_cg) + (-sym_flight.Lt * x_ac_h)];
+% sym_flight.Ff = res(1);
+% sym_flight.Fr = res(2);
 
 
 sym_flight.x = load_dist.x;
-sym_flight.load = load_dist.load + dist_from_point(load_dist.x,Ff,front_spar_x) + dist_from_point(load_dist.x,Fr,rear_spar_x) + dist_from_point(load_dist.x,Ft,x_ac_h);
+sym_flight.load = sectional_load(sym_flight.Ff,sym_flight.Fr,sym_flight.Lt);
 sym_flight.Fi = load_dist.Fi;
 sym_flight.Fi_cg = load_dist.Fi_cg;
-sym_flight.shear = shear_force(Ff,Fr,Ft);
-sym_flight.bending_moment = bending_moment(Ff,Fr,Ft);
+sym_flight.shear = shear_force(sym_flight.load);
+sym_flight.bending_moment = bending_moment(sym_flight.x,sym_flight.shear);
 sym_flight.shear_fit = fit(sym_flight.x,sym_flight.shear,'linearinterp');
 sym_flight.bending_moment_fit = fit(sym_flight.x,sym_flight.bending_moment,'linearinterp');
+
 
 fuselage_load_plots(sym_flight);
 
 
 fuselageLoading.sym_flight = sym_flight;
 
-%%SOLVE FOR FRONT OFF CASE -> NO AERO LOADS 
-% constants for offset
-x_gear = 4.6941;
-a = x_gear - front_spar_x;
-b = x_gear - rear_spar_x;
+%SOLVE FOR FRONT OFF CASE -> NO AERO LOADS 
 
-Ff_frontoff = @(Fuc) Fuc*(1-(a/(b-a)));
-Fr_frontoff = @(Fuc) Fuc*(a/(b-a));
+%find required tail force for trim by taking global equilbrium of aircraft
+res = [1 1;mlg.cg x_ac_h]\[-load_dist.global.Fi;-load_dist.global.Fi*load_dist.global.Fi_cg];
+front_off.Fuc = res(1); % main landing gear force
+front_off.Lt = res(2); %tail lift force
 
-F = @(x) [force_eq(Ff_frontoff(x(1)),Fr_frontoff(x(1)),x(2));moment_eq(Ff_frontoff(x(1)),Fr_frontoff(x(1)),x(2))];
-
-res = fsolve(@(x) F(x),[0 0]);
-Fuc = res(1);
-Ft = res(2);
-Ff = Ff_frontoff(Fuc);
-Fr = Fr_frontoff(Fuc);
+%calculating local equilbirum considering only the fuselage loads now
+res = [1 1;front_spar_x rear_spar_x]\[-load_dist.Fi-front_off.Lt;(-load_dist.Fi*load_dist.Fi_cg) + (-front_off.Lt * x_ac_h)];
+front_off.Ff = res(1);
+front_off.Fr = res(2);
 
 front_off.x = load_dist.x;
-front_off.load = load_dist.load + dist_from_point(load_dist.x,Ff,front_spar_x) + dist_from_point(load_dist.x,Fr,rear_spar_x) + dist_from_point(load_dist.x,Ft,x_ac_h);
+front_off.load = sectional_load(front_off.Ff,front_off.Fr,front_off.Lt);
 front_off.Fi = load_dist.Fi;
 front_off.Fi_cg = load_dist.Fi_cg;
-front_off.shear = shear_force(Ff,Fr,Ft);
-front_off.bending_moment = bending_moment(Ff,Fr,Ft);
+front_off.shear = shear_force(front_off.load);
+front_off.bending_moment = bending_moment(front_off.x,front_off.shear);
 front_off.shear_fit = fit(front_off.x,front_off.shear,'linearinterp');
 front_off.bending_moment_fit = fit(front_off.x,front_off.bending_moment,'linearinterp');
 
+
 fuselage_load_plots(front_off);
+
 
 fuselageLoading.front_off = front_off;
 
