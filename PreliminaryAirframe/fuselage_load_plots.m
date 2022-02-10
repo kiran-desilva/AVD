@@ -4,6 +4,8 @@ function [figlist] = fuselage_load_plots(loadcase)
     %%Sectional Loading
 
     figlist(1) = figure;
+
+    subplot(3,1,1)
     hold on
 
     plot(loadcase.x,loadcase.load)
@@ -16,7 +18,8 @@ function [figlist] = fuselage_load_plots(loadcase)
 
     %%Shear force
 
-    figlist(2) = figure;
+    % figlist(2) = figure;
+    subplot(3,1,2)
     hold on
 
     plot(loadcase.x,loadcase.shear)
@@ -28,7 +31,8 @@ function [figlist] = fuselage_load_plots(loadcase)
 
     %%Bending Moment
     
-    figlist(3) = figure;
+    % figlist(3) = figure;
+    subplot(3,1,3)
     hold on
 
     plot(loadcase.x,loadcase.bending_moment)
