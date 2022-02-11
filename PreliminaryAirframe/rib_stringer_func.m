@@ -22,6 +22,7 @@
 %%		All in metric
 %%
 %%		-	Young's modulus (E when a variable)
+%%		- 	Poissons ratio
 %%
 %% 				Design Parameters
 %%--------------------------------------------------------------
@@ -61,6 +62,23 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		eff_thickness = panel_thickness + stringer.cross_sec_area/design_params.stringer_pitch; 
 		number_of_panels = ...;
 		panel_eff_area = eff_thickness*design_params.stringer_pitch*number_of_panels;
+
+		%% Catchpole diagram calculations
+		t_s_over_t = design_params.stringer_thickness/panel_thickness;
+		h_over_b = design_params.stringer_web_height/design_params.stringer_pitch;
+		K_catchpole = catchpole_calculator(h_over_b, t_s_over_t, material.poisson_r);
+		sigma_cr = K_catchpole/K*sigma_0;
+
+
+		%% FARRAR efficiency factor
+		A_s_over_bt = stringer.cross_sec_area/(design_params.stringer_pitch*panel_thickness);)
+		F = farrar_calculator(A_s_over_bt, t_s_over_t);
+		rib_spacing = comp_load_per_length*material.E*(F/sigma_cr)^2;
+
+		%% Draw a rib
+
+		spanwise_station = spanwise_station + rib_spacing;
+		
 
 	end
 end
