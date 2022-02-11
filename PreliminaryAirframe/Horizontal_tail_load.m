@@ -121,15 +121,24 @@ croot = 0.8166;
 ytip = 2.3887/2; 
 c_H = @(y) ((ctip - croot)/ytip) * (abs(y) - ytip) + ctip; 
 
-HTorsion = Torsion(y, c_H, TailLoad, xbar, WH); 
-plot(y, HTorsion)
+HTorsiondist = Torsion(y, c_H, TailLoad, xbar, WH);
+figure
+plot(y, HTorsiondist)
 xlabel("y (m)", 'interpreter', 'Latex')
-ylabel("Horizontal Tail Torsion (Nm)", 'interpreter', 'Latex')
+ylabel("Horizontal Tail Torque distribution (Nm)", 'interpreter', 'Latex')
+grid on
+
+Torque = sum(HTorsiondist) - cumsum(HTorsiondist) + HTorsiondist; 
+
+figure
+plot(y, Torque)
+xlabel("y (m)", 'interpreter', 'Latex')
+ylabel("Horizontal Tail Torque (Nm)", 'interpreter', 'Latex')
 grid on
 
 function [Torsion] = Torsion(y, c_H, TailLoad, xbar, WH)
-    CoF = (0.68-0.15) .* c_H(y) / 2 + 0.15 .* c_H(y);
-    Torsion = TailLoad(y) .* (CoF - c_H(y)/4) + WH * (xbar - CoF); 
+    CoF = (0.68-0.15) .* c_H(y) / 2 + 0.15 .* c_H(y); %center of flexure midway between spars
+    Torsion = TailLoad(y) .* (CoF - c_H(y)/4) + WH * (xbar - CoF); %no M0, ac at c/4 for each section
 end
 
 function [ShearforceH] = ShearBending(y,s_h,R,TailLoad,WH)
