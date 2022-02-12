@@ -44,20 +44,28 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 	spanwise_station = 0; % Start at root
 	total_volume = 0;
 
-	if doPlot
-		x_leading_edge = @(y) -tand(geometry.sweep_deg)*y + geometry.c(0)/2;
-		x_trailing_edge = @(y) x_leading_edge(y) - geometry.c(y);
+	x_leading_edge = @(y) -tand(geometry.sweep_deg)*y + geometry.c(0)/2;
+	x_trailing_edge = @(y) x_leading_edge(y) - geometry.c(y);
+	x_at_some_percent_chord = @(y, percent_chord) x_leading_edge(y) - geometry.c(y)*percent_chord;
+	x_front_spar = @(y) x_at_some_percent_chord(y, geometry.spar.front_x_c);
+	x_rear_spar = @(y) x_at_some_percent_chord(y, geometry.spar.rear_x_c);
 
+	if doPlot
 		y_space = linspace(0, geometry.semispan, 1000);
 		figure;
 		hold on;
 		plot([0, 0], [x_leading_edge(0), x_trailing_edge(0)], 'k');
 		plot([geometry.semispan, geometry.semispan], [x_leading_edge(geometry.semispan), x_trailing_edge(geometry.semispan)], 'k');
+
 		plot(y_space, x_leading_edge(y_space), 'k')
 		plot(y_space, x_trailing_edge(y_space), 'k')
+
+		% Plot front and rear spar
+		plot(y_space, x_front_spar(y_space), 'k')
+		plot(y_space, x_rear_spar(y_space), 'k')
+
 		grid on;
 		axis equal;
-		hold off;
 	end
 	%% TODO: Start sketching the wing
 
@@ -95,7 +103,12 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		%% Draw a rib
 
 		spanwise_station = spanwise_station + rib_spacing;
+		plot([spanwise_station, spanwise_station], [x_leading_edge(spanwise_station), x_trailing_edge(spanwise_station)], 'r');
 		
 
+	end
+
+	if doPlot
+		hold off;
 	end
 end
