@@ -68,10 +68,10 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
     intercepts = min([fsolve(@(x) x_front_spar(x) - placed_stringer_func(x), zeros(starting_no_of_stringers, 1)),...
         fsolve(@(x) x_rear_spar(x) - placed_stringer_func(x), zeros(starting_no_of_stringers, 1))], [], 2);
 
-	intercept_pt = @(stringer_idx) [intercepts(stringer_idx); stringer_func(intercepts(stringer_idx), stringer_x_space(stringer_idx))];
-	stringer_length_till_y = @(y, stringer_idx) norm(stringer_func(y, stringer_x_space(stringer_idx))...
-                                                - [0; stringer_func(0, stringer_x_space(stringer_idx))]);
-    percentage_of_stringer_at_y = @(y, stringer_idx) stringer_length_till_y(y, stringer_idx)/stringer_length_till_y(intercepts(stringer_idx), stringer_idx);
+	%intercept_pt = @(stringer_idx) [intercepts(stringer_idx); stringer_func(intercepts(stringer_idx), stringer_x_space(stringer_idx))];
+	stringer_length_till_y = @(y, stringer_idx) vecnorm([y.*ones(size(stringer_idx)); stringer_func(y, stringer_x_space(stringer_idx))]...
+                                                - [zeros(size(stringer_idx)); stringer_func(0, stringer_x_space(stringer_idx))]);
+    percentage_of_stringer_at_y = @(y, stringer_idx) stringer_length_till_y(y, stringer_idx)./stringer_length_till_y(intercepts(stringer_idx)', stringer_idx);
 
 	if doPlot
 		y_space = linspace(0, geometry.semispan, 1000);
@@ -87,14 +87,6 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		plot(y_space, x_front_spar(y_space), 'k')
 		plot(y_space, x_rear_spar(y_space), 'k')
 
-		stringer_x_data = repmat(y_space, starting_no_of_stringers, 1)';
-		stringer_y_data = stringer_func(y_space, stringer_x_space')';
-
-		valid_indices = stringer_x_data < intercepts';
-        stringer_x_data(~valid_indices) = NaN;
-        stringer_y_data(~valid_indices) = NaN;
-		plot(stringer_x_data, stringer_y_data, 'g');
-
 		grid on;
 		axis equal;
 	end
@@ -107,7 +99,7 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		web_height = geometry.web_height_func(spanwise_station);
 
 		stringer.flange_width = design_params.stringer_web_height*design_params.flange_to_web_ratio;
-		stringer.cross_sec_area = NaN; % TODO: As appropriate for the selected stringer type
+		stringer.cross_sec_area = design_params.stringer_thickness*design_params.stringer_web_height + 2*stringer.flange_width*design_params.stringer_thickness; % TODO: As appropriate for the selected stringer type
 
 		K = 0.9*4; % From buckling of SS plate plot, taken for a/b -> infinity
 		comp_load_per_length = bending_moment/(box_width*web_height);
@@ -116,7 +108,7 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		% for stringers using catchpole diagram
 
 		eff_thickness = panel_thickness + stringer.cross_sec_area/design_params.stringer_pitch; 
-		number_of_panels = NaN;
+		number_of_panels = num_stringers + 1;
 		panel_eff_area = eff_thickness*design_params.stringer_pitch*number_of_panels;
 
 		%% Catchpole diagram calculations
@@ -132,14 +124,27 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		rib_spacing = comp_load_per_length*material.E*(F/sigma_cr)^2;
 
 		%% Draw a rib
-
 		spanwise_station = spanwise_station + rib_spacing;
+        if spanwise_station > geometry.semispan
+            break;
+        end
 		plot([spanwise_station, spanwise_station], [x_leading_edge(spanwise_station), x_trailing_edge(spanwise_station)], 'r');
-		
 
+		stringers_to_cut = percentage_of_stringer_at_y(spanwise_station, 1:starting_no_of_stringers)' > 0.9...
+							& intercepts > spanwise_station;
+		
+		intercepts(stringers_to_cut) = spanwise_station;
+		num_stringers = num_stringers - sum(stringers_to_cut, 'all');
 	end
 
 	if doPlot
+		stringer_x_data = repmat(y_space, starting_no_of_stringers, 1)';
+		stringer_y_data = stringer_func(y_space, stringer_x_space')';
+
+		valid_indices = stringer_x_data < intercepts';
+        stringer_x_data(~valid_indices) = NaN;
+        stringer_y_data(~valid_indices) = NaN;
+		plot(stringer_x_data, stringer_y_data, 'g');
 		hold off;
 	end
 end

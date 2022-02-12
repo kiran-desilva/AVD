@@ -1,6 +1,6 @@
 clear
 clc
-%close all
+close all
 
 airfoilcoords.top = [1.00000     0.00000;
 0.95033     0.00986;
