@@ -6,7 +6,7 @@
 %	cl_dist					-	array representing discretised sectional lift coefficient distribution
 %	spanwise_disc			-	array with spanwise points at which cl is sampled
 %								THIS HAS TO BE UNIFORMLY SPACED!!!
-function [shear_dist, bm_dist, torque_dist] = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, spanwise_disc, cm0, isLanding, doPlot, loadingCaseStr)
+function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, spanwise_disc, cm0, isLanding, doPlot, loadingCaseStr)
 	load('loadcase.mat')
 
 	% n = 1;
@@ -183,6 +183,11 @@ function [shear_dist, bm_dist, torque_dist] = wing_load(n, Vinf_eas, wing_fuel_w
     %lift.pitching_moment_load = 0;
 	torsional_dist = double(uc.torsional_load(spanwise_disc) + wing.torsional_load + lift.pitching_moment_load + lift.torsional_load); 
 	torque_dist = sum(torsional_dist) - cumsum(torsional_dist) + torsional_dist;
+
+	distributions.points = spanwise_disc;
+	distributions.bm = bm_dist;
+	distributions.torque = torque_dist;
+	distributions.shear = shear_dist;
 
 	if doPlot
 		figure;
