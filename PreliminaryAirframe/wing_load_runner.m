@@ -16,7 +16,7 @@ tmp = loadcase{1};
 A1 = wing_load(1.5, tmp.v, 100, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, false, true, "Load Case 1: ");
 
 tmp = loadcase{2};
-A2 = wing_load(1.5, tmp.v, 100, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, false, true, "Load Case 2: ");
+A2 = wing_load(1.5, tmp.v, 100, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{2}.cm, false, true, "Load Case 2: ");
 
 A3 = wing_load(1.5, tmp.v, 100, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, true, true, "Landing: ");
 
