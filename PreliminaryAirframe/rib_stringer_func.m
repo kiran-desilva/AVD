@@ -40,18 +40,35 @@
 %%		  this value is proportional to weight and thus
 %%		  should be minimised
 
-function total_volume = rib_stringer_func(geometry, material, design_params, bending_moment_dist)
+function total_volume = rib_stringer_func(geometry, material, design_params, bending_moment_dist, doPlot)
 	spanwise_station = 0; % Start at root
 	total_volume = 0;
 
-	while spawise_station < geometry.semispan
-		bending_moment = double(bending_moment_dist(spanwise_station));
+	if doPlot
+		x_leading_edge = @(y) -tand(geometry.sweep_deg)*y + geometry.c(0)/2;
+		x_trailing_edge = @(y) x_leading_edge(y) - geometry.c(y);
+
+		y_space = linspace(0, geometry.semispan, 1000);
+		figure;
+		hold on;
+		plot([0, 0], [x_leading_edge(0), x_trailing_edge(0)], 'k');
+		plot([geometry.semispan, geometry.semispan], [x_leading_edge(geometry.semispan), x_trailing_edge(geometry.semispan)], 'k');
+		plot(y_space, x_leading_edge(y_space), 'k')
+		plot(y_space, x_trailing_edge(y_space), 'k')
+		grid on;
+		axis equal;
+		hold off;
+	end
+	%% TODO: Start sketching the wing
+
+	while spanwise_station < geometry.semispan
+		bending_moment = double(ppval(bending_moment_dist, spanwise_station));
 
 		box_width = double(geometry.box_width_func(spanwise_station));
 		web_height = double(geometry.web_height_func(spanwise_station));
 
 		stringer.flange_width = design_params.stringer_web_height*design_params.flange_to_web_ratio;
-		stringer.cross_sec_area = ...; % TODO: As appropriate for the selected stringer type
+		stringer.cross_sec_area = NaN; % TODO: As appropriate for the selected stringer type
 
 		K = 0.9*4; % From buckling of SS plate plot, taken for a/b -> infinity
 		comp_load_per_length = bending_moment/(box_width*web_height);
@@ -60,7 +77,7 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		% for stringers using catchpole diagram
 
 		eff_thickness = panel_thickness + stringer.cross_sec_area/design_params.stringer_pitch; 
-		number_of_panels = ...;
+		number_of_panels = NaN;
 		panel_eff_area = eff_thickness*design_params.stringer_pitch*number_of_panels;
 
 		%% Catchpole diagram calculations
@@ -71,7 +88,7 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 
 
 		%% FARRAR efficiency factor
-		A_s_over_bt = stringer.cross_sec_area/(design_params.stringer_pitch*panel_thickness);)
+		A_s_over_bt = stringer.cross_sec_area/(design_params.stringer_pitch*panel_thickness);
 		F = farrar_calculator(A_s_over_bt, t_s_over_t);
 		rib_spacing = comp_load_per_length*material.E*(F/sigma_cr)^2;
 
