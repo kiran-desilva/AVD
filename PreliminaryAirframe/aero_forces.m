@@ -20,7 +20,7 @@ load sizing.mat
 
 %% CRUISE
 
-a=importfile("C:\Users\izzye\OneDrive\Documents\GitHub\AVD\PreliminaryAirframe\AVL Data Files\AVL_10th_feb.dat", [21, 84]);
+a=importfile("AVL Data Files/AVL_10th_feb.dat", [21, 84]);
 
 
 % Parameters from AVL
@@ -132,14 +132,17 @@ cruise.ratio_cl=cruise.cl_req/cruise.cl_total_dim; %scaling factor
 %% mutliply lift coefficient distribution by necessary factor
 
 cruise.cl_scaled=cruise.cl*cruise.ratio_cl;
-fit.poly_cl=polyfit(cruise.y_le,cruise.cl_scaled,20);
+cl_fit.poly=polyfit(cruise.y_le,cruise.cl_scaled,13);
 
 x = linspace(min(cruise.y_le), max(cruise.y_le), 1000);
 figure;
 hold on
-plot(x, polyval(fit.poly_cl, x))
+plot(x, polyval(cl_fit.poly, x))
 plot(cruise.y_le, cruise.cl_scaled)
 hold off
+
+
+save('cl_fit')
 % test=[0:0.001:3.63]
 % %plot(cruise.y_le,cruise.lift_no_dynamic_p)
 % q=polyfit(cruise.y_le,cruise.lift_no_dynamic_p,64)

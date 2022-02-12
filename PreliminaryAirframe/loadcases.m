@@ -17,6 +17,7 @@ cm = @(aoa) cm_0; %looking at thoery of wing sections, cm changes negligibly wit
 %%LOAD CASE 1 -> SYMMETRIC AT VA%%
 idx = 1;
 
+loadcase{idx}.n = vn.n_max*1.5;
 loadcase{idx}.lift = vn.n_max * vn.Mtow; % the limit lift load
 loadcase{idx}.v = vn.Va; %eas
 

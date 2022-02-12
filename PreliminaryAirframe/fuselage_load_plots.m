@@ -9,7 +9,7 @@ function [figlist] = fuselage_load_plots(loadcase)
     hold on
 
     plot(loadcase.x,loadcase.load)
-    plot(loadcase.Fi_cg,0,'x','color','red')
+    % plot(loadcase.Fi_cg,0,'x','color','red')
 
     xlabel('X coordinate from Tip (m)')
     ylabel('Sectional Loading (N)')
