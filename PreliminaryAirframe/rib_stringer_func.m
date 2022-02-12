@@ -50,6 +50,29 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 	x_front_spar = @(y) x_at_some_percent_chord(y, geometry.spar.front_x_c);
 	x_rear_spar = @(y) x_at_some_percent_chord(y, geometry.spar.rear_x_c);
 
+
+	starting_no_of_stringers = floor(geometry.box_width_func(0)/design_params.stringer_pitch);
+	disp(starting_no_of_stringers)
+
+	% Place the stringers s.t. the middle stringer connects middle of wingbox
+	% at root to middle of wingbox at tip
+	x0 = (x_front_spar(0) + x_rear_spar(0))/2;
+	x1 = (x_front_spar(geometry.semispan) + x_rear_spar(geometry.semispan))/2;
+	slope = (x1 - x0)/(geometry.semispan);
+
+	stringer_x_space = linspace(0, 1, starting_no_of_stringers + 2);
+	stringer_x_space = stringer_x_space(2:end-1);
+	stringer_func = @(y, root_intercept_percent) slope*y + x_front_spar(0) - geometry.box_width_func(0)*root_intercept_percent;
+
+	placed_stringer_func = @(y) stringer_func(y, stringer_x_space');
+    intercepts = min([fsolve(@(x) x_front_spar(x) - placed_stringer_func(x), zeros(starting_no_of_stringers, 1)),...
+        fsolve(@(x) x_rear_spar(x) - placed_stringer_func(x), zeros(starting_no_of_stringers, 1))], [], 2);
+
+	intercept_pt = @(stringer_idx) [intercepts(stringer_idx); stringer_func(intercepts(stringer_idx), stringer_x_space(stringer_idx))];
+	stringer_length_till_y = @(y, stringer_idx) norm(stringer_func(y, stringer_x_space(stringer_idx))...
+                                                - [0; stringer_func(0, stringer_x_space(stringer_idx))]);
+    percentage_of_stringer_at_y = @(y, stringer_idx) stringer_length_till_y(y, stringer_idx)/stringer_length_till_y(intercepts(stringer_idx), stringer_idx);
+
 	if doPlot
 		y_space = linspace(0, geometry.semispan, 1000);
 		figure;
@@ -64,16 +87,24 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		plot(y_space, x_front_spar(y_space), 'k')
 		plot(y_space, x_rear_spar(y_space), 'k')
 
+		stringer_x_data = repmat(y_space, starting_no_of_stringers, 1)';
+		stringer_y_data = stringer_func(y_space, stringer_x_space')';
+
+		valid_indices = stringer_x_data < intercepts';
+        stringer_x_data(~valid_indices) = NaN;
+        stringer_y_data(~valid_indices) = NaN;
+		plot(stringer_x_data, stringer_y_data, 'g');
+
 		grid on;
 		axis equal;
 	end
-	%% TODO: Start sketching the wing
 
+	num_stringers = starting_no_of_stringers; % This var will keep track of the number of stringers in the current panel;
 	while spanwise_station < geometry.semispan
-		bending_moment = double(ppval(bending_moment_dist, spanwise_station));
+		bending_moment = bending_moment_dist(spanwise_station);
 
-		box_width = double(geometry.box_width_func(spanwise_station));
-		web_height = double(geometry.web_height_func(spanwise_station));
+		box_width = geometry.box_width_func(spanwise_station);
+		web_height = geometry.web_height_func(spanwise_station);
 
 		stringer.flange_width = design_params.stringer_web_height*design_params.flange_to_web_ratio;
 		stringer.cross_sec_area = NaN; % TODO: As appropriate for the selected stringer type

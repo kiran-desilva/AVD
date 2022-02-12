@@ -1,6 +1,6 @@
 clear
 clc
-close all
+%close all
 
 airfoilcoords.top = [1.00000     0.00000;
 0.95033     0.00986;
@@ -80,21 +80,21 @@ geometry.airfoil = NaN; %% TODO:
 
 geometry.c = @(y) -(c_root - c_tip)/geometry.semispan*y + c_root;
 
-geometry.box_width_func = @(y) abs(geometry.spar.front_x_c - geometry.spar.rear_x_c)*c(y);
+geometry.box_width_func = @(y) abs(geometry.spar.front_x_c - geometry.spar.rear_x_c)*geometry.c(y);
 front_web_height = abs(top_af_fit(geometry.spar.front_x_c) - bottom_af_fit(geometry.spar.front_x_c));
 rear_web_height = abs(top_af_fit(geometry.spar.rear_x_c) - bottom_af_fit(geometry.spar.rear_x_c));
-geometry.web_height_func = @(y) max(front_web_height, rear_web_height)*c(y); %% TODO: Play with the max function, try min or avg instead
-																			 %% 	  max should however give largest stress
+geometry.web_height_func = @(y) max(front_web_height, rear_web_height)*geometry.c(y); 	%% TODO: Play with the max function, try min or avg instead
+																						%% 	  max should however give largest stress
 
 material.E = 70E9;
 material.poisson_r = 1/3;
 
 %% TODO:
-design_params.stringer_pitch = 20E-3;
+design_params.stringer_pitch = 100E-3;
 design_params.stringer_thickness = 1E-3;
 design_params.stringer_web_height = 36E-3;
 design_params.flange_to_web_ratio = 0.3;
 
-bending_moment_dist = spline(limiting_loadcase_distributions.points, limiting_loadcase_distributions.bm);
+bending_moment_dist = fit(limiting_loadcase_distributions.points', limiting_loadcase_distributions.bm', 'smoothingspline');
 
 rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
