@@ -1,6 +1,7 @@
 clear
 clc
 close all
+addpath(fullfile('.', 'helper_funcs')); 
 
 airfoilcoords.top = [1.00000     0.00000;
 0.95033     0.00986;
@@ -77,6 +78,7 @@ geometry.sweep_deg = 18.17;
 geometry.spar.front_x_c = 0.1;
 geometry.spar.rear_x_c = 0.77;
 geometry.airfoil = NaN; %% TODO:
+geometry.A0 = 0.0655;
 
 geometry.c = @(y) -(c_root - c_tip)/geometry.semispan*y + c_root;
 
@@ -97,4 +99,32 @@ design_params.flange_to_web_ratio = 0.3;
 
 bending_moment_dist = fit(limiting_loadcase_distributions.points', limiting_loadcase_distributions.bm', 'smoothingspline');
 
+design_params.stringer_pitch = 1e-3;
+rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
+
+return;
+
+stringer_pitch_param_space = linspace(2E-3, 50E-3, 50);
+% total_area = rib_stringer_func(geometry, material, design_params, bending_moment_dist, false)
+
+area_arr = [];
+for p = stringer_pitch_param_space
+	test_space = design_params;
+	test_space.stringer_pitch = p;
+	area_arr = [area_arr, rib_stringer_func(geometry, material, test_space, bending_moment_dist, false)];
+end
+
+[min_area, min_idx] = min(area_arr);
+
+figure;
+hold on;
+plot(stringer_pitch_param_space, area_arr);
+scatter(stringer_pitch_param_space(min_idx), min_area, 20, 'k', 'x');
+grid on;
+title("Stringer Optimisation")
+xlabel("Stringer Pitch [m]")
+ylabel("Total Volume [m^3]")
+hold off;
+
+design_params.stringer_pitch = stringer_pitch_param_space(min_idx);
 rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);

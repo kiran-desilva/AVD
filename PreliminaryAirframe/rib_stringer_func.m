@@ -42,7 +42,6 @@
 
 function total_volume = rib_stringer_func(geometry, material, design_params, bending_moment_dist, doPlot)
 	spanwise_station = 0; % Start at root
-	total_volume = 0;
 
 	x_leading_edge = @(y) -tand(geometry.sweep_deg)*y + geometry.c(0)/2;
 	x_trailing_edge = @(y) x_leading_edge(y) - geometry.c(y);
@@ -68,7 +67,6 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
     intercepts = min([fsolve(@(x) x_front_spar(x) - placed_stringer_func(x), zeros(starting_no_of_stringers, 1)),...
         fsolve(@(x) x_rear_spar(x) - placed_stringer_func(x), zeros(starting_no_of_stringers, 1))], [], 2);
 
-	%intercept_pt = @(stringer_idx) [intercepts(stringer_idx); stringer_func(intercepts(stringer_idx), stringer_x_space(stringer_idx))];
 	stringer_length_till_y = @(y, stringer_idx) vecnorm([y.*ones(size(stringer_idx)); stringer_func(y, stringer_x_space(stringer_idx))]...
                                                 - [zeros(size(stringer_idx)); stringer_func(0, stringer_x_space(stringer_idx))]);
     percentage_of_stringer_at_y = @(y, stringer_idx) stringer_length_till_y(y, stringer_idx)./stringer_length_till_y(intercepts(stringer_idx)', stringer_idx);
@@ -91,8 +89,9 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		axis equal;
 	end
 
+	total_volume = 0;
 	num_stringers = starting_no_of_stringers; % This var will keep track of the number of stringers in the current panel;
-	while spanwise_station < geometry.semispan
+	while true
 		bending_moment = bending_moment_dist(spanwise_station);
 
 		box_width = geometry.box_width_func(spanwise_station);
@@ -126,15 +125,22 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		%% Draw a rib
 		spanwise_station = spanwise_station + rib_spacing;
         if spanwise_station > geometry.semispan
+			total_volume = total_volume + panel_eff_area*(geometry.semispan - (spanwise_station - rib_spacing)); % panel untill the end
             break;
         end
-		plot([spanwise_station, spanwise_station], [x_leading_edge(spanwise_station), x_trailing_edge(spanwise_station)], 'r');
+
+		if doPlot
+			plot([spanwise_station, spanwise_station], [x_leading_edge(spanwise_station), x_trailing_edge(spanwise_station)], 'r');
+		end
 
 		stringers_to_cut = percentage_of_stringer_at_y(spanwise_station, 1:starting_no_of_stringers)' > 0.9...
 							& intercepts > spanwise_station;
 		
 		intercepts(stringers_to_cut) = spanwise_station;
 		num_stringers = num_stringers - sum(stringers_to_cut, 'all');
+		total_volume = total_volume + panel_eff_area*rib_spacing;
+		total_volume = total_volume + geometry.A0*geometry.c(spanwise_station)^2*2E-3;	% account for ribs as well, might be kinda dodgy tho
+																						% bcs we dont know rib thickness yet
 	end
 
 	if doPlot
