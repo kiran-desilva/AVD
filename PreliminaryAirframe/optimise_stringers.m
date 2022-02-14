@@ -1,6 +1,6 @@
 clear
 clc
-close all
+% close all
 addpath(fullfile('.', 'helper_funcs')); 
 
 airfoilcoords.top = [1.00000     0.00000;
@@ -88,11 +88,15 @@ rear_web_height = abs(top_af_fit(geometry.spar.rear_x_c) - bottom_af_fit(geometr
 geometry.web_height_func = @(y) max(front_web_height, rear_web_height)*geometry.c(y); 	%% TODO: Play with the max function, try min or avg instead
 																						%% 	  max should however give largest stress
 
+%Material library has different units need to chage it
+% load materialLib
+% material = materialLib{1};
 material.E = 70E9;
 material.poisson_r = 1/3;
 
+
 %% TODO:
-design_params.stringer_pitch = 500E-3;
+design_params.stringer_pitch = 50E-3;
 design_params.stringer_thickness = 1E-3;
 design_params.stringer_web_height = 36E-3;
 design_params.flange_to_web_ratio = 0.3;
