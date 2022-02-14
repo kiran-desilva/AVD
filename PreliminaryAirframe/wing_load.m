@@ -89,8 +89,8 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 	% lift.gamma(x) = lift.gamma0*sqrt(1 - (x/semispan).^2)
 	% lift.L(x) = rho0*Vinf_eas*lift.gamma(x)
 	% lift.L_dist = double(lift.L(spanwise_disc))
-	lift.L_dist = 0.5*2.5*rho0*Vinf_eas^2*c(spanwise_disc).*cl_dist;
-	double(trapz(spanwise_disc, lift.L_dist))
+	lift.L_dist = 0.5*rho0*n*Vinf_eas^2*double(c(spanwise_disc)).*cl_dist;
+	%double(trapz(spanwise_disc, lift.L_dist))
 
 	%% Wing weight loading
 	% M(x1, x2) = M_wing*V(x1, x2)/V_wing
@@ -104,7 +104,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 	M(x1, x2) = wing.avg_density*V(x1, x2);
 	x1_arr = spanwise_disc - delta_s/2;
 	x2_arr = spanwise_disc + delta_s/2;
-	wing.inertial_loading = -g*n*M(x1_arr, x2_arr)/delta_s;
+	wing.inertial_loading = -g*n*double(M(x1_arr, x2_arr))/delta_s;
 
 	%% Undercarriage loading
 	uc.spanwise_start = 1.18 - 0.049;
@@ -117,7 +117,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 	% fuel.fuel_weight = g*fuel.density*fuel.volume_in_wings_m3;
 	fuel.density = 775; % kg/m^3
 	fuel.full_wing_mass = fuel.density*V(bottom_edge_intercept, 0.95*semispan);
-	fuel.percent_full = wing_fuel_weight_kg/fuel.full_wing_mass;
+	fuel.percent_full = double(wing_fuel_weight_kg/fuel.full_wing_mass);
 	fuel.loading(x1, x2) = piecewise((x1 >= bottom_edge_intercept) & (x2 <= 0.95*semispan), -g*n*fuel.density*fuel.percent_full*V(x1, x2)/delta_s, 0);
 
 	%% Torsion dist
@@ -172,8 +172,11 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 		%% Ah ffs might have to include some flap loads
     end
     
-    combined_loading = double(uc.loading(spanwise_disc) + fuel.loading(x1_arr, x2_arr) + lift.L_dist + wing.inertial_loading);
-	shear_dist = sum(combined_loading) - cumsum(combined_loading) + combined_loading;
+    combined_load = double(uc.loading(spanwise_disc) + fuel.loading(x1_arr, x2_arr) + lift.L_dist + wing.inertial_loading);
+    combined_force = movsum(combined_load, 2)*delta_s/2;
+    combined_force = [combined_force(2:end), 0];
+    
+	shear_dist = sum(combined_force) - cumsum(combined_force) + combined_force;
 
 	temp = movsum(shear_dist, 2)*delta_s/2;
 	dM = [temp(2:end), 0];
@@ -207,7 +210,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 
 		subplot(5,1,3)
 		hold on;
-		plot(spanwise_disc, combined_loading);
+		plot(spanwise_disc, combined_force);
 		xline(bottom_edge_intercept, 'r')
 		% plot(X_hatch, Y_hatch, 'r')
 		xlim([0 semispan]);

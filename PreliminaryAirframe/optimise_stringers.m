@@ -75,7 +75,7 @@ hold off;
 
 geometry.semispan = 8.94/2;
 geometry.sweep_deg = 18.17;
-geometry.spar.front_x_c = 0.1;
+geometry.spar.front_x_c = 0.2;
 geometry.spar.rear_x_c = 0.77;
 geometry.airfoil = NaN; %% TODO:
 geometry.A0 = 0.0655;
@@ -92,16 +92,15 @@ material.E = 70E9;
 material.poisson_r = 1/3;
 
 %% TODO:
-design_params.stringer_pitch = 100E-3;
+design_params.stringer_pitch = 500E-3;
 design_params.stringer_thickness = 1E-3;
 design_params.stringer_web_height = 36E-3;
 design_params.flange_to_web_ratio = 0.3;
 
 bending_moment_dist = fit(limiting_loadcase_distributions.points', limiting_loadcase_distributions.bm', 'smoothingspline');
 
-design_params.stringer_pitch = 1e-3;
+%design_params.stringer_pitch = 1e-3;
 rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
-
 return;
 
 stringer_pitch_param_space = linspace(2E-3, 50E-3, 50);
