@@ -19,19 +19,19 @@ for i=2:length(ribs_loc_1)
     s(i-1)=ribs_loc_1(i)-ribs_loc_1(i-1); %displacement between 2 ribs
 end
 s(ribs_n)=3.63-ribs_loc_1(ribs_n);
-Young_E=72e+09; %Young's modulus [72 GPa]
+E_panel=72e+09; %Young's modulus of panel (???) [72 GPa]
 t_s=2e-03; %thickness of stringer
 %b=1; %panel width [m] - need to prescribe
-t_e=3*t_s/2; % effective thickness of the panel [m]
+t_e=3*t_s/2; % effective thickness of the panel [m] - assuming stiffness ratio is 0.5
 
 %input max M of each section to be considered for each rib
 M=ones(1,ribs_n);
 h_c=ones(1,ribs_n)*0.4; %assume wing box is constant height - need to modify
 I=(chord.*(t_e)^3/12 + chord.*(t_e).*(h_c./2).^2); %[m^4]
-F=(M.^2.*s.*h_c.*t_e.*chord)./(2*Young_E.*I.^2);
-t_r=((F.*h_c.^2)./(3.62*Young_E.*chord)).^(1/3); %required rib thickness for optimal design
+F=(M.^2.*s.*h_c.*t_e.*chord)./(2*E_panel.*I.^2);
+t_r=((F.*h_c.^2)./(3.62*E_panel.*chord)).^(1/3); %required rib thickness for optimal design
 
-
+save ('wing_ribs.mat')
 % n_ribs=length(ribs_loc_1);
 % c_ribs=ones(1,n_ribs)*1.1; %chord of each rib [m]
 % panels=n_ribs+1; %number of panels - assuming no rib at tip of wing

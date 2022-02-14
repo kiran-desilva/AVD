@@ -12,4 +12,6 @@ materialLib{1}.tensile_yield = 324 %Mpa
 materialLib{1}.shear_yield = 187.1; %Mpa
 materialLib{1}.rho = 2.73e3; %kg/m^3
 
+
+
 save('materialLib','materialLib')
