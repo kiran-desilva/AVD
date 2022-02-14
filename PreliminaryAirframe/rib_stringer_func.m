@@ -128,6 +128,7 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		%equate sigma_cr to euler buckling to find optimum length
 
 		rib_spacing = Kna*pi*sqrt(material.E/sigma_cr);
+		F = sigma_cr * sqrt(rib_spacing/(comp_load_per_length*material.E)); 
 
 
 		%% FARRAR efficiency factor
