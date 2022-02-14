@@ -111,6 +111,7 @@ coordsouter = [0.000000  0.000000;
 %axis equal
 
 section = polyshape(coordsouter(:,1),coordsouter(:,2));
+figure
 plot(section)
 axis equal
 
