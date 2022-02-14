@@ -1,8 +1,10 @@
 
 
-function [area,effThickness] = stringer_panel_geometry(b,t,ts,td,d,h,type,doplot)
+function [Kna,Ina,area,Teff] = stringer_panel_geometry(b,t,ts,td,d,h,type,doplot)
+ 
     shp = polyshape();
-    if strcmp(type,"Z")
+    if strcmp(type,"Z_dh03")
+        assert(abs((d/h)-0.3)<1e-3,'d/h needs to be 0.3');
         coords = [-b/2, 0;...
                   b/2, 0;...
                   b/2, t;...
@@ -16,20 +18,15 @@ function [area,effThickness] = stringer_panel_geometry(b,t,ts,td,d,h,type,doplot
                   -d,t;...
                   -b/2,t];
         shp = polyshape(coords(:,1),coords(:,2));
-        
+        Ina = (((0.633*b*t) + (0.37*h*ts))/((1.6*h*ts)+(b*t)))*((h^3)*ts); %from Farrar, only applies to d_h = 0.3
+          
     end
 
     area = shp.area;
-    [cx,cy] = shp.centroid
-    effThickness = area/b;
-
-    shifted_coords(:,1) = coords(:,1) - cx;
-    shifted_coords(:,2) = coords(:,2) - cy;
-    %get centroidal moments of intertia
-    [geo,intertial,cpm] = polygeom(shifted_coords(:,1),shifted_coords(:,2))
-
-
-    
+    [cx,cy] = shp.centroid;
+    Teff = area/b;
+    Kna = sqrt(Ina/area);
+ 
 
 
 

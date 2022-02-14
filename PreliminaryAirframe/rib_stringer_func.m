@@ -106,7 +106,16 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		sigma_0 = comp_load_per_length/panel_thickness; % Critical Buckling Stress -> need to adjust this
 		% for stringers using catchpole diagram
 
-		eff_thickness = panel_thickness + stringer.cross_sec_area/design_params.stringer_pitch; 
+		[Kna,~,stringer_panel_area,eff_thickness] = stringer_panel_geometry(design_params.stringer_pitch,...
+																			panel_thickness,...
+																			design_params.stringer_thickness,...
+																			design_params.stringer_thickness,...
+																			stringer.flange_width,...
+																			design_params.stringer_web_height,...
+																			"Z_dh03",...
+																			0);
+
+		% eff_thickness = panel_thickness + stringer.cross_sec_area/design_params.stringer_pitch; 
 		number_of_panels = num_stringers + 1;
 		panel_eff_area = eff_thickness*design_params.stringer_pitch*number_of_panels;
 
@@ -117,8 +126,8 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		sigma_cr = K_catchpole/K*sigma_0;
 
 		%equate sigma_cr to euler buckling to find optimum length
-		gyration = 1;
-		rib_spacing = gyration*pi*sqrt(material.E/sigma_cr);
+
+		rib_spacing = Kna*pi*sqrt(material.E/sigma_cr);
 
 
 		%% FARRAR efficiency factor
