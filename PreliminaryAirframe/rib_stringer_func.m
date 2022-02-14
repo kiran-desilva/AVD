@@ -116,11 +116,15 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		K_catchpole = catchpole_calculator(h_over_b, t_s_over_t, material.poisson_r);
 		sigma_cr = K_catchpole/K*sigma_0;
 
+		%equate sigma_cr to euler buckling to find optimum length
+		gyration = 1;
+		rib_spacing = gyration*pi*sqrt(material.E/sigma_cr);
+
 
 		%% FARRAR efficiency factor
-		A_s_over_bt = stringer.cross_sec_area/(design_params.stringer_pitch*panel_thickness);
-		F = farrar_calculator(A_s_over_bt, t_s_over_t);
-		rib_spacing = comp_load_per_length*material.E*(F/sigma_cr)^2;
+		% A_s_over_bt = stringer.cross_sec_area/(design_params.stringer_pitch*panel_thickness);
+		% F = farrar_calculator(A_s_over_bt, t_s_over_t);
+		% rib_spacing = comp_load_per_length*material.E*(F/sigma_cr)^2;
 
 		%% Draw a rib
 		spanwise_station = spanwise_station + rib_spacing;
