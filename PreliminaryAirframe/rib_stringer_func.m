@@ -93,6 +93,7 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 	num_stringers = starting_no_of_stringers; % This var will keep track of the number of stringers in the current panel;
 
 	while true
+        
 		bending_moment = bending_moment_dist(spanwise_station);
 
 		box_width = geometry.box_width_func(spanwise_station);
@@ -139,24 +140,25 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 
 		%% Draw a rib
 		spanwise_station = spanwise_station + rib_spacing;
+                
+        if spanwise_station > geometry.semispan
+			total_volume = total_volume + panel_eff_area*(geometry.semispan - (spanwise_station - rib_spacing)); % panel untill the end
+            break;
+        end
+                
+		if doPlot
+			plot([spanwise_station, spanwise_station], [x_leading_edge(spanwise_station), x_trailing_edge(spanwise_station)], 'r');
+		end
 
 		previous_stringers_to_cut = intercepts < spanwise_station & intercepts > spanwise_station - rib_spacing;
 
 		if any(previous_stringers_to_cut) 
 			intercepts(previous_stringers_to_cut) = (spanwise_station - rib_spacing); % cut the previous stringers which didnt reach far enough
 			% now we have to redo the current iteration because the number of stringers changed (as some previous ones were cut)
-			spanwise_statio = spanwise_station - rib_spacing;
+			spanwise_station = spanwise_station - rib_spacing;
 			num_stringers = num_stringers - sum(previous_stringers_to_cut, 'all');
-		end
-
-        if spanwise_station > geometry.semispan
-			total_volume = total_volume + panel_eff_area*(geometry.semispan - (spanwise_station - rib_spacing)); % panel untill the end
-            break;
+            continue;
         end
-        
-		if doPlot
-			plot([spanwise_station, spanwise_station], [x_leading_edge(spanwise_station), x_trailing_edge(spanwise_station)], 'r');
-		end
 		
 		% intercepts(stringers_to_cut) = spanwise_station;
 		total_volume = total_volume + panel_eff_area*rib_spacing;
