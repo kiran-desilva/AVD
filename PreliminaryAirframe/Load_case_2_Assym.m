@@ -37,75 +37,13 @@ grid on
 
 %Vertical tail torsion
 
-coordsouter = [ 0.000000  0.000000;
-  0.005000  0.012080;
-  0.007500  0.014560;
-  0.012500  0.018420;
-  0.025000  0.025280;
-  0.050000  0.035040;
-  0.075000  0.042400;
-  0.100000  0.048420;
-  0.150000  0.057850;
-  0.200000  0.064800;
-  0.250000  0.069850;
-  0.300000  0.073190;
-  0.350000  0.074820;
-  0.400000  0.074730;
-  0.450000  0.072240;
-  0.500000  0.068100;
-  0.550000  0.062660;
-  0.600000  0.056200;
-  0.650000  0.048950;
-  0.700000  0.041130;
-  0.750000  0.032960;
-  0.800000  0.024720;
-  0.850000  0.016770;
-  0.900000  0.009500;
-  0.950000  0.003460;
-  1.000000  0.000000;
-  0.000000  0.000000;
-  0.005000  -.012080;
-  0.007500  -.014560;
-  0.012500  -.018420;
-  0.025000  -.025280;
-  0.050000  -.035040;
-  0.075000  -.042400;
-  0.100000  -.048420;
-  0.150000  -.057850;
-  0.200000  -.064800;
-  0.250000  -.069850;
-  0.300000  -.073190;
-  0.350000  -.074820;
-  0.400000  -.074730;
-  0.450000  -.072240;
-  0.500000  -.068100;
-  0.550000  -.062660;
-  0.600000  -.056200;
-  0.650000  -.048950;
-  0.700000  -.041130;
-  0.750000  -.032960;
-  0.800000  -.024720;
-  0.850000  -.016770;
-  0.900000  -.009500;
-  0.950000  -.003460;
-  1.000000  0.000000];
-
-%plot(coords(:,1), coords(:,2))
-%axis equal
-
-section = polyshape(coordsouter(:,1),coordsouter(:,2));
-plot(section)
-axis equal
-
-[xbar,ybar] = centroid(section);
-
 ctip = 0.8166;
 croot = 1.0015;
 ztip = 2.3887/2; 
 c_V = @(z) ((ctip - croot)/ztip) * (z - ztip) + ztip; 
 
 VTailLoad = F_v / 1000; %Force at each of 1000 stations
-VTorsiondist = Torsion(z, c_V, VTailLoad, xbar); 
+VTorsiondist = Torsion(z, c_V, VTailLoad); 
 figure
 plot(z, VTorsiondist)
 xlabel("z (m)", 'interpreter', 'Latex')
@@ -120,7 +58,7 @@ xlabel("z (m)", 'interpreter', 'Latex')
 ylabel("Vertical Tail Torque (Nm)", 'interpreter', 'Latex')
 grid on
 
-function [Torsion] = Torsion(z, c_V, VTailLoad, xbar)
+function [Torsion] = Torsion(z, c_V, VTailLoad)
     CoF = (0.7-0.15) .* c_V(z) / 2 + 0.15 .* c_V(z); %center of flexure midway between spars
     Torsion = VTailLoad .* (CoF - c_V(z)/4); %no M0, ac at c/4 for each section
 end
