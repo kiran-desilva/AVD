@@ -143,6 +143,7 @@ hold off
 
 
 save('cl_fit')
+save('cruise')
 % test=[0:0.001:3.63]
 % %plot(cruise.y_le,cruise.lift_no_dynamic_p)
 % q=polyfit(cruise.y_le,cruise.lift_no_dynamic_p,64)
