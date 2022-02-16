@@ -1,5 +1,3 @@
-
-
 %% Places the ribs for a given geometry and free parameters
 %% and calculates the total area, which can be used as an
 %% optimisation metric to be minimised (for smallest weight
@@ -94,18 +92,18 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 
 	while true
         
-		bending_moment = bending_moment_dist(spanwise_station);
+		bending_moment = bending_moment_dist(spanwise_station)
 
-		box_width = geometry.box_width_func(spanwise_station);
-		web_height = geometry.web_height_func(spanwise_station);
+		box_width = geometry.box_width_func(spanwise_station)
+		web_height = geometry.web_height_func(spanwise_station)
 
-		stringer.flange_width = design_params.stringer_web_height*design_params.flange_to_web_ratio;
-		stringer.cross_sec_area = design_params.stringer_thickness*design_params.stringer_web_height + 2*stringer.flange_width*design_params.stringer_thickness; % TODO: As appropriate for the selected stringer type
+		stringer.flange_width = design_params.stringer_web_height*design_params.flange_to_web_ratio
+		stringer.cross_sec_area = design_params.stringer_thickness*design_params.stringer_web_height + 2*stringer.flange_width*design_params.stringer_thickness% TODO: As appropriate for the selected stringer type
 
-		K = 0.9*4; % From buckling of SS plate plot, taken for a/b -> infinity
-		comp_load_per_length = bending_moment/(box_width*web_height);
-		panel_thickness = (comp_load_per_length*design_params.stringer_pitch^2/(K*material.E))^(1/3);
-		sigma_0 = comp_load_per_length/panel_thickness; % Critical Buckling Stress -> need to adjust this
+		K = 4 * (pi^2)/(12*(1-(material.v^2))); % From buckling of SS plate plot, taken for a/b -> infinity
+		comp_load_per_length = bending_moment/(box_width*web_height)
+		panel_thickness = ((comp_load_per_length*design_params.stringer_pitch^2)/(K*material.E))^(1/3)
+		sigma_0 = comp_load_per_length/panel_thickness % Critical Buckling Stress -> need to adjust this
 		% for stringers using catchpole diagram
 
 		[Kna,~,stringer_panel_area,eff_thickness] = stringer_panel_geometry(design_params.stringer_pitch,...
@@ -115,31 +113,42 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 																			stringer.flange_width,...
 																			design_params.stringer_web_height,...
 																			"Z_dh03",...
-																			0);
+																			0)
 
 		% eff_thickness = panel_thickness + stringer.cross_sec_area/design_params.stringer_pitch; 
-		number_of_panels = num_stringers + 1;
-		panel_eff_area = eff_thickness*design_params.stringer_pitch*number_of_panels;
+		number_of_panels = num_stringers + 1
+		panel_eff_area = eff_thickness*design_params.stringer_pitch*number_of_panels
 
 		%% Catchpole diagram calculations
-		t_s_over_t = design_params.stringer_thickness/panel_thickness;
-		h_over_b = design_params.stringer_web_height/design_params.stringer_pitch;
-		K_catchpole = catchpole_calculator(h_over_b, t_s_over_t, material.poisson_r,1);
-		sigma_cr = K_catchpole/K*sigma_0;
+		t_s_over_t = design_params.stringer_thickness/panel_thickness
+		h_over_b = design_params.stringer_web_height/design_params.stringer_pitch
+		K_catchpole = catchpole_calculator(h_over_b, t_s_over_t, material.v,1)
+		sigma_cr = K_catchpole/K*sigma_0
+		% sig_cr = K_catchpole*material.E*((panel_thickness/design_params.stringer_pitch)^2)
+		% sig_0 = 3.62*material.E*((panel_thickness/design_params.stringer_pitch)^2)
+		% sig_cr = (K_catchpole/K)*sig_0
 
 		%equate sigma_cr to euler buckling to find optimum length
 
-		rib_spacing = Kna*pi*sqrt(material.E/sigma_cr);
-		F = sigma_cr * sqrt(rib_spacing/(comp_load_per_length*material.E));
+		rib_spacing = Kna*pi*sqrt(material.E/sigma_cr)
+		F = sigma_cr * sqrt(rib_spacing/(comp_load_per_length*material.E))
+		
+
+		assert(F < 1, 'F stands for fuuucked')
 
 
 		%% FARRAR efficiency factor
-		% A_s_over_bt = stringer.cross_sec_area/(design_params.stringer_pitch*panel_thickness);
-		% F = farrar_calculator(A_s_over_bt, t_s_over_t);
-		% rib_spacing = comp_load_per_length*material.E*(F/sigma_cr)^2;
+		A_s_over_bt = stringer.cross_sec_area/(design_params.stringer_pitch*panel_thickness)
+		Fcalc = farrar_calculator(A_s_over_bt, t_s_over_t)
+		rbs = comp_load_per_length*material.E*(Fcalc/sigma_cr)^2
+
+		% sg = Fcalc*sqrt((comp_load_per_length*material.E)/)
+		
 
 		%% Draw a rib
 		spanwise_station = spanwise_station + rib_spacing;
+
+		break;
                 
         if spanwise_station > geometry.semispan
 			total_volume = total_volume + panel_eff_area*(geometry.semispan - (spanwise_station - rib_spacing)); % panel untill the end
