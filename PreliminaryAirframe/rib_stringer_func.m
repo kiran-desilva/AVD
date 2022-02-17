@@ -90,7 +90,8 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 	total_volume = 0;
 	num_stringers = starting_no_of_stringers; % This var will keep track of the number of stringers in the current panel;
 
-	F_array = [];
+	output.F_array = [];
+	output.rib_array = [];
 	while true
         
 		bending_moment = bending_moment_dist(spanwise_station);
@@ -170,7 +171,8 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
             continue;
         end
 
-		F_array = [F_array, F];
+		output.F_array = [output.F_array, F];
+		output.rib_array = [output.rib_array, spanwise_station];
 		
 		% intercepts(stringers_to_cut) = spanwise_station;
 		total_volume = total_volume + panel_eff_area*rib_spacing;
@@ -190,5 +192,4 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 	end
 
 	output.total_volume = total_volume;
-	output.F_array = F_array;
 end

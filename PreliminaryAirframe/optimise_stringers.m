@@ -104,7 +104,7 @@ design_params.flange_to_web_ratio = 0.3;
 bending_moment_dist = fit(limiting_loadcase_distributions.points', limiting_loadcase_distributions.bm', 'smoothingspline');
 
 %design_params.stringer_pitch = 1e-3;
-rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
+rib_stringer_func(geometry, material, design_params, bending_moment_dist, true)
 return;
 
 stringer_pitch_param_space = linspace(100E-3, 300E-3, 50);
