@@ -32,7 +32,7 @@ jobs:
         # Destination repository
         destination-repository-name: AVD_PreliminaryReport
         # Email for the git commit
-        user-email: 'kd619@ic.ac.uk'
+        user-email: kd619@ic.ac.uk
         # Github server
 #         github-server: https://git.overleaf.com/
         commit-message: pushed_figures
