@@ -38,7 +38,7 @@ jobs:
 #         github-server: https://git.overleaf.com/
         commit-message: pushed_figures
         target-directory: Media/AutoPushFigures
-        target-branch: master
+        target-branch: main
     - name: list directories
       run: ls /
     
