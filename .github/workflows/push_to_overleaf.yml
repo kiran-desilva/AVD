@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Push directory to another repository
+      - name: Push figures
         uses: cpina/github-action-push-to-another-repository@v1.4.1
         env:
             API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
@@ -39,6 +39,24 @@ jobs:
           # Github server
           commit-message: pushed_figures
           target-directory: Media/AutoPushFigures
+          target-branch: main
+          
+      - name: Push code
+        uses: cpina/github-action-push-to-another-repository@v1.4.1
+        env:
+            API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          # Source directory from the origin directory
+          source-directory: PreliminaryAirframe/**.m
+          # Name of the destination username/organization
+          destination-github-username: 'kiran-desilva'
+          # Destination repository
+          destination-repository-name: AVD_PreliminaryReport
+          # Email for the git commit
+          user-email: kd619@ic.ac.uk
+          # Github server
+          commit-message: pushed_code
+          target-directory: MatlabCode/AutoPushCode
           target-branch: main
  
     
