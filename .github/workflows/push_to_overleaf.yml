@@ -26,7 +26,7 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
         # Source directory from the origin directory
-        source-directory: Figures/
+        source-directory: 'PreliminaryAirframe/Figures'
         # Name of the destination username/organization
         destination-github-username: 'kiran-desilva'
         # Destination repository
