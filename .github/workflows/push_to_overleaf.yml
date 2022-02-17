@@ -22,7 +22,7 @@ jobs:
     # Runs a single command using the runners shell
  
     - name: Push directory to another repository
-      uses: cpina/github-action-push-to-another-repository@v1.4.1
+      uses: cpina/github-action-push-to-another-repository@v1.4
       env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
