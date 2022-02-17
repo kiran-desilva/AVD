@@ -30,13 +30,13 @@ jobs:
         # Name of the destination username/organization
         destination-github-username: 'kd619@ic.ac.uk'
         # Destination repository
-        destination-repository-name: 61f2ff4607f8d34cf8229ea2
+        destination-repository-name: AVD_PreliminaryReport
         # Email for the git commit
         user-email: 'kd619@ic.ac.uk'
         # Github server
-        github-server: https://git.overleaf.com/
+#         github-server: https://git.overleaf.com/
         commit-message: pushed_figures
-        target-directory: Media/Figures
+        target-directory: Media/AutoPushFigures
         
 #   push_code_to_overleaf:
 #     # The type of runner that the job will run on
