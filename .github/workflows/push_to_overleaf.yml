@@ -20,6 +20,8 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Runs a single command using the runners shell
+    - name: list directories
+      run: ls /
     - name: Push directory to another repository
       uses: cpina/github-action-push-to-another-repository@v1.4.1
       env:
@@ -37,6 +39,8 @@ jobs:
 #         github-server: https://git.overleaf.com/
         commit-message: pushed_figures
         target-directory: Media/AutoPushFigures
+        target-branch: master
+    
         
 #   push_code_to_overleaf:
 #     # The type of runner that the job will run on
