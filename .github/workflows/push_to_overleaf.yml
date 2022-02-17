@@ -23,12 +23,12 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Push directory to another repository
-        uses: cpina/github-action-push-to-another-repository@f5b6d14ea883bde23eefd9ab1bb44227511a37ec
+        uses: cpina/github-action-push-to-another-repository@v1.4.1
         env:
             API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
           # Source directory from the origin directory
-          source-directory: 'PreliminaryReport/Figures/'
+          source-directory: 'AVD/PreliminaryReport/Figures/'
           # Name of the destination username/organization
           destination-github-username: 'kiran-desilva'
           # Destination repository
