@@ -38,7 +38,7 @@
 %%		  this value is proportional to weight and thus
 %%		  should be minimised
 
-function total_volume = rib_stringer_func(geometry, material, design_params, bending_moment_dist, doPlot)
+function output = rib_stringer_func(geometry, material, design_params, bending_moment_dist, doPlot)
 	spanwise_station = 0; % Start at root
 
 	x_leading_edge = @(y) -tand(geometry.sweep_deg)*y + geometry.c(0)/2;
@@ -90,6 +90,7 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 	total_volume = 0;
 	num_stringers = starting_no_of_stringers; % This var will keep track of the number of stringers in the current panel;
 
+	F_array = [];
 	while true
         
 		bending_moment = bending_moment_dist(spanwise_station);
@@ -168,6 +169,8 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 			num_stringers = num_stringers - sum(previous_stringers_to_cut, 'all');
             continue;
         end
+
+		F_array = [F_array, F];
 		
 		% intercepts(stringers_to_cut) = spanwise_station;
 		total_volume = total_volume + panel_eff_area*rib_spacing;
@@ -185,4 +188,7 @@ function total_volume = rib_stringer_func(geometry, material, design_params, ben
 		plot(stringer_x_data, stringer_y_data, 'g');
 		hold off;
 	end
+
+	output.total_volume = total_volume;
+	output.F_array = F_array;
 end

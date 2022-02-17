@@ -114,7 +114,8 @@ area_arr = [];
 for p = stringer_pitch_param_space
 	test_space = design_params;
 	test_space.stringer_pitch = p;
-	area_arr = [area_arr, rib_stringer_func(geometry, material, test_space, bending_moment_dist, false)];
+    out = rib_stringer_func(geometry, material, test_space, bending_moment_dist, false);
+	area_arr = [area_arr, out.total_volume];
 end
 
 [min_area, min_idx] = min(area_arr);
