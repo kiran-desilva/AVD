@@ -28,7 +28,7 @@ jobs:
         # Source directory from the origin directory
         source-directory: PreliminaryAirframe/Figures/
         # Name of the destination username/organization
-        destination-github-username: 'kd619@ic.ac.uk'
+        destination-github-username: 'kiran-desilva'
         # Destination repository
         destination-repository-name: AVD_PreliminaryReport
         # Email for the git commit
