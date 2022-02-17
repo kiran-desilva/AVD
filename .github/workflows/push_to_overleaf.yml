@@ -20,27 +20,27 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Runs a single command using the runners shell
+      - uses: actions/checkout@v2
+
+      - name: Push directory to another repository
+        uses: cpina/github-action-push-to-another-repository@f5b6d14ea883bde23eefd9ab1bb44227511a37ec
+        env:
+            API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          # Source directory from the origin directory
+          source-directory: 'PreliminaryReport/Figures/'
+          # Name of the destination username/organization
+          destination-github-username: 'kiran-desilva'
+          # Destination repository
+          destination-repository-name: AVD_PreliminaryReport
+          # Email for the git commit
+          user-email: kd619@ic.ac.uk
+          # Github server
+  #         github-server: https://git.overleaf.com/
+          commit-message: pushed_figures
+          target-directory: Media/AutoPushFigures
+          target-branch: main
  
-    - name: Push directory to another repository
-      uses: cpina/github-action-push-to-another-repository@f5b6d14ea883bde23eefd9ab1bb44227511a37ec
-      env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-      with:
-        # Source directory from the origin directory
-        source-directory: 'PreliminaryReport/Figures/'
-        # Name of the destination username/organization
-        destination-github-username: 'kiran-desilva'
-        # Destination repository
-        destination-repository-name: AVD_PreliminaryReport
-        # Email for the git commit
-        user-email: kd619@ic.ac.uk
-        # Github server
-#         github-server: https://git.overleaf.com/
-        commit-message: pushed_figures
-        target-directory: Media/AutoPushFigures
-        target-branch: main
-    - name: list directories
-      run: ls /
     
         
 #   push_code_to_overleaf:
