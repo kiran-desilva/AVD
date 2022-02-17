@@ -20,15 +20,14 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Runs a single command using the runners shell
-    - name: list directories
-      run: ls /
+ 
     - name: Push directory to another repository
       uses: cpina/github-action-push-to-another-repository@v1.4.1
       env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
       with:
         # Source directory from the origin directory
-        source-directory: './'
+        source-directory: 'PreliminaryReport/Figures/'
         # Name of the destination username/organization
         destination-github-username: 'kiran-desilva'
         # Destination repository
@@ -40,6 +39,8 @@ jobs:
         commit-message: pushed_figures
         target-directory: Media/AutoPushFigures
         target-branch: master
+    - name: list directories
+      run: ls /
     
         
 #   push_code_to_overleaf:
