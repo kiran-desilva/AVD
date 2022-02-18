@@ -7,7 +7,7 @@
 %%%%
 
 %%assuming z stringers here
-function [weight_per_length,booms,fig] = fuselage_bending_analysis(loadcase,fuselage_skin_thickness,n_stringers,material,stringer,doplot)
+function [weight_per_length,booms,max_principle_stress,fig] = fuselage_bending_analysis(loadcase,fuselage_skin_thickness,n_stringers,material,stringer,doplot)
 
     
 
@@ -22,14 +22,14 @@ function [weight_per_length,booms,fig] = fuselage_bending_analysis(loadcase,fuse
     booms.s = linspace(0,cf,n_stringers+1);
     booms.s(end) = []; 
 
+    booms.skin_thickness = fuselage_skin_thickness;
+    booms.stringer_pitch = abs(booms.s(2) - booms.s(1)); 
 
-    stringer_pitch = abs(booms.s(2) - booms.s(1)); 
+    booms.stringer_area = stringer.web_height*stringer.thickness*(1+(2*stringer.flange_to_web_ratio));
 
-    stringer_area = stringer.web_height*stringer.thickness*(1+(2*stringer.flange_to_web_ratio));
+    booms.skin_equivalent_boom_area = 15*fuselage_skin_thickness^2; %15t^2
 
-    skin_equivalent_boom_area = 15*fuselage_skin_thickness^2; %15t^2
-
-    single_boom_area = skin_equivalent_boom_area + stringer_area;
+    single_boom_area = booms.skin_equivalent_boom_area + booms.stringer_area;
 
     booms.area = single_boom_area*ones(size(booms.phi));
     booms.ixx = booms.area.*(booms.y.^2);
@@ -49,8 +49,9 @@ function [weight_per_length,booms,fig] = fuselage_bending_analysis(loadcase,fuse
     %check max princple stress is below yield stress
     assert(max_principle_stress<=max_yield_stress,'tensile yield stress exceeded!!');
 
-    total_csa = (n_stringers*stringer_area) + (fuselage_skin_thickness*cf);
+    total_csa = (n_stringers*booms.stringer_area) + (fuselage_skin_thickness*cf);
     weight_per_length = (total_csa * material.rho);
+
 
 
     if doplot
