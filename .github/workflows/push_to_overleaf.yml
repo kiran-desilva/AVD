@@ -1,0 +1,80 @@
+# This is a basic workflow that is manually triggered
+
+name: push_to_overleaf
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  push:
+    branches:
+      - 'master'
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "greet"
+  push_to_overleaf:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Runs a single command using the runners shell
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Push repo
+        uses: cpina/github-action-push-to-another-repository@v1.4.1
+        env:
+            API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          # Source directory from the origin directory
+          source-directory: PreliminaryAirframe/
+          # Name of the destination username/organization
+          destination-github-username: 'kiran-desilva'
+          # Destination repository
+          destination-repository-name: AVD_PreliminaryReport
+          # Email for the git commit
+          user-email: kd619@ic.ac.uk
+          # Github server
+          commit-message: AVD repo update
+          target-directory: Media/AVD_REPO_AUTOPUSH
+          target-branch: main
+          
+ 
+    
+        
+#   push_code_to_overleaf:
+#     # The type of runner that the job will run on
+#     runs-on: ubuntu-latest
+
+#     # Steps represent a sequence of tasks that will be executed as part of the job
+#     steps:
+#     # Runs a single command using the runners shell
+#     - name: Push directory to another repository
+#       # You may pin to the exact commit or the version.
+#       # uses: cpina/github-action-push-to-another-repository@483689a71cf9d3a0bbdd79d23e00646ef4124391
+#       uses: cpina/github-action-push-to-another-repository@v1.4.1
+#       with:
+#         # Source before directory from the origin directory
+#         source-before-directory: # optional
+#         # Source directory from the origin directory
+#         source-directory: 
+#         # Name of the destination username/organization
+#         destination-github-username: 
+#         # Destination repository
+#         destination-repository-name: 
+#         # Email for the git commit
+#         user-email: 
+#         # Github server
+#         github-server: # optional, default is github.com
+#         # [Optional] Name for the git commit. Defaults to the destination username/organization name
+#         user-name: # optional, default is 
+#         # [Optional] Username/organization for the destination repository
+#         destination-repository-username: # optional, default is 
+#         # [Optional] set target branch name for the destination repository. Defaults to "main"
+#         target-branch: # optional, default is main
+#         # [Optional] commit message for the output repository. ORIGIN_COMMIT is replaced by the URL@commit in the origin repo
+#         commit-message: # optional, default is Update from ORIGIN_COMMIT
+#         # [Optional] The directory to wipe and replace in the target repository
+#         target-directory: # optional, default is 

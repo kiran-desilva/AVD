@@ -309,7 +309,7 @@ front_off.x = load_dist.x;
 front_off.load = sectional_load(front_off.Ff,front_off.Fr,front_off.Lt);
 front_off.Fi = load_dist.Fi;
 front_off.Fi_cg = load_dist.Fi_cg;
-front_off.shear = shear_force(front_off.load);
+front_off.shear = shear_force(front_off.load)*1.5; %  multiplied by 1.5 for ultimate load
 front_off.bending_moment = bending_moment(front_off.x,front_off.shear);
 front_off.shear_fit = fit(front_off.x,front_off.shear,'linearinterp');
 front_off.bending_moment_fit = fit(front_off.x,front_off.bending_moment,'linearinterp');
@@ -354,10 +354,10 @@ Fv = EngineMoment/(x_ac_h-x_ac_w);
 Fw = -Fv;
 
 oei.load =  dist_from_point(oei.x,Fw,x_ac_w) + dist_from_point(oei.x,Fv,x_ac_v);
-oei.shear =  shear_force(oei.load);
+oei.shear =  shear_force(oei.load)*1.5; % multiplied by 1.5 for ultimate load 
 
 %enforce bc of bending moment to find unkown moment assyumed to be given by wing
-oei.bending_moment_func =@(Mw)  bending_moment(oei.x,oei.shear) + (EngineMoment*(oei.x >= Xengine)) + Mw;
+oei.bending_moment_func =@(Mw)  bending_moment(oei.x,oei.shear) + (EngineMoment*(oei.x >= Xengine)) + (Mw*(oei.x >= x_ac_w));
 index_at = @(expr,idx) expr(idx);
 
 Mw_eq = fsolve(@(Mw) index_at(oei.bending_moment_func(Mw),length(load_dist.x)),0);

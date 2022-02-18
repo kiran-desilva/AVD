@@ -89,14 +89,14 @@ geometry.web_height_func = @(y) max(front_web_height, rear_web_height)*geometry.
 																						%% 	  max should however give largest stress
 
 %Material library has different units need to chage it
-% load materialLib
-% material = materialLib{1};
-material.E = 70E9;
-material.poisson_r = 1/3;
+load materialLib
+material = materialLib{1};
+% material.E = 70E9;
+% material.v = 1/3;
 
 
 %% TODO:
-design_params.stringer_pitch = 50E-3;
+design_params.stringer_pitch = 100E-3;
 design_params.stringer_thickness = 1E-3;
 design_params.stringer_web_height = 36E-3;
 design_params.flange_to_web_ratio = 0.3;
@@ -104,17 +104,18 @@ design_params.flange_to_web_ratio = 0.3;
 bending_moment_dist = fit(limiting_loadcase_distributions.points', limiting_loadcase_distributions.bm', 'smoothingspline');
 
 %design_params.stringer_pitch = 1e-3;
-rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
+rib_stringer_func(geometry, material, design_params, bending_moment_dist, true)
 return;
 
-stringer_pitch_param_space = linspace(2E-3, 50E-3, 50);
+stringer_pitch_param_space = linspace(100E-3, 300E-3, 50);
 % total_area = rib_stringer_func(geometry, material, design_params, bending_moment_dist, false)
 
 area_arr = [];
 for p = stringer_pitch_param_space
 	test_space = design_params;
 	test_space.stringer_pitch = p;
-	area_arr = [area_arr, rib_stringer_func(geometry, material, test_space, bending_moment_dist, false)];
+    out = rib_stringer_func(geometry, material, test_space, bending_moment_dist, false);
+	area_arr = [area_arr, out.total_volume];
 end
 
 [min_area, min_idx] = min(area_arr);
