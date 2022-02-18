@@ -1,4 +1,4 @@
-function [required_skin_thickness,max_shear_flow,total_shear_flow,q_func] = fuselage_shear_flow_analysis(loadcase,material,doplot)
+function [required_skin_thickness,max_shear_flow,total_shear_flow,q_func,fig] = fuselage_shear_flow_analysis(loadcase,material,doplot)
     
     df = 1.68; %fuselage
     rf = df/2;
@@ -15,7 +15,7 @@ function [required_skin_thickness,max_shear_flow,total_shear_flow,q_func] = fuse
     max_shear_flow_phi = phi_range(idx);
     required_skin_thickness = max_shear_flow/material.shear_yield;
     if doplot
-        figure
+        fig = figure
         polarplot(phi_range,abs(total_shear_flow_dist));
         ax1 = gca;
         ax1.ThetaZeroLocation = 'bottom';
@@ -23,5 +23,7 @@ function [required_skin_thickness,max_shear_flow,total_shear_flow,q_func] = fuse
         polarplot(phi_range,7500*ones(size(phi_range)));
         legend('Shear Flow Distribution','Fuselage')
         grid on
+
+
 
     end
