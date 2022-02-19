@@ -13,7 +13,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "greet"
-  push_figures_to_overleaf:
+  push_to_overleaf:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Push figures
+      - name: Push repo
         uses: cpina/github-action-push-to-another-repository@v1.4.1
         env:
             API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
