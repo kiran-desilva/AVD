@@ -39,7 +39,7 @@ stringer_height_range = generate_range(stringer_height_min,stringer_height_max);
 
 n_stringer_min = 10;
 n_stringer_max = 100;
-n_stringer_range = [10:1:100];
+n_stringer_range = [5:2:50];
 
 [FS,TS,HS,N] = ndgrid(skin_thickness_range,stringer_thickness_range,stringer_height_range,n_stringer_range); %create indivdual vectors for easy plotting
 [X] = ndgrid(skin_thickness_range,stringer_thickness_range,stringer_height_range,n_stringer_range);
@@ -61,8 +61,9 @@ parfor i_fs = 1:skin_thickness_range_length
                 stringer.thickness = stringer_thickness_range(i_ts);
                 stringer.web_height = stringer_height_range(i_hs);
                 N = n_stringer_range(i_n);
-                [~,weight] = fuselage_generate(material,loadcase,N,stringer,skin_thickness,0);
+                [fuse,weight] = fuselage_generate(material,loadcase,N,stringer,skin_thickness,0);
                 weights(i_fs,i_ts,i_hs,i_n) = weight;
+                fuselages(i_fs,i_ts,i_hs,i_n) =fuse;
             end
         end
     end

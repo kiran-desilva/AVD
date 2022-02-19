@@ -17,7 +17,7 @@ function [fuselage,total_weight,figlist] = fuselage_generate(material,loadcase,n
     catch e
         if strcmp(e.message,'TENSILEYIELD')
             disp('Fuselage Tensile Yield')
-            fuselage.total_weight = NaN;
+            fuselage.total_weight = -1;
             total_weight=fuselage.total_weight;
             return;
         else
@@ -30,7 +30,7 @@ function [fuselage,total_weight,figlist] = fuselage_generate(material,loadcase,n
     catch exception
         if strcmp(exception.message,'EFFECTIVEDISTANCE')
             disp("effective distance negative")
-            fuselage.total_weight = NaN;
+            fuselage.total_weight = -2;
             total_weight=fuselage.total_weight;
             return;
         else
@@ -43,7 +43,7 @@ function [fuselage,total_weight,figlist] = fuselage_generate(material,loadcase,n
     Rcs = (fuselage.max_principle_stress/fuselage.sigma_crit_c) + (fuselage.max_shear_stress/fuselage.sigma_crit_s)^2;
     if (Rcs > 1)
         disp("Fuselage Buckled eek")
-        fuselage.total_weight = NaN;
+        fuselage.total_weight = -3;
         total_weight=fuselage.total_weight;
         return;
     end
@@ -53,7 +53,7 @@ function [fuselage,total_weight,figlist] = fuselage_generate(material,loadcase,n
     catch e
         if contains(e.message,'Tried to sample catchpole diagram out of distribution') % hack
             disp('catchpole out of range')
-            fuselage.total_weight = NaN;
+            fuselage.total_weight = -4;
             total_weight=fuselage.total_weight;
             return;
         else
