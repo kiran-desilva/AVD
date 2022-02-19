@@ -1,4 +1,5 @@
 function [required_skin_thickness,max_shear_flow,total_shear_flow,q_func,fig] = fuselage_shear_flow_analysis(loadcase,material,doplot)
+    fig = 0;
     
     df = 1.68; %fuselage
     rf = df/2;

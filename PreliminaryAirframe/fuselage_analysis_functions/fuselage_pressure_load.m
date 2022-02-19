@@ -1,5 +1,5 @@
 %Calculated the required thicknesses to resist the pressure load at 45000ft with a cabin pressurization of 8000ft
-function [t1_t2,t_min_hoop,t_min_long,t_min_cap] = pressure_load(material)
+function [t1_t2,t_min_hoop,t_min_long,t_min_cap] = fuselage_pressure_load(material)
 
     abs_ceiling_alt = 45000;
     cabin_alt = 8000;

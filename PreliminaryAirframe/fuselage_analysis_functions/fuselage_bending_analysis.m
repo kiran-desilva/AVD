@@ -7,13 +7,13 @@
 %%%%
 
 %%assuming z stringers here
-function [weight_per_length,booms,max_principle_stress,fig] = fuselage_bending_analysis(loadcase,fuselage_skin_thickness,n_stringers,material,stringer,doplot)
+function [weight,booms,max_principle_stress,weight_per_length,fig] = fuselage_bending_analysis(loadcase,fuselage_skin_thickness,n_stringers,stringer,material,doplot)
 
-    
+    fig = 0;
 
     df = 1.68;
     cf = pi*df; %fuselage circumference
-
+    lf = 11.73;
     booms.phi = linspace(0,2*pi,n_stringers+1);
     booms.phi(end) = []; %remove last element as this overlaps with 0th element
     booms.x = (df/2) * cos(booms.phi);
@@ -43,15 +43,19 @@ function [weight_per_length,booms,max_principle_stress,fig] = fuselage_bending_a
     Mx = 0;
     booms.stress = (My/booms.total_iyy)*(booms.x) + (Mx/booms.total_ixx)*(booms.y);
     [max_principle_stress,max_principle_stress_idx] = max(booms.stress);
+    booms.max_principle_stress = max_principle_stress;
+    booms.max_bending_moment = My;
 
     max_yield_stress = material.tensile_yield;
 
     %check max princple stress is below yield stress
-    assert(max_principle_stress<=max_yield_stress,'tensile yield stress exceeded!!');
+    assert(max_principle_stress<=max_yield_stress,'TENSILEYIELD','tensile yield stress exceeded!!');
 
     total_csa = (n_stringers*booms.stringer_area) + (fuselage_skin_thickness*cf);
     weight_per_length = (total_csa * material.rho);
+    weight = weight_per_length*lf;
 
+    booms.material = material;
 
 
     if doplot
