@@ -21,7 +21,7 @@ N(nanidx) = NaN;
 
 figure
 hold on
-bubblechart3(TS(:),HS(:),N(:),100000*FS(:),weights(:))
+bubblechart3(TS(:),HS(:),N(:),100000*FS(:),weights(:));
 c = colorbar;
 zlabel('N Stringers')
 xlabel('Stringer Thickness [m]')
