@@ -3,6 +3,7 @@ function [frames,fig] = fuselage_light_frames(frame_material,sectionType,booms,s
     fig = 0;
     frames.L_conventional = 0.5; % this is for an airline, might be diff for buisness hjet
     df = 1.68;
+    lf = 11.37;
 
 
     stringer.flange_width = stringer.flange_to_web_ratio*stringer.web_height;
@@ -25,6 +26,7 @@ function [frames,fig] = fuselage_light_frames(frame_material,sectionType,booms,s
 
     %set euler critical buckling to occur at same stress for best efficency
     frames.L = Kna*pi*sqrt(booms.material.E/sigma_cr);
+   
 
     cf = 1/16000;
     frames.required_stiffness = cf*booms.max_bending_moment*(df^2)/frames.L;
@@ -39,34 +41,46 @@ function [frames,fig] = fuselage_light_frames(frame_material,sectionType,booms,s
     end
 
     %manufacturing constraints -> need to come back to this later
-    hmin = 0.05;
+    hmin = 1e-3;
     hmax = 0.2;
-    bmin = 0;
+    bmin = 1e-3;
     bmax = 0.1;
+    tmin = 1e-3;
+    tmax = 0.1;
 
+    function [c,ceq] = ix_constraint(x)
+        c = [];
+        ceq = [t_eq(x(2),x(3)) - x(1)];
+    end
+
+    min_area_result = fmincon(@(x) area_eq(x(1),x(2),x(3)),[.01 .01 .01],[],[],[],[],[hmin,bmin,tmin],[hmax,bmax,tmax],@ix_constraint);
     
-    min_area_result = fmincon(@(x) obj(x(1),x(2)),[.01 .01],[],[],[],[],[hmin bmin],[hmax,bmax]);
-    frames.b = min_area_result(1);
-    frames.h = min_area_result(2);
-    frames.t = obj(frames.b,frames.h);
+    % min_area_result = fmincon(@(x) obj(x(1),x(2)),[.01 .01],[],[],[],[],[hmin bmin],[hmax,bmax]);
+    frames.t = min_area_result(1);
+    frames.b = min_area_result(2);
+    frames.h = min_area_result(3);
     frames.csa = area_eq(frames.t,frames.b,frames.h);
-    frames.weight = frames.csa * (pi*df) * frame_material.rho;
+    frames.weight_per_frame = frames.csa * (pi*df) * frame_material.rho;
+    frames.number = floor(lf/frames.L); % estimate number of light frames
+    frames.weight = frames.weight_per_frame * frames.number;
 
     if doPlot
         %plot function space
-        fig = figure
+        fig = figure;
         b_range = linspace(bmin,bmax,1000);
         h_range = linspace(hmin,hmax,1000);
         [B,H] = meshgrid(b_range,h_range);
-        T = obj(B,H);
+        T = t_eq(B,H);
+        Area = area_eq(T,B,H);
         hold on
-        mesh(B,H,T)
+        mesh(B,H,T,Area)
         xlabel('Section Width [m]')
         ylabel('Section Height [m]')
         zlabel('Section Thickness [m]')
+        plot3(frames.b,frames.h,frames.t,'x','color','red','MarkerSize',10,'LineWidth',5)
         c = colorbar;
         c.Label.String = 'Section Area [m^2]';
         grid on
         
     end
-
+end

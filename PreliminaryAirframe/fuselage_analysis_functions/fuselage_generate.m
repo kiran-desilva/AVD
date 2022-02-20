@@ -4,6 +4,7 @@
 %%stringer.web_height
 
 function [fuselage,total_weight,figlist] = fuselage_generate(material,loadcase,n_stringer,stringer,fuselage_thickness,doplot)
+    fuselage.stringer = stringer;
     % get max shear flow
     figlist = [];
     [~,shear_flow,~,~,fig] = fuselage_shear_flow_analysis(loadcase,material,doplot);
@@ -19,6 +20,7 @@ function [fuselage,total_weight,figlist] = fuselage_generate(material,loadcase,n
             disp('Fuselage Tensile Yield')
             fuselage.total_weight = -1;
             total_weight=fuselage.total_weight;
+            fuselage.error = e;
             return;
         else
             rethrow(e)
@@ -27,20 +29,22 @@ function [fuselage,total_weight,figlist] = fuselage_generate(material,loadcase,n
 
     try
         [fuselage.sigma_crit_c,fuselage.sigma_crit_s] = fuselage_skin_buckling_analysis(fuselage.stringerpanel.booms);
-    catch exception
-        if strcmp(exception.message,'EFFECTIVEDISTANCE')
+    catch e
+        if strcmp(e.message,'EFFECTIVEDISTANCE')
             disp("effective distance negative")
             fuselage.total_weight = -2;
             total_weight=fuselage.total_weight;
+            fuselage.error = e;
             return;
         else
-            rethrow(exception)
+            rethrow(e)
         end
     end
 
     % check mixed mode buckling criteron
 
     Rcs = (fuselage.max_principle_stress/fuselage.sigma_crit_c) + (fuselage.max_shear_stress/fuselage.sigma_crit_s)^2;
+    fuselage.Rcs = Rcs;
     if (Rcs > 1)
         disp("Fuselage Buckled eek")
         fuselage.total_weight = -3;
@@ -55,6 +59,13 @@ function [fuselage,total_weight,figlist] = fuselage_generate(material,loadcase,n
             disp('catchpole out of range')
             fuselage.total_weight = -4;
             total_weight=fuselage.total_weight;
+            fuselage.error = e;
+            return;
+        elseif contains(e.message,'Objective function is undefined')
+            disp('fmincon error')
+            fuselage.total_weight = -5;
+            total_weight=fuselage.total_weight;
+            fuselage.error = e;
             return;
         else
             rethrow(e)
