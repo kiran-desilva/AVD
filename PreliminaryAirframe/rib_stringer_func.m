@@ -192,4 +192,5 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 	end
 
 	output.total_volume = total_volume;
+	output.total_weight = total_volume*material.rho;
 end
