@@ -47,9 +47,9 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 	x_front_spar = @(y) x_at_some_percent_chord(y, geometry.spar.front_x_c);
 	x_rear_spar = @(y) x_at_some_percent_chord(y, geometry.spar.rear_x_c);
 
+	options = optimoptions('fsolve','Display','none');
 
 	starting_no_of_stringers = floor(geometry.box_width_func(0)/design_params.stringer_pitch);
-	disp(starting_no_of_stringers)
 
 	% Place the stringers s.t. the middle stringer connects middle of wingbox
 	% at root to middle of wingbox at tip
@@ -62,8 +62,8 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 	stringer_func = @(y, root_intercept_percent) slope*y + x_front_spar(0) - geometry.box_width_func(0)*root_intercept_percent;
 
 	placed_stringer_func = @(y) stringer_func(y, stringer_x_space');
-    intercepts = min([fsolve(@(x) x_front_spar(x) - placed_stringer_func(x), zeros(starting_no_of_stringers, 1)),...
-        fsolve(@(x) x_rear_spar(x) - placed_stringer_func(x), zeros(starting_no_of_stringers, 1))], [], 2);
+    intercepts = min([fsolve(@(x) x_front_spar(x) - placed_stringer_func(x), zeros(starting_no_of_stringers, 1), options),...
+        fsolve(@(x) x_rear_spar(x) - placed_stringer_func(x), zeros(starting_no_of_stringers, 1), options)], [], 2);
 
 	stringer_length_till_y = @(y, stringer_idx) vecnorm([y.*ones(size(stringer_idx)); stringer_func(y, stringer_x_space(stringer_idx))]...
                                                 - [zeros(size(stringer_idx)); stringer_func(0, stringer_x_space(stringer_idx))]);
@@ -133,7 +133,7 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 		%equate sigma_cr to euler buckling to find optimum length
 
 		rib_spacing = Kna*pi*sqrt(material.E/sigma_cr);
-		F = sigma_cr * sqrt(rib_spacing/(comp_load_per_length*material.E))
+		F = sigma_cr * sqrt(rib_spacing/(comp_load_per_length*material.E));
 		
 
 		assert(F < 1, 'F stands for fuuucked')
@@ -146,21 +146,9 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 
 		% sg = Fcalc*sqrt((comp_load_per_length*material.E)/)
 		
-
 		%% Draw a rib
 		spanwise_station = spanwise_station + rib_spacing;
-
-		
                 
-        if spanwise_station > geometry.semispan
-			total_volume = total_volume + panel_eff_area*(geometry.semispan - (spanwise_station - rib_spacing)); % panel untill the end
-            break;
-        end
-                
-		if doPlot
-			plot([spanwise_station, spanwise_station], [x_leading_edge(spanwise_station), x_trailing_edge(spanwise_station)], 'r');
-		end
-
 		previous_stringers_to_cut = intercepts < spanwise_station & intercepts > spanwise_station - rib_spacing;
 
 		if any(previous_stringers_to_cut) 
@@ -170,6 +158,16 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 			num_stringers = num_stringers - sum(previous_stringers_to_cut, 'all');
             continue;
         end
+
+        if spanwise_station > geometry.semispan
+			total_volume = total_volume + panel_eff_area*(geometry.semispan - (spanwise_station - rib_spacing)); % panel untill the end
+            break;
+        end
+
+		if doPlot
+			plot([spanwise_station, spanwise_station], [x_leading_edge(spanwise_station), x_trailing_edge(spanwise_station)], 'r');
+		end
+
 
 		output.F_array = [output.F_array, F];
 		output.rib_array = [output.rib_array, spanwise_station];

@@ -104,8 +104,8 @@ design_params.flange_to_web_ratio = 0.3;
 bending_moment_dist = fit(limiting_loadcase_distributions.points', limiting_loadcase_distributions.bm', 'smoothingspline');
 
 %design_params.stringer_pitch = 1e-3;
-rib_stringer_func(geometry, material, design_params, bending_moment_dist, true)
-return;
+% rib_stringer_func(geometry, material, design_params, bending_moment_dist, true)
+% return;
 
 stringer_pitch_param_space = linspace(100E-3, 300E-3, 50);
 % total_area = rib_stringer_func(geometry, material, design_params, bending_moment_dist, false)
@@ -114,7 +114,12 @@ area_arr = [];
 for p = stringer_pitch_param_space
 	test_space = design_params;
 	test_space.stringer_pitch = p;
-    out = rib_stringer_func(geometry, material, test_space, bending_moment_dist, false);
+	try
+		out = rib_stringer_func(geometry, material, test_space, bending_moment_dist, false);
+	catch ME
+		warning(ME.message);
+		out.total_volume = NaN;
+	end
 	area_arr = [area_arr, out.total_volume];
 end
 
