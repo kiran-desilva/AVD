@@ -42,7 +42,7 @@ function [frames,fig] = fuselage_light_frames(frame_material,sectionType,booms,s
 
     %manufacturing constraints -> need to come back to this later
     hmin = 1e-3;
-    hmax = 0.2;
+    hmax = 0.1;
     bmin = 1e-3;
     bmax = 0.1;
     tmin = 1e-3;

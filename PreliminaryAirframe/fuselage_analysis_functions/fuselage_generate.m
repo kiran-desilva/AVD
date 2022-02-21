@@ -61,13 +61,20 @@ function [fuselage,total_weight,figlist] = fuselage_generate(material,loadcase,n
             total_weight=fuselage.total_weight;
             fuselage.error = e;
             return;
-        elseif contains(e.message,'Objective function is undefined')
+        elseif contains(e.message,'Objective function is undefined') 
+            disp('fmincon error')
+            fuselage.total_weight = -5;
+            total_weight=fuselage.total_weight;
+            fuselage.error = e;
+            return;
+        elseif contains(e.message,'Nonlinear constraint function is undefined')
             disp('fmincon error')
             fuselage.total_weight = -5;
             total_weight=fuselage.total_weight;
             fuselage.error = e;
             return;
         else
+            
             rethrow(e)
         end
     end
@@ -77,7 +84,4 @@ function [fuselage,total_weight,figlist] = fuselage_generate(material,loadcase,n
     
     fuselage.total_weight = fuselage.frames.weight + fuselage.stringerpanel.weight;
     total_weight=fuselage.total_weight;
-
-
-
 

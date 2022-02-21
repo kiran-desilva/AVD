@@ -39,7 +39,7 @@ stringer_height_range = generate_range(stringer_height_min,stringer_height_max);
 
 n_stringer_min = 10;
 n_stringer_max = 100;
-n_stringer_range = [4:2:50];
+n_stringer_range = [4:2:100];
 
 [FS,TS,HS,N] = ndgrid(skin_thickness_range,stringer_thickness_range,stringer_height_range,n_stringer_range); %create indivdual vectors for easy plotting
 [X] = ndgrid(skin_thickness_range,stringer_thickness_range,stringer_height_range,n_stringer_range);
@@ -69,11 +69,6 @@ parfor i_fs = 1:skin_thickness_range_length
     end
 end
 
+save test_weights_3
 
-
-
-
-
-
-
-save fuselageStructure
+fuselage_search_analysis(load("test_weights_3.mat")) %hacky for now cba
