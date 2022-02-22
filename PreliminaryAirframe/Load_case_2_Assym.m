@@ -19,18 +19,18 @@ F_v = (T_1eng_max * Y_engine) / (X_ac_v - X_ac_W); %force on vertical tail plane
 
 F_vperm = F_v / s_v; %rectangular lift distribution
 
-ShearForce_vt = @(z) F_vperm * (z - s_v); %shear force and bending moment for vertical tail
-BendingMoment_vt = @(z) -F_vperm * (s_v - z).^2 / 2;
+VerticalTail.ShearForce_vt = @(z) F_vperm * (z - s_v); %shear force and bending moment for vertical tail
+VerticalTail.BendingMoment_vt = @(z) -F_vperm * (s_v - z).^2 / 2;
 
 figure
 z = linspace(0,s_v,1000);
-plot(z, ShearForce_vt(z))
+plot(z, VerticalTail.ShearForce_vt(z))
 xlabel("z (m)", 'interpreter', 'Latex')
 ylabel("Shear Force (N)", 'interpreter', 'Latex')
 grid on
 
 figure
-plot(z, BendingMoment_vt(z))
+plot(z, VerticalTail.BendingMoment_vt(z))
 xlabel("z (m)", 'interpreter', 'Latex')
 ylabel("Bending Moment (Nm)", 'interpreter', 'Latex')
 grid on
@@ -42,21 +42,23 @@ croot = 1.0015;
 ztip = 2.3887/2; 
 c_V = @(z) ((ctip - croot)/ztip) * (z - ztip) + ztip; 
 
-VTailLoad = F_v / 1000; %Force at each of 1000 stations
-VTorsiondist = Torsion(z, c_V, VTailLoad); 
+VerticalTail.VTailLoad = F_v / 1000; %Force at each of 1000 stations
+VerticalTail.VTorsiondist = Torsion(z, c_V, VerticalTail.VTailLoad); 
 figure
-plot(z, VTorsiondist)
+plot(z, VerticalTail.VTorsiondist)
 xlabel("z (m)", 'interpreter', 'Latex')
 ylabel("Vertical Tail Torque distribution (Nm)", 'interpreter', 'Latex')
 grid on
 
-Torque = sum(VTorsiondist) - cumsum(VTorsiondist) + VTorsiondist; 
+VerticalTail.Torque = sum(VerticalTail.VTorsiondist) - cumsum(VerticalTail.VTorsiondist) + VerticalTail.VTorsiondist; 
 
 figure
-plot(z, Torque)
+plot(z, VerticalTail.Torque)
 xlabel("z (m)", 'interpreter', 'Latex')
 ylabel("Vertical Tail Torque (Nm)", 'interpreter', 'Latex')
 grid on
+
+save("VerticalTail.mat");
 
 function [Torsion] = Torsion(z, c_V, VTailLoad)
     CoF = (0.7-0.15) .* c_V(z) / 2 + 0.15 .* c_V(z); %center of flexure midway between spars
