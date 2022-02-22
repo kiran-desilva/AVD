@@ -36,7 +36,8 @@ function [analysis] = fuselage_search_analysis(data)
     % ylabel('Stringer Thickness')
     % zlabel('Stringer Height')
     % c.Label.String = "Weight";
-    % caxis([0 100])
+    % caxis([200 2000])
+
     xlabel('Stringer Thickness')
     ylabel('Stringer Height')
     zlabel('Weight')
@@ -99,7 +100,7 @@ function [analysis] = fuselage_search_analysis(data)
 
         gplotmatrix(X_new,[],data.weights(:),[],[],15,[],[],varNames)
     end
-    
+
     function [slice] = create_slice(fs_idx,data)
         flatten = @(x) x(:);
     
