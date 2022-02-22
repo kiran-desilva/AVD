@@ -37,7 +37,8 @@ options = optimoptions('fmincon','Display','iter','ConstraintTolerance',1e-20,'O
 % x0 = [50,1.1e-3,0.02,0.0013]; %set x0 to the optimal found during the grid search
 
 % x0 = [6e-3,1.5e-3,1.5e-2,1.1e-3]; %set x0 to the optimal found during the grid search
-x0 = [7e-3,1.5e-3,1.5e-2,1.1e-3]
+x0 = [7e-3,1.5e-3,1.5e-2,1.1e-3]; % note stringer panel number has been scaled so is a similar magnitude to other parameters
+
 % options = optimoptions('ga','Display','iter','InitialPopulation',x0,'UseParallel',true,'PlotFcn',@gaplotbestf,'MutationFcn','mutationgaussian');
 % x0 = [6.2e-3,1e-3,1.05e-2,1.2e-3];
 % x0 = [6.5e-3,1.2e-3,1.444e-2,1.1e-3]; 

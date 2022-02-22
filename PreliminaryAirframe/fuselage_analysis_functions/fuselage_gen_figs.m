@@ -11,8 +11,8 @@ function [figs,fout] = fuselage_gen_figs(fuselage_struct,save)
 
     if save
         for f = figs
-            improvePlot(f)
-            saveas(f,"Figures/" + f.Name,"epsc")
+            % improvePlot(f)
+            saveas(f,"Figures/" + f.Name,"png")
         end
     end
     
