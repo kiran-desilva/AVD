@@ -5,6 +5,7 @@
 
 function [fuselage,total_weight,figlist] = fuselage_generate(material,loadcase,n_stringer,stringer,fuselage_thickness,doplot)
     fuselage.stringer = stringer;
+    fuselage.loadcase = loadcase;
     % get max shear flow
     figlist = [];
     [~,shear_flow,~,~,fig] = fuselage_shear_flow_analysis(loadcase,material,doplot);
