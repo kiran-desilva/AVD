@@ -203,6 +203,8 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
         stringer_x_data(~valid_indices) = NaN;
         stringer_y_data(~valid_indices) = NaN;
 		plot(stringer_x_data, stringer_y_data, 'g');
+        xlabel("y [m]")
+        ylabel("x [m]")
 		hold off;
 	end
 
