@@ -15,15 +15,42 @@ function [required_skin_thickness,max_shear_flow,total_shear_flow,q_func,fig] = 
     [max_shear_flow,idx] = max(abs(total_shear_flow_dist));
     max_shear_flow_phi = phi_range(idx);
     required_skin_thickness = max_shear_flow/material.shear_yield;
+
+
     if doplot
-        fig = figure
-        polarplot(phi_range,abs(total_shear_flow_dist));
-        ax1 = gca;
-        ax1.ThetaZeroLocation = 'bottom';
+        fig = figure('Name','skin_shear_flow_dist')
+
         hold on
-        polarplot(phi_range,7500*ones(size(phi_range)));
-        legend('Shear Flow Distribution','Fuselage')
+
+        unit_shear_flow_dist = abs(total_shear_flow_dist)./max(total_shear_flow_dist);
+        fuselage = ones(size(phi_range));
+        fuselage_dist = fuselage + unit_shear_flow_dist;
+
+        [fx,fy] = pol2cart(phi_range+(pi/2),fuselage);
+        [fsx,fsy] = pol2cart(phi_range+(pi/2),fuselage_dist);
+        
+        fuse = plot(fx,fy,'color','red')
+        dist = plot(fsx,fsy,'color','green')
+        
+
+        
+
+        for i=1:5:length(phi_range)
+            p = plot([fx(i) fsx(i)],[fy(i) fsy((i))],'color','green');
+
+        end
+
+        legend([fuse dist],'Fuselage','Scaled Shear Flow Distribution')
+        
+        
+
+        
+        xlabel('X coordinate')
+        ylabel('Y coordinate')
+
         grid on
+        axis equal
+        xlim([-2.25 2.25])
 
 
 

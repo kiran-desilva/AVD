@@ -59,7 +59,7 @@ function [weight,booms,max_principle_stress,weight_per_length,fig] = fuselage_be
 
 
     if doplot
-        fig = figure
+        fig = figure("Name",'fuselage_boom_shear_bending')
         hold on
         phirange = linspace(0,2*pi,1000);
         plot3(0.5*df*cos(phirange),0.5*df*sin(phirange),zeros(size(phirange)),'color','blue');
