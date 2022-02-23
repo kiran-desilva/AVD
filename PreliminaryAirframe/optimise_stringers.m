@@ -179,6 +179,12 @@ disp(design_params);
 out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
 improvePlot(gcf)
 
+figure;
+plot(out.rib_array, out.F_array);
+xlabel("Spanwise Station [m]");
+ylabel("F Factor");
+grid on;
+
 
 function output_vol = optimiser_func(x, geometry, material, design_params, bending_moment_dist)
     design_params.stringer_pitch = x(1);

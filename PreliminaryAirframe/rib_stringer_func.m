@@ -159,12 +159,14 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 		
 		%% Draw a rib
 		spanwise_station = spanwise_station + rib_spacing;
+
+		fudge_nr = 0.95;
                 
-		previous_stringers_to_cut = intercepts < spanwise_station + delta_matrix(spanwise_station) & intercepts > spanwise_station - rib_spacing + delta_matrix(spanwise_station - rib_spacing);
+		previous_stringers_to_cut = intercepts < spanwise_station + fudge_nr*delta_matrix(spanwise_station) & intercepts > spanwise_station - rib_spacing + fudge_nr*delta_matrix(spanwise_station - rib_spacing);
 
 		if any(previous_stringers_to_cut) 
             tmp_delta = delta_matrix(spanwise_station - rib_spacing);
-			intercepts(previous_stringers_to_cut) = (spanwise_station - rib_spacing + tmp_delta(previous_stringers_to_cut)); % cut the previous stringers which didnt reach far enough
+			intercepts(previous_stringers_to_cut) = (spanwise_station - rib_spacing + fudge_nr*tmp_delta(previous_stringers_to_cut)); % cut the previous stringers which didnt reach far enough
 			% now we have to redo the current iteration because the number of stringers changed (as some previous ones were cut)
 			spanwise_station = spanwise_station - rib_spacing;
 			num_stringers = num_stringers - sum(previous_stringers_to_cut, 'all');
