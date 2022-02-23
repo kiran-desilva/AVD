@@ -46,6 +46,10 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 	x_at_some_percent_chord = @(y, percent_chord) x_leading_edge(y) - geometry.c(y)*percent_chord;
 	x_front_spar = @(y) x_at_some_percent_chord(y, geometry.spar.front_x_c);
 	x_rear_spar = @(y) x_at_some_percent_chord(y, geometry.spar.rear_x_c);
+    x_flexural_axis = @(y) (x_front_spar(y) + x_rear_spar(y))*0.5;
+    
+    flexural_axis_angle = atan(x_flexural_axis(0) - x_flexural_axis(1)/(0 - 1));
+    delta = @(y) ((x_front_spar(y) - x_rear_spar(y))*tan(flexural_axis_angle));
 
 	options = optimoptions('fsolve','Display','none');
 
@@ -68,6 +72,11 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 	stringer_length_till_y = @(y, stringer_idx) vecnorm([y.*ones(size(stringer_idx)); stringer_func(y, stringer_x_space(stringer_idx))]...
                                                 - [zeros(size(stringer_idx)); stringer_func(0, stringer_x_space(stringer_idx))]);
     percentage_of_stringer_at_y = @(y, stringer_idx) stringer_length_till_y(y, stringer_idx)./stringer_length_till_y(intercepts(stringer_idx)', stringer_idx);
+
+	sign_matrix(placed_stringer_func(0) > x_flexural_axis(0)) = -1;
+	sign_matrix(placed_stringer_func(0) <= x_flexural_axis(0)) = 1;
+    sign_matrix = sign_matrix';
+	delta_matrix = @(y) sign_matrix.*repmat(delta(y), size(intercepts));
 
 	if doPlot
 		y_space = linspace(0, geometry.semispan, 1000);
@@ -92,17 +101,20 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 
 	output.F_array = [];
 	output.rib_array = [];
-	while true
+    output.panel_thickness = [];
+    
+    
+	stringer.flange_width = design_params.stringer_web_height*design_params.flange_to_web_ratio;
+	stringer.cross_sec_area = design_params.stringer_thickness*design_params.stringer_web_height + 2*stringer.flange_width*design_params.stringer_thickness;% TODO: As appropriate for the selected stringer type
+    K = 4 * (pi^2)/(12*(1-(material.v^2))); % From buckling of SS plate plot, taken for a/b -> infinity
+    assert(design_params.stringer_web_height < 0.5*geometry.web_height_func(geometry.semispan), 'Stringer height too large');
+    while true
         
 		bending_moment = bending_moment_dist(spanwise_station);
 
 		box_width = geometry.box_width_func(spanwise_station);
 		web_height = geometry.web_height_func(spanwise_station);
 
-		stringer.flange_width = design_params.stringer_web_height*design_params.flange_to_web_ratio;
-		stringer.cross_sec_area = design_params.stringer_thickness*design_params.stringer_web_height + 2*stringer.flange_width*design_params.stringer_thickness;% TODO: As appropriate for the selected stringer type
-
-		K = 4 * (pi^2)/(12*(1-(material.v^2))); % From buckling of SS plate plot, taken for a/b -> infinity
 		comp_load_per_length = bending_moment/(box_width*web_height);
 		panel_thickness = ((comp_load_per_length*design_params.stringer_pitch^2)/(K*material.E))^(1/3);
 		sigma_0 = comp_load_per_length/panel_thickness; % Critical Buckling Stress -> need to adjust this
@@ -136,8 +148,7 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 		F = sigma_cr * sqrt(rib_spacing/(comp_load_per_length*material.E));
 		
 
-		assert(F < 1, 'F stands for fuuucked')
-
+		assert(F < 1, 'F stands for fuuucked') 
 
 		%% FARRAR efficiency factor
 		A_s_over_bt = stringer.cross_sec_area/(design_params.stringer_pitch*panel_thickness);
@@ -149,10 +160,11 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 		%% Draw a rib
 		spanwise_station = spanwise_station + rib_spacing;
                 
-		previous_stringers_to_cut = intercepts < spanwise_station & intercepts > spanwise_station - rib_spacing;
+		previous_stringers_to_cut = intercepts < spanwise_station + delta_matrix(spanwise_station) & intercepts > spanwise_station - rib_spacing + delta_matrix(spanwise_station - rib_spacing);
 
 		if any(previous_stringers_to_cut) 
-			intercepts(previous_stringers_to_cut) = (spanwise_station - rib_spacing); % cut the previous stringers which didnt reach far enough
+            tmp_delta = delta_matrix(spanwise_station - rib_spacing);
+			intercepts(previous_stringers_to_cut) = (spanwise_station - rib_spacing + tmp_delta(previous_stringers_to_cut)); % cut the previous stringers which didnt reach far enough
 			% now we have to redo the current iteration because the number of stringers changed (as some previous ones were cut)
 			spanwise_station = spanwise_station - rib_spacing;
 			num_stringers = num_stringers - sum(previous_stringers_to_cut, 'all');
@@ -165,18 +177,21 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
         end
 
 		if doPlot
-			plot([spanwise_station, spanwise_station], [x_leading_edge(spanwise_station), x_trailing_edge(spanwise_station)], 'r');
+			plot([spanwise_station + delta(spanwise_station), spanwise_station - delta(spanwise_station)], [x_rear_spar(spanwise_station + delta(spanwise_station)), x_front_spar(spanwise_station - delta(spanwise_station))], 'r');
 		end
 
 
 		output.F_array = [output.F_array, F];
 		output.rib_array = [output.rib_array, spanwise_station];
+        output.panel_thickness = [output.panel_thickness, panel_thickness];
+        
+        
 		
 		% intercepts(stringers_to_cut) = spanwise_station;
 		total_volume = total_volume + panel_eff_area*rib_spacing;
 		total_volume = total_volume + geometry.A0*geometry.c(spanwise_station)^2*2E-3;	% account for ribs as well, might be kinda dodgy tho
 																						% bcs we dont know rib thickness yet
-	end
+    end
 
 	if doPlot
 		stringer_x_data = repmat(y_space, starting_no_of_stringers, 1)';

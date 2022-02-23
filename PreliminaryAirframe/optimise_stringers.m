@@ -1,6 +1,6 @@
 clear
 clc
-% close all
+close all
 addpath(fullfile('.', 'helper_funcs')); 
 
 airfoilcoords.top = [1.00000     0.00000;
@@ -96,44 +96,100 @@ material = materialLib{1};
 
 
 %% TODO:
-design_params.stringer_pitch = 100E-3;
-design_params.stringer_thickness = 1E-3;
+design_params.stringer_pitch = 0.0364;
+design_params.stringer_thickness = 3E-4;
 design_params.stringer_web_height = 36E-3;
 design_params.flange_to_web_ratio = 0.3;
 
 bending_moment_dist = fit(limiting_loadcase_distributions.points', limiting_loadcase_distributions.bm', 'smoothingspline');
 
-%design_params.stringer_pitch = 1e-3;
-% rib_stringer_func(geometry, material, design_params, bending_moment_dist, true)
-% return;
+design_params.stringer_pitch = 100e-3;
+%rib_stringer_func(geometry, material, design_params, bending_moment_dist, true)
+%return;
+mode = 29;
 
-stringer_pitch_param_space = linspace(100E-3, 300E-3, 50);
-% total_area = rib_stringer_func(geometry, material, design_params, bending_moment_dist, false)
+if mode == 0
+    stringer_pitch_param_space = linspace(10E-3, 300E-3, 50);
+    stringer_thickness_param_space = linspace(1E-4, 5E-3, 20);
+    stringer_web_height_param_space = linspace(10E-3, 50E-3, 20);
+    % total_area = rib_stringer_func(geometry, material, design_params, bending_moment_dist, false)
 
-area_arr = [];
-for p = stringer_pitch_param_space
-	test_space = design_params;
-	test_space.stringer_pitch = p;
-	try
-		out = rib_stringer_func(geometry, material, test_space, bending_moment_dist, false);
-	catch ME
-		warning(ME.message);
-		out.total_volume = NaN;
-	end
-	area_arr = [area_arr, out.total_volume];
+    optimisation.point_arr = [];
+    optimisation.area_arr = [];
+    point_arr = [];
+    area_arr = [];
+    parfor (p_idx = 1:numel(stringer_pitch_param_space), 16)
+        test_space = design_params;
+        for t = stringer_thickness_param_space
+            for w = stringer_web_height_param_space
+                test_space.stringer_pitch = stringer_pitch_param_space(p_idx);
+                test_space.stringer_thickness = t;
+                test_space.stringer_web_height = w;
+                try
+                    out = rib_stringer_func(geometry, material, test_space, bending_moment_dist, false);
+                catch ME
+                    %disp(['b = ', num2str(test_space.stringer_pitch), ' t_s = ', num2str(test_space.stringer_thickness), ' w = ', num2str(test_space.stringer_web_height)]);
+                    %warning(ME.message);
+                    out.total_volume = NaN;
+                end
+
+                point_arr = [point_arr, [stringer_pitch_param_space(p_idx); t; w]];
+                area_arr = [area_arr, out.total_volume];
+            end
+        end
+    end
+    optimisation.point_arr = point_arr;
+    optimisation.area_arr = area_arr;
+elseif mode == 1
+    f = @(x) optimiser_func(x, geometry, material, design_params, bending_moment_dist);
+    %options = optimoptions(@fmincon,'Display','iter')
+    options = optimset('TolCon',1e-18,'TolX',1e-19,'PlotFcns',@optimplotfval, 'UseParallel', true);
+    x = fmincon(f, [0.0869; 0.0011; 0.0226], [], [], [], [], [5e-4; 5e-4; 5e-4], [1; 100e-3; 30e-3], [], options)
+    
+    design_params.stringer_pitch = x(1);
+    design_params.stringer_thickness = x(2);
+    design_params.stringer_web_height = x(3);
+    disp(design_params);
+    out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
+    improvePlot(gcf)
+    return;
+else 
+    load('optimisation')
 end
-
-[min_area, min_idx] = min(area_arr);
+[optimisation.min_area, optimisation.min_idx] = min(area_arr);
+save('optimisation')
 
 figure;
 hold on;
-plot(stringer_pitch_param_space, area_arr);
-scatter(stringer_pitch_param_space(min_idx), min_area, 20, 'k', 'x');
+% plot(stringer_pitch_param_space, area_arr);
+scatter3(optimisation.point_arr(2, :), optimisation.point_arr(3, :), optimisation.area_arr, 50, optimisation.point_arr(1, :), 'filled');
+scatter3(optimisation.point_arr(2, optimisation.min_idx), optimisation.point_arr(3, optimisation.min_idx), optimisation.min_area, 100, 'k', 'x');
+c = colorbar;
 grid on;
 title("Stringer Optimisation")
-xlabel("Stringer Pitch [m]")
-ylabel("Total Volume [m^3]")
+xlabel("Stringer Thickness [m]")
+ylabel("Stringer Web Height [m]")
+zlabel("Total Volume [m^3]")
 hold off;
 
-design_params.stringer_pitch = stringer_pitch_param_space(min_idx);
-rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
+design_params.stringer_pitch = optimisation.point_arr(1, optimisation.min_idx);
+design_params.stringer_thickness = optimisation.point_arr(2, optimisation.min_idx);
+design_params.stringer_web_height = optimisation.point_arr(3, optimisation.min_idx);
+disp(design_params);
+out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
+improvePlot(gcf)
+
+
+function output_vol = optimiser_func(x, geometry, material, design_params, bending_moment_dist)
+    design_params.stringer_pitch = x(1);
+    design_params.stringer_thickness = x(2);
+    design_params.stringer_web_height = x(3);
+    %disp(design_params)
+    try
+        out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, false);
+        output_vol = out.total_volume;
+    catch ME
+        output_vol = NaN;
+    end
+    
+end
