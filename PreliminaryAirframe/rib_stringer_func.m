@@ -151,9 +151,9 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 		assert(F < 1, 'F stands for fuuucked') 
 
 		%% FARRAR efficiency factor
-		A_s_over_bt = stringer.cross_sec_area/(design_params.stringer_pitch*panel_thickness);
-		Fcalc = farrar_calculator(A_s_over_bt, t_s_over_t);
-		rbs = comp_load_per_length*material.E*(Fcalc/sigma_cr)^2;
+		%A_s_over_bt = stringer.cross_sec_area/(design_params.stringer_pitch*panel_thickness);
+		%Fcalc = farrar_calculator(A_s_over_bt, t_s_over_t);
+		%rbs = comp_load_per_length*material.E*(Fcalc/sigma_cr)^2;
 
 		% sg = Fcalc*sqrt((comp_load_per_length*material.E)/)
 		
