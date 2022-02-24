@@ -1,51 +1,57 @@
 
-function [analysis] = fuselage_search_analysis(data)
+function [analysis] = fuselage_search_analysis(data,doplot)
     
     %plot full domian
     analysis.full_domain = get_domain(data);
     % scatter_plot(analysis.full_domain);
-    multi_variable_plot(analysis.full_domain);
+    
 
     %filter for failure codes
     analysis.fail_domain = get_filtered_domian(data,data.weights(:)<0);
-    multi_variable_plot(analysis.fail_domain);
+    
 
     %filter for valid solutions
     analysis.valid_domain = get_filtered_domian(data,data.weights(:)>0);
-    multi_variable_plot(analysis.valid_domain);
+    
     %find the best solution
     [~,analysis.valid_domain.best_idx] = min(analysis.valid_domain.weights(:));
     analysis.best_fuselage = analysis.valid_domain.fuselages{analysis.valid_domain.best_idx};
     analysis.valid_domain.valid_fuselages = cellfun(@(x) x, analysis.valid_domain.fuselages(analysis.valid_domain.idx));
     
-    %3d slice plots
-    figure
-    hold on
+    if doplot
+        multi_variable_plot(analysis.full_domain);
+        multi_variable_plot(analysis.fail_domain);
+        multi_variable_plot(analysis.valid_domain);
+        %3d slice plots
+        figure
+        hold on
 
-    fs_idx = [1 2 3 4 5 6 7 8 9];
-    subplot_dimentions = [3,3];
+        fs_idx = [1 2 3 4 5 6 7 8 9];
+        subplot_dimentions = [3,3];
 
-    for i=1:length(fs_idx)
-    subplot(subplot_dimentions(1),subplot_dimentions(2),i);
-    plot_slice(fs_idx(i),analysis);
-    c = colorbar;
-    colormap(turbo)
-    title(num2str(fs_idx(i)));
+        for i=1:length(fs_idx)
+            subplot(subplot_dimentions(1),subplot_dimentions(2),i);
+            plot_slice(fs_idx(i),analysis);
+            c = colorbar;
+            colormap(turbo)
+            title(num2str(fs_idx(i)));
 
-    % xlabel('N')
-    % ylabel('Stringer Thickness')
-    % zlabel('Stringer Height')
-    % c.Label.String = "Weight";
-    % caxis([200 2000])
+            % xlabel('N')
+            % xlabel('Fuselage Thickness')
+            % ylabel('Stringer Thickness')
+            % zlabel('Stringer Height')
+            % c.Label.String = "Weight";
+            % caxis([200 2000])
 
-    xlabel('Stringer Thickness')
-    ylabel('Stringer Height')
-    zlabel('Weight')
-    c.Label.String = "N stringers";
-    caxis([0 100])
+            xlabel('Stringer Thickness')
+            ylabel('Stringer Height')
+            zlabel('Weight')
+            c.Label.String = "N stringers";
+            caxis([0 100])
 
-    grid on
+            grid on
 
+        end
     end
 
 
@@ -112,6 +118,7 @@ function [analysis] = fuselage_search_analysis(data)
         slice.x = data.valid_domain.TS(fs_idx,:,:,:);
         slice.y = data.valid_domain.HS(fs_idx,:,:,:);
         slice.z = data.valid_domain.weights(fs_idx,:,:,:);
+
     end
     
     function [slice,ax] = plot_slice(fs_idx,data)

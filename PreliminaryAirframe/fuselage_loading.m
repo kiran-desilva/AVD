@@ -213,7 +213,8 @@ load_dist.load = -load_dist.load;
 sectional_load = @(Ff,Fr,Ft) load_dist.load + dist_from_point(load_dist.x,Ff,front_spar_x) + dist_from_point(load_dist.x,Fr,rear_spar_x) + dist_from_point(load_dist.x,Ft,x_ac_h);
 %shear force is simply addtion of the point load distribution
 shear_force = @(s_load) cumsum(s_load);
-bending_moment = @(x_dist,s_force) cumtrapz(x_dist,s_force);
+% bending_moment = @(x_dist,s_force) cumtrapz(x_dist,s_force);
+bending_moment = @(x_dist,s_force) cumtrapz(s_force*(x_dist(2)-x_dist(1)));
 
 %find required tail force for trim by taking global equilbrium of aircraft
 %add wing weight, fuel in wing,main landing gear note the negative signs as wieght acts downwards
