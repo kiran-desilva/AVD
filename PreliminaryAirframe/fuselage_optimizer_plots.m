@@ -125,24 +125,24 @@ view([-130 30])
 grid on
 
 
-% set(gcf, 'rend', 'painters', 'Units', 'pixels', 'pos', ...
-%         [100 100 1600 1200]);
+set(gcf, 'rend', 'painters', 'Units', 'pixels', 'pos', ...
+        [100 100 1600 1200]);
 
-% axis_handles=findobj(gcf,'type','axe');
+axis_handles=findobj(gcf,'type','axe');
 
-% for i = 1:length(axis_handles)
-%     ax = axis_handles(i);
+for i = 1:length(axis_handles)
+    ax = axis_handles(i);
 
-%     % Change default font size (tick labels, legend, etc.)
-%     set(ax, 'FontSize', 15, 'FontName', 'Arial', 'LineWidth', 1);
+    % Change default font size (tick labels, legend, etc.)
+    set(ax, 'FontSize', 15, 'FontName', 'Arial', 'LineWidth', 1);
     
-%     set(ax, 'Box', 'on');
+    set(ax, 'Box', 'on');
 
-%     % Change font size for axis text labels
-%     set(get(ax, 'XLabel'),'FontSize', 15, 'FontWeight', 'Bold');
-%     set(get(ax, 'YLabel'),'FontSize', 15, 'FontWeight', 'Bold');
+    % Change font size for axis text labels
+    set(get(ax, 'XLabel'),'FontSize', 15, 'FontWeight', 'Bold');
+    set(get(ax, 'YLabel'),'FontSize', 15, 'FontWeight', 'Bold');
 
-% end
+end
 
 
 
