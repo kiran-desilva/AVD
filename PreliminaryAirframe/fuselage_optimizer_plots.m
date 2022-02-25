@@ -3,8 +3,8 @@
 
 addpath(fullfile('.','fuselage_analysis_functions'))
 
-% grid_data = load('test_weights_3.mat');
-% analysis = fuselage_search_analysis(grid_data,0);
+grid_data = load('test_weights_3.mat');
+analysis = fuselage_search_analysis(grid_data,0);
 
 %plot valid function space
 
@@ -190,14 +190,12 @@ function [m] = create_mesh(x,y,fit)
     [X,Y] = meshgrid(x,y);
     Z = fit(X,Y);
     m = surf(X,Y,Z,'EdgeColor','interp');
-    % m = contourf(X,Y,Z);
 end  
 
 
 function [m] = create_contour(x,y,fit)
     [X,Y] = meshgrid(x,y);
     Z = fit(X,Y);
-    % m = mesh(X,Y,Z);
     m = contourf(X,Y,Z);
 end  
 

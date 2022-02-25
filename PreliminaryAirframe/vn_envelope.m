@@ -12,6 +12,7 @@ cl_max_neg = -0.684;
 
 %clean clalpha for wing at takeoff
 cl_alpha_w_0 = 5.6007;
+% cl_alpha_w_0 = 7;
 %clean clalpha at cruise altitude
 cl_alpha_w_cruise =  5.42;
 
@@ -63,21 +64,29 @@ k_sub = (0.88*mu)/(5.3+mu);
 delta_n(v,cl_alpha,ws,rho,Ude) = simplify((rho_0*k_sub*Ude*v*cl_alpha)/(2*ws));
 
 %taken from FAR-25 Transport Category Aircraft at 40kft
-Ude_Vd = 16.3*fts_to_ms; 
-Ude_Vc = 33*fts_to_ms;
-Ude_Vb = 47*fts_to_ms; 
+% Ude_Vd = 16.3*fts_to_ms; 
+Ude_Vd = 25*fts_to_ms; 
+% Ude_Vc = 33*fts_to_ms;
+Ude_Vc = 50*fts_to_ms;
+% Ude_Vb = 47*fts_to_ms; 
+Ude_Vb = 66*fts_to_ms; 
 Ude_Vb_0 = 20;
 
 % using uref, density and cl_alpha at sealevel , idk if this is right ngl 
 Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_cruise,ws_tow,rho_c,uref_func(0))));
+% Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,uref_func(0))));
+% Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb)));
 % Vb_sym = solve(n == 1 + delta_n(v,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb_0),v);
 % Vb = pos_solution(double(subs(Vb_sym,cl,cl_max_pos)));
 
 % Vb_delta_n = double(delta_n(Vb,cl_alpha_w_cruise,ws_end_cruise,rho_c,Ude_Vb));
-Vb_delta_n  = double(delta_n(Vb,cl_alpha_w_cruise,ws_tow,rho_c,Ude_Vb));
+% Vb_delta_n  = double(delta_n(Vb,cl_alpha_w_cruise,ws_tow,rho_c,Ude_Vb));
+% Vc_delta_n = double(delta_n(Vc,cl_alpha_w_cruise,ws_tow,rho_c,Ude_Vc));
+% Vd_delta_n = double(delta_n(Vd,cl_alpha_w_cruise,ws_tow,rho_c,Ude_Vd));
 
-Vc_delta_n = double(delta_n(Vc,cl_alpha_w_cruise,ws_tow,rho_c,Ude_Vc));
-Vd_delta_n = double(delta_n(Vd,cl_alpha_w_cruise,ws_tow,rho_c,Ude_Vd));
+Vb_delta_n  = double(delta_n(Vb,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb));
+Vc_delta_n = double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,Ude_Vc));
+Vd_delta_n = double(delta_n(Vd,cl_alpha_w_0,ws_tow,rho_0,Ude_Vd));
 %%%%%%%%%%%%%%%%%% %%
 
 
@@ -133,8 +142,8 @@ plot([Vd Vd],[n_max 0],'color',LLM_color,'linewidth',LLM_linewidth)
 GE_color = 'green';
 GE_linewidth = 2;
 
-% plot([0 Vb],[1 1+Vb_delta_n],'--','color','green')
-% plot([0 Vb],[1 1-Vb_delta_n],'--','color','green')
+plot([0 Vb],[1 1+Vb_delta_n],'--','color','green')
+plot([0 Vb],[1 1-Vb_delta_n],'--','color','green')
 
 plot([0 Vc],[1 1+Vc_delta_n],'--','color','green')
 plot([0 Vc],[1 1-Vc_delta_n],'--','color','green')
