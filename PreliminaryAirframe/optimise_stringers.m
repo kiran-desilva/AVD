@@ -109,22 +109,25 @@ design_params.stringer_pitch = 100e-3;
 mode = 1;
 
 if mode == 0
-    stringer_pitch_param_space = linspace(10E-3, 300E-3, 50);
-    stringer_thickness_param_space = linspace(1E-4, 5E-3, 20);
-    stringer_web_height_param_space = linspace(10E-3, 50E-3, 20);
+    stringer_pitch_param_space = linspace(10E-3, 300E-3, 60);
+    stringer_thickness_param_space = linspace(1E-4, 5E-3, 60);
+    stringer_web_height_param_space = linspace(10E-3, 50E-3, 60);
     % total_area = rib_stringer_func(geometry, material, design_params, bending_moment_dist, false)
 
     optimisation.point_arr = [];
     optimisation.area_arr = [];
     point_arr = [];
+    area_mesh_arr = zeros(numel(stringer_pitch_param_space), numel(stringer_thickness_param_space), numel(stringer_web_height_param_space));
     area_arr = [];
+    num_t = numel(stringer_thickness_param_space);
+    num_w = numel(stringer_web_height_param_space);
     parfor (p_idx = 1:numel(stringer_pitch_param_space), 16)
         test_space = design_params;
-        for t = stringer_thickness_param_space
-            for w = stringer_web_height_param_space
+        for t_idx = 1:num_t
+            for w_idx = 1:num_w
                 test_space.stringer_pitch = stringer_pitch_param_space(p_idx);
-                test_space.stringer_thickness = t;
-                test_space.stringer_web_height = w;
+                test_space.stringer_thickness = stringer_thickness_param_space(t_idx);
+                test_space.stringer_web_height = stringer_web_height_param_space(w_idx);
                 try
                     out = rib_stringer_func(geometry, material, test_space, bending_moment_dist, false);
                 catch ME
@@ -133,13 +136,19 @@ if mode == 0
                     out.total_volume = NaN;
                 end
 
-                point_arr = [point_arr, [stringer_pitch_param_space(p_idx); t; w]];
+                point_arr = [point_arr, [stringer_pitch_param_space(p_idx); stringer_thickness_param_space(t_idx); stringer_web_height_param_space(w_idx)]];
+                area_mesh_arr(p_idx, t_idx, w_idx) = out.total_volume;
                 area_arr = [area_arr, out.total_volume];
             end
         end
     end
+    optimisation.pitch_space = stringer_pitch_param_space;
+    optimisation.thickness_space = stringer_thickness_param_space;
+    optimisation.height_space = stringer_web_height_param_space;
+    
     optimisation.point_arr = point_arr;
     optimisation.area_arr = area_arr;
+    optimisation.area_mesh_arr = area_mesh_arr;
 elseif mode == 1
     f = @(x) optimiser_func(x, geometry, material, design_params, bending_moment_dist);
     %options = optimoptions(@fmincon,'Display','iter')
@@ -151,11 +160,20 @@ elseif mode == 1
     design_params.stringer_web_height = x(3);
     disp(design_params);
     out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
-    improvePlot(gcf)
+    improvePlot(gcf);
+    wing_layout = out;
+    save('wing_layout')
     return;
 else 
     load('optimisation')
+    
+    [X, Y, Z] = meshgrid(optimisation.thickness_space, optimisation.pitch_space, optimisation.height_space);
+    [min_ar, idx] = min(optimisation.area_mesh_arr, [], [3],'linear');
+
+    figure;
+    contourf(X(idx), Y(idx), min_ar, 5);
 end
+
 [optimisation.min_area, optimisation.min_idx] = min(area_arr);
 save('optimisation')
 
@@ -184,7 +202,6 @@ plot(out.rib_array, out.F_array);
 xlabel("Spanwise Station [m]");
 ylabel("F Factor");
 grid on;
-
 
 function output_vol = optimiser_func(x, geometry, material, design_params, bending_moment_dist)
     design_params.stringer_pitch = x(1);

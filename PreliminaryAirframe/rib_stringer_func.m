@@ -205,6 +205,13 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 		plot(stringer_x_data, stringer_y_data, 'g');
         xlabel("y [m]")
         ylabel("x [m]")
+        width = 0.2;
+        height = 0.1;
+        dim = [0.81-width, 0.9-height, width, height];
+        str = {['Stringer Pitch = ', num2str(round(design_params.stringer_pitch*1000,2)), ' mm'],...
+               ['Stringer Thickness = ', num2str(round(design_params.stringer_thickness*1000,2)), ' mm'],...
+               ['Stringer Web Height = ', num2str(round(design_params.stringer_web_height*1000,2)), ' mm']};
+        annotation('textbox',dim,'String',str,'FitBoxToText','on', 'FontWeight', 'bold', 'FontSize', 13, 'HorizontalAlignment', 'left');
 		hold off;
 	end
 
