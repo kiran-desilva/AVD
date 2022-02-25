@@ -160,7 +160,9 @@ elseif mode == 1
     design_params.stringer_web_height = x(3);
     disp(design_params);
     out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
-    improvePlot(gcf)
+    improvePlot(gcf);
+    wing_layout = out;
+    save('wing_layout')
     return;
 else 
     load('optimisation')
@@ -168,7 +170,6 @@ else
     [X, Y, Z] = meshgrid(optimisation.thickness_space, optimisation.pitch_space, optimisation.height_space);
     [min_ar, idx] = min(optimisation.area_mesh_arr, [], [3],'linear');
 
-    %thing1 = min(Z);
     figure;
     contourf(X(idx), Y(idx), min_ar, 5);
 end
@@ -201,10 +202,6 @@ plot(out.rib_array, out.F_array);
 xlabel("Spanwise Station [m]");
 ylabel("F Factor");
 grid on;
-
-function r = get_range(x)
-    
-end
 
 function output_vol = optimiser_func(x, geometry, material, design_params, bending_moment_dist)
     design_params.stringer_pitch = x(1);
