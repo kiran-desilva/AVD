@@ -211,7 +211,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 		subplot(5,1,3)
 		hold on;
 		plot(spanwise_disc, combined_force);
-		xline(bottom_edge_intercept, 'r')
+		% xline(bottom_edge_intercept, 'r')
 		% plot(X_hatch, Y_hatch, 'r')
 		xlim([0 semispan]);
 		% ylim([0 max(combined_loading)*1.1])
@@ -222,7 +222,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 		subplot(5,1,4)
 		hold on;
 		plot(spanwise_disc, shear_dist);
-		xline(bottom_edge_intercept, 'r')
+		% xline(bottom_edge_intercept, 'r')
 		grid on;
 		title(append(loadingCaseStr, "Shear Loading"))
 		xlim([0 semispan]);
@@ -232,7 +232,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 		subplot(5,1,5);
 		hold on;
 		plot(spanwise_disc, bm_dist);
-		xline(bottom_edge_intercept, 'r')
+		% xline(bottom_edge_intercept, 'r')
 		grid on;
 		title(append(loadingCaseStr, "Bending Moment"))
 		xlim([0 semispan]);
@@ -243,7 +243,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 		subplot(2,1,1);
 		hold on;
 		plot(spanwise_disc, lift.L_dist);
-		xline(bottom_edge_intercept, 'r')
+		% xline(bottom_edge_intercept, 'r')
 		grid on;
 		title(append(loadingCaseStr, "Lift Distribution"))
 		xlim([0 semispan]);
@@ -255,7 +255,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 		subplot(2,1,2);
 		hold on;
 		plot(spanwise_disc, wing.inertial_loading);
-		xline(bottom_edge_intercept, 'r')
+		% xline(bottom_edge_intercept, 'r')
 		grid on;
 		title(append(loadingCaseStr, "Wing Weight Distribution (Debug only)"))
 		xlim([0 semispan]);
