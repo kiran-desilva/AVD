@@ -184,8 +184,11 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 	bm_dist = sum(dM) - cumsum(dM) + dM;
     
     %lift.pitching_moment_load = 0;
-	torsional_dist = double(uc.torsional_load(spanwise_disc) + wing.torsional_load + lift.pitching_moment_load + lift.torsional_load); 
-	torque_dist = sum(torsional_dist) - cumsum(torsional_dist) + torsional_dist;
+	torsional_dist = double(uc.torsional_load(spanwise_disc) + wing.torsional_load + lift.pitching_moment_load + lift.torsional_load);
+    
+    temp = movsum(torsional_dist, 2)*delta_s/2;
+    dT = [temp(2:end), 0];
+	torque_dist = sum(dT) - cumsum(dT) + dT;
 
 	distributions.points = spanwise_disc;
 	distributions.bm = bm_dist;
