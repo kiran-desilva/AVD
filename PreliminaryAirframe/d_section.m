@@ -5,17 +5,17 @@
 clear
 clc
 
-load wing_ribs.mat %in PreliminaryAirframe file
+%in PreliminaryAirframe file
 load b_a_int.mat
 load a_b_int.mat
 load wing_layout.mat
 %% Wing box parameters
-b_ref=3.63; %wingbox span [m] -NEED TO VERIFY
-a=s; %d-cell span length
-b=0.12.*chord; %curved panel length - proportion of x/c. [NEED TO ESTABLISH THE PROPORTION]
-t1=ones(1,length(a)).*2e-03; %d-cell thickness (initial guess - 2mm)
-R1= 0.01.*chord; %D-cell radius at position of rib (taking minimum value of radius (1% of x/c). Could take the average?  
-
+%b_ref=3.63; %wingbox span [m] -NEED TO VERIFY
+a=ribs_check.s; %d-cell span length
+b=0.2.*ribs_check.chord; %curved panel length - proportion of x/c. [NEED TO ESTABLISH THE PROPORTION]
+t1=wing_layout.panel_thickness; %d-cell thickness 
+%R1= 0.01.*ribs_check.chord; %D-cell radius at position of rib (taking minimum value of radius (1% of x/c). Could take the average?  
+R1=ones(1,length(a));
 frac_A1=b./a; %b/a if b>a
 frac_B1=a./sqrt(R1.*t1); %if b>a
 frac_A2=a./b; %a/b if a>b
