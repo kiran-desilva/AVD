@@ -8,6 +8,7 @@ clc
 load wing_ribs.mat %in PreliminaryAirframe file
 load b_a_int.mat
 load a_b_int.mat
+load wing_layout.mat
 %% Wing box parameters
 b_ref=3.63; %wingbox span [m] -NEED TO VERIFY
 a=s; %d-cell span length
