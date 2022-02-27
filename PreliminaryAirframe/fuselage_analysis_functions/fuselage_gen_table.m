@@ -7,7 +7,7 @@ function [StringerPanel] = fuselage_gen_table(fuselage)
                             'Stringer Web Height';
                             'Stringer Web to Flange Ratio'};
     StringerPanel.Units = {
-        'N';
+        'Kg';
         'mm';
         '-';
         '-';
@@ -38,7 +38,7 @@ function [StringerPanel] = fuselage_gen_table(fuselage)
                         'Frame Width'};
 
     LightFrames.Units = {
-        'N';
+        'Kg';
         'm';
         '-';
         '-';
