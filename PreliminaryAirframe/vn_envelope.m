@@ -46,7 +46,7 @@ pos_solution = @(array) array(array>=0);
 
 Vs1 = pos_solution(double(solve(subs(n,cl,cl_max_pos) == 1,v)));
 
-Vc = m_to_eas(0.75,0);
+Vc = m_to_eas(0.75,cruisealt_m);
 
 %equivalent to Vs1*sqrt(n_max)
 Va = pos_solution(double(solve(subs(n,cl,cl_max_pos) == n_max,v)));
