@@ -46,7 +46,7 @@ pos_solution = @(array) array(array>=0);
 
 Vs1 = pos_solution(double(solve(subs(n,cl,cl_max_pos) == 1,v)));
 
-Vc = m_to_eas(0.75,cruisealt_m);
+Vc = m_to_eas(0.75,0);
 
 %equivalent to Vs1*sqrt(n_max)
 Va = pos_solution(double(solve(subs(n,cl,cl_max_pos) == n_max,v)));
@@ -84,6 +84,11 @@ Vb = Vc - (1.32*uref_func(cruisealt_m));
 
 
 
+<<<<<<< HEAD
+=======
+% using uref, density and cl_alpha at sealevel , idk if this is right ngl 
+Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_cruise,ws_tow,rho_0,uref_func(0))));
+>>>>>>> c24421c644d56dd426db66bae9e59fadad01ee04
 % Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,uref_func(0))));
 % Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb)));
 % Vb_sym = solve(n == 1 + delta_n(v,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb_0),v);
@@ -173,7 +178,7 @@ ylabel("Load Factor")
 
 legend([ULM_plot LLM_plot GE_plot SC_plot],'Ultimate Load Manouever Envelope','Limit Load Manouever Envelope','Gust Envelope','Stall Load Factor Constraint','location','southwest')
 
-xlim([0 150])
+%xlim([0 150])
 ylim([-3 4])
 
 improvePlotNOLINE(gcf);
