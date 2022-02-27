@@ -41,8 +41,11 @@ function [frames,fig] = fuselage_light_frames(frame_material,sectionType,booms,s
     end
 
     %manufacturing constraints -> need to come back to this later
-    hmin = 1e-3;
-    hmax = 0.1;
+    % hmin = 1e-3;
+    % hmax = 0.1;
+    hmin = 1.2 * stringer.web_height; % constrained by stringer height -> at least 1.2* stringer height
+    hmax = 5e-2; % od - id for fuselage
+
     bmin = 1e-3;
     bmax = 0.1;
     tmin = 1e-3;

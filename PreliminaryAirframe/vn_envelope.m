@@ -5,6 +5,7 @@ kts_to_ms = 0.514444;
 fts_to_ms = 0.3048;
 
 cl_max_pos = 1.362;
+% cl_max_pos = 1.6;
 
 % cl_2d_max_neg = -0.8;
 % cl_max_neg = 0.9*cl_2d_max_neg*cosd(18.17);
@@ -70,10 +71,19 @@ Ude_Vd = 25*fts_to_ms;
 Ude_Vc = 50*fts_to_ms;
 % Ude_Vb = 47*fts_to_ms; 
 Ude_Vb = 66*fts_to_ms; 
-Ude_Vb_0 = 20;
+% Ude_Vb = 20;
 
-% using uref, density and cl_alpha at sealevel , idk if this is right ngl 
-Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_cruise,ws_tow,rho_c,uref_func(0))));
+% using uref, density and cl_alpha at sea level , idk if this is right ngl 
+Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,uref_func(0))));
+Vb = Vc - (1.32*uref_func(cruisealt_m));
+
+
+% Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb)));
+% Vb = Vc - (1.32*uref_func(0));
+
+
+
+
 % Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,uref_func(0))));
 % Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb)));
 % Vb_sym = solve(n == 1 + delta_n(v,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb_0),v);
@@ -83,6 +93,7 @@ Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_cruise,ws_tow,rho_c,uref_func(0))))
 % Vb_delta_n  = double(delta_n(Vb,cl_alpha_w_cruise,ws_tow,rho_c,Ude_Vb));
 % Vc_delta_n = double(delta_n(Vc,cl_alpha_w_cruise,ws_tow,rho_c,Ude_Vc));
 % Vd_delta_n = double(delta_n(Vd,cl_alpha_w_cruise,ws_tow,rho_c,Ude_Vd));
+
 
 Vb_delta_n  = double(delta_n(Vb,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb));
 Vc_delta_n = double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,Ude_Vc));
@@ -110,8 +121,10 @@ xline(Vb,'--','Vb','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
 n_ul_max = 1.5*2.5;
 n_ul_min = 1.5*-1;
 
-Va_ul = Vs1*sqrt(n_ul_max);
-Vf_ul = Vf*sqrt(abs(n_ul_min)); 
+% Va_ul = Vs1*sqrt(n_ul_max);
+Va_ul = Va;
+% Vf_ul = Vf*sqrt(abs(n_ul_min)); 
+Vf_ul = Vf;
 
 ULM_color = 'red';
 ULM_linewidth = 2;
@@ -151,14 +164,14 @@ plot([0 Vc],[1 1-Vc_delta_n],'--','color','green')
 plot([0 Vd],[1 1+Vd_delta_n],'--','color','green')
 plot([0 Vd],[1 1-Vd_delta_n],'--','color','green')
 
-GE_plot = plot([0 Vc Vd Vd Vc 0], [1 1+Vc_delta_n 1+Vd_delta_n 1-Vd_delta_n 1-Vc_delta_n 1],'color',GE_color,'linewidth',GE_linewidth);
+GE_plot = plot([0 Vb Vc Vd Vd Vc Vb 0], [1 1+Vb_delta_n 1+Vc_delta_n 1+Vd_delta_n 1-Vd_delta_n 1-Vc_delta_n 1-Vb_delta_n 1],'color',GE_color,'linewidth',GE_linewidth);
 
 
 
 xlabel("EAS (m/s)")
 ylabel("Load Factor")
 
-legend([ULM_plot LLM_plot GE_plot SC_plot],'Ultimate Load Manouever Envelope','Limit Load Manouever Envelope','Gust Envelope at 40000ft','Stall Load Factor Constraint','location','southwest')
+legend([ULM_plot LLM_plot GE_plot SC_plot],'Ultimate Load Manouever Envelope','Limit Load Manouever Envelope','Gust Envelope','Stall Load Factor Constraint','location','southwest')
 
 xlim([0 150])
 ylim([-3 4])
