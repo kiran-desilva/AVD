@@ -15,12 +15,12 @@ function [StringerPanel] = fuselage_gen_table(fuselage)
         'mm';
         '-';
     };
-    StringerPanel.Data = {fuselage.stringerpanel.weight;
-                        fuselage.stringerpanel.booms.skin_thickness*(1e3);
+    StringerPanel.Data = {round(fuselage.stringerpanel.weight,1);
+                        round(fuselage.stringerpanel.booms.skin_thickness*(1e3),1);
                         length(fuselage.stringerpanel.booms.phi);
                         'Z';
-                        fuselage.stringer.thickness*(1e3);
-                        fuselage.stringer.web_height*(1e3);
+                        round(fuselage.stringer.thickness*(1e3),1);
+                        round(fuselage.stringer.web_height*(1e3),1);
                         fuselage.stringer.flange_to_web_ratio};
     
     StringerPanel.table = table(StringerPanel.Units,StringerPanel.Data)
@@ -47,13 +47,13 @@ function [StringerPanel] = fuselage_gen_table(fuselage)
         'mm';
     };
     LightFrames.Data = {
-        fuselage.frames.weight;
+        round(fuselage.frames.weight,1);
         fuselage.frames.L;
         fuselage.frames.number;
         'C';
-        fuselage.frames.t;
-        fuselage.frames.h;
-        fuselage.frames.b;
+        round(fuselage.frames.t*(1e3),1);
+        round(fuselage.frames.h*(1e3),1);
+        round(fuselage.frames.b*(1e3),1);
 
     };
     
