@@ -26,7 +26,7 @@ function [StringerPanel] = fuselage_gen_table(fuselage)
     StringerPanel.table = table(StringerPanel.Units,StringerPanel.Data)
     StringerPanel.table.Properties.RowNames = StringerPanel.Labels;
     StringerPanel.table.Properties.VariableNames = {'Units','Value'};
-    table2latex(StringerPanel.table,'Tables/fuselage_stringerpanel_table.tex');
+    table2latex(StringerPanel.table,'Tables/fuselage_stringerpanel_table_raw.tex');
 
 
     LightFrames.Labels = {'Weight';
@@ -60,4 +60,4 @@ function [StringerPanel] = fuselage_gen_table(fuselage)
     LightFrames.table = table(LightFrames.Units,LightFrames.Data)
     LightFrames.table.Properties.RowNames = LightFrames.Labels;
     LightFrames.table.Properties.VariableNames = {'Units','Value'};
-    table2latex(LightFrames.table,'Tables/fuselage_lightframes_table.tex');
+    table2latex(LightFrames.table,'Tables/fuselage_lightframes_table_raw.tex');
