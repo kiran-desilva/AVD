@@ -84,11 +84,6 @@ Vb = Vc - (1.32*uref_func(cruisealt_m));
 
 
 
-<<<<<<< HEAD
-=======
-% using uref, density and cl_alpha at sealevel , idk if this is right ngl 
-Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_cruise,ws_tow,rho_0,uref_func(0))));
->>>>>>> c24421c644d56dd426db66bae9e59fadad01ee04
 % Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,uref_func(0))));
 % Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb)));
 % Vb_sym = solve(n == 1 + delta_n(v,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb_0),v);
