@@ -75,11 +75,11 @@ create_contour(get_range(fs),get_range(n),fs_n_w_int);
 scatter(fs,n,'red','x')
 scatter3(fs,n,w_scaled,'red','x')
 
-xlabel("Fuselage Thickness [m]")
-ylabel("Number of Stringers")
-zlabel("Log(Weight)")
+xlabel("Fuselage Thickness [m]",'FontSize', 12, 'FontWeight', 'Bold')
+ylabel("Number of Stringers",'FontSize', 12, 'FontWeight', 'Bold')
+zlabel("Log(Weight)",'FontSize', 12, 'FontWeight', 'Bold')
 
-legend('','Minimum Weight Surface','Minimum Weight Solutions')
+legend('','Minimum Weight Surface','Minimum Weight Solutions','FontSize',12)
 
 
 view([-130 30])
@@ -95,11 +95,11 @@ create_contour(get_range(ts),get_range(n),ts_n_w_int);
 scatter(ts,n,'red','x')
 scatter3(ts,n,w_scaled,'red','x')
 
-xlabel("Stringer Thickness [m]")
-ylabel("Number of Stringers")
-zlabel("Log(Weight)")
+xlabel("Stringer Thickness [m]",'FontSize', 12, 'FontWeight', 'Bold')
+ylabel("Number of Stringers",'FontSize', 12, 'FontWeight', 'Bold')
+zlabel("Log(Weight)",'FontSize', 12, 'FontWeight', 'Bold')
 
-legend('','Minimum Weight Surface','Minimum Weight Solutions')
+legend('','Minimum Weight Surface','Minimum Weight Solutions','FontSize',12)
 
 
 view([-130 30])
@@ -114,11 +114,11 @@ create_contour(get_range(hs),get_range(n),hs_n_w_int);
 scatter(hs,n,'red','x')
 scatter3(hs,n,w_scaled,'red','x')
 
-xlabel("Stringer Height [m]")
-ylabel("Number of Stringers")
-zlabel("Log(Weight)")
+xlabel("Stringer Height [m]",'FontSize', 12, 'FontWeight', 'Bold')
+ylabel("Number of Stringers",'FontSize', 12, 'FontWeight', 'Bold')
+zlabel("Log(Weight)",'FontSize', 12, 'FontWeight', 'Bold')
 
-legend('','Minimum Weight Surface','Minimum Weight Solutions')
+legend('','Minimum Weight Surface','Minimum Weight Solutions','FontSize',12)
 
 
 view([-130 30])
@@ -126,23 +126,23 @@ grid on
 
 
 set(gcf, 'rend', 'painters', 'Units', 'pixels', 'pos', ...
-        [100 100 1600 1200]);
+        [100 100 800*1.2 600*1.2]);
 
-axis_handles=findobj(gcf,'type','axe');
+% axis_handles=findobj(gcf,'type','axe');
 
-for i = 1:length(axis_handles)
-    ax = axis_handles(i);
+% for i = 1:length(axis_handles)
+%     ax = axis_handles(i);
 
-    % Change default font size (tick labels, legend, etc.)
-    set(ax, 'FontSize', 15, 'FontName', 'Arial', 'LineWidth', 1);
+%     % Change default font size (tick labels, legend, etc.)
+%     set(ax, 'FontSize', 15, 'FontName', 'Arial', 'LineWidth', 1);
     
-    set(ax, 'Box', 'on');
+%     set(ax, 'Box', 'on');
 
-    % Change font size for axis text labels
-    set(get(ax, 'XLabel'),'FontSize', 15, 'FontWeight', 'Bold');
-    set(get(ax, 'YLabel'),'FontSize', 15, 'FontWeight', 'Bold');
+%     % Change font size for axis text labels
+%     set(get(ax, 'XLabel'),'FontSize', 15, 'FontWeight', 'Bold');
+%     set(get(ax, 'YLabel'),'FontSize', 15, 'FontWeight', 'Bold');
 
-end
+% end
 
 
 
@@ -190,14 +190,12 @@ function [m] = create_mesh(x,y,fit)
     [X,Y] = meshgrid(x,y);
     Z = fit(X,Y);
     m = surf(X,Y,Z,'EdgeColor','interp');
-    % m = contourf(X,Y,Z);
 end  
 
 
 function [m] = create_contour(x,y,fit)
     [X,Y] = meshgrid(x,y);
     Z = fit(X,Y);
-    % m = mesh(X,Y,Z);
     m = contourf(X,Y,Z);
 end  
 
