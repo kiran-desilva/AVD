@@ -132,10 +132,10 @@ xlabel("y (m)", 'interpreter', 'Latex')
 ylabel("Horizontal Tail Torque distribution (Nm)", 'interpreter', 'Latex')
 grid on
 
-Torque = sum(HorizontalTail.HTorsiondist) - cumsum(HorizontalTail.HTorsiondist) + HorizontalTail.HTorsiondist; 
+HorizontalTail.Torque = sum(HorizontalTail.HTorsiondist) - cumsum(HorizontalTail.HTorsiondist) + HorizontalTail.HTorsiondist; 
 
 figure
-plot(y, Torque)
+plot(y, HorizontalTail.Torque)
 xlabel("y (m)", 'interpreter', 'Latex')
 ylabel("Horizontal Tail Torque (Nm)", 'interpreter', 'Latex')
 grid on
