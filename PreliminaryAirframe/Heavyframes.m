@@ -8,19 +8,19 @@ load("fuselageLoading.mat");
 
 
 %% WINGS FRONT SPAR
-% D_wing = 1.58;
-% Loads_wingf = [fuselageLoading.Vd_flight.Ff, fuselageLoading.Vd_flight.Ff];
-% angles_wingf = [50, 50]; %CHANGE THIS  
-% Torque_wingf = []
-% [HeavyFrames.wing.twFRONT, HeavyFrames.wing.lfwFRONT] = framedimensioncalc(Loads_wingf, Torque_wingf, angles_wingf, D_wing, "Wing Front Spar Heavy Frame");
-% 
-% %% WINGS REAR SPAR
-% D_wing = 1.58;
-% Loads_wingr = [fuselageLoading.Vd_flight.Fr, fuselageLoading.Vd_flight.Fr];
-% angles_wingr = [50, 50]; %CHANGE THIS
-% Torque_wingr = []
-% [HeavyFrames.wing.twREAR, HeavyFrames.wing.lfwREAR] = framedimensioncalc(Loads_wingr, Torque_wingr, angles_wingr, D_wing, "Wing Rear Spar Heavy Frame");
-% 
+D_wing = 1.58;
+Loads_wingf = [fuselageLoading.Vd_flight.Ff, fuselageLoading.Vd_flight.Ff];
+angles_wingf = [50, 50]; %CHANGE THIS  
+Torque_wingf = [0,0];
+[HeavyFrames.wing.twFRONT, HeavyFrames.wing.lfwFRONT] = framedimensioncalc(Loads_wingf, Torque_wingf, angles_wingf, D_wing, "Wing Front Spar Heavy Frame");
+
+%% WINGS REAR SPAR
+D_wing = 1.58;
+Loads_wingr = [fuselageLoading.Vd_flight.Fr, fuselageLoading.Vd_flight.Fr];
+angles_wingr = [50, 50]; %CHANGE THIS
+Torque_wingr = [0,0];
+[HeavyFrames.wing.twREAR, HeavyFrames.wing.lfwREAR] = framedimensioncalc(Loads_wingr, Torque_wingr, angles_wingr, D_wing, "Wing Rear Spar Heavy Frame");
+
 % %% VERTICAL TAIL FRONT SPAR
 % D_VTF = ;
 % Loads_VTF = ;
@@ -54,7 +54,8 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
     %yieldbending = ;SAME AS DIRECT?
 
     syms t lf Ad As %thicknesses equal
-    H = 0.05; %wall-to-wall thickness                     
+    H = 0.05; %wall-to-wall thickness    
+    
     Ixx = ((H-2*t)^3)*t/12 + 2*((t^3)*lf/12 + t*lf*((H-2*t)+t)^2 /4); %second moment f=of area of I beam
     %A = 2*tf*lf + lw*tw;    %frame sectionalarea
     yc = 0.025; %section thickness / 2 (defined by fuselage paramaters)
@@ -103,18 +104,31 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
     hold on
     plot(theta, (Mtot/(sum(T))))
     hold on
-    plot(theta, (Stot*R/sum(T)))
+    plot(theta, (Stot)*R/sum(T))
     hold off
     grid on
     xlabel("Theta (deg)", 'interpreter', 'Latex')
     ylabel("$\frac{NR}{T}, \frac{M}{T}, \frac{SR}{T}$", 'interpreter', 'Latex')
     legend("$\frac{NR}{T}$","$\frac{M}{T}$","$\frac{SR}{T}$", 'interpreter', 'Latex')
     title(LoadcaseSTR)
+    
+    figure
+    plot(theta, Ntot)
+    hold on
+    plot(theta, Mtot/(sum(T)))
+    hold on
+    plot(theta, Stot)
+    hold off
+    grid on
+    xlabel("Theta (deg)", 'interpreter', 'Latex')
+    ylabel("$N, M, S$", 'interpreter', 'Latex')
+    legend("$N$","$M$","$S$", 'interpreter', 'Latex')
+    title(LoadcaseSTR)
 
     
-    Nmax = max(Ntot);   %find max vals of stresses
-    Mmax = max(Mtot);
-    Smax = max(Stot);
+    Nmax = max(abs(Ntot));   %find max vals of stresses
+    Mmax = max(abs(Mtot));
+    Smax = max(abs(Stot));
 
     directstressmax = Nmax / Ad; %Pa
     shearstressmax = Smax / As; %Pa
@@ -129,12 +143,27 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
     areas = [Ad,As];
     A = max(areas);
     f4 = A == 2*t*lf + (H-2*t)*t;    %frame sectionalarea
-
+    
+%     area_eq = @(t,lf) 2*t*lf + (H-2*t)*t;
+%     
+%     ixx_eq = matlabFunction(Ixx) % function handle @(lf,t)
+%     
+%     
+%     
+%     fmincon(
+    
+    
+    
     eqns = [f3 f4];
     vars = [t; lf];
     Sol = solve(eqns, vars);
     t = double(Sol.t((imag(Sol.t)==0)));
     lf = double(Sol.lf((imag(Sol.t)==0)));
+    
+%     function [c,ceq] = cons(x)
+%         c = 0;
+%         ceq = ixx_eq(lf,t) - 
+%     end
 end
 
 function [N, M, S] = SectionalLoadCalc(P, Q, T, D)
