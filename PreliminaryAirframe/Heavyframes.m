@@ -49,7 +49,7 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
 %TORQUE
 
     load("materialLib");
-    yielddirect = materialLib{1}.yield_strength;
+    yielddirect = materialLib{1}.tensile_yield;
     yieldshear = materialLib{1}.shear_yield;
     %yieldbending = ;SAME AS DIRECT?
 

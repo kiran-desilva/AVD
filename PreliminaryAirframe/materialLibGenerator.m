@@ -9,7 +9,7 @@ materialLib{1}.E = 69e9; %N/m^2 (69-76)
 materialLib{1}.v = 0.325; %(0.325-0.335)
 materialLib{1}.G = 26e9; %N/m^2 (26-28)
 materialLib{1}.K = 67e9; %N/m^2 (67-74)
-materialLib{2}.tensile_yield = 100e6; %Pa (100-120)
+materialLib{1}.tensile_yield = 100e6; %Pa (100-120)
 materialLib{1}.shear_yield = 100e6/2; %Pa
 materialLib{1}.rho = 2.77e3; %kg/m^3 (2.77-2.82)
 
