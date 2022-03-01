@@ -89,7 +89,7 @@ c = chord(y) * (0.77-0.1); %Distance between spars
 b2front = polyval(aerofoiltop, chord(y)*0.1) - polyval(aerofoilbottom, chord(y)*0.1);
 b2rear = polyval(aerofoiltop, chord(y)*0.77) - polyval(aerofoilbottom, chord(y)*0.77);
 Ks = 8.1;%lookup from graph
-E_sp = materialLib{1}.E;%Youngs modulus of spar web 
+E_sp = materialLib{3}.E;%Youngs modulus of spar web 
 
 Shear_Load = limiting_loadcase_distributions.shear; %N
 Torque_Load = limiting_loadcase_distributions.torque; %Nm
@@ -219,7 +219,7 @@ c = chord(y) * (0.68-0.15); %Distance between spars
 b2front = polyval(aerofoiltop, chord(y)*0.15) - polyval(aerofoilbottom, chord(y)*0.15);
 b2rear = polyval(aerofoiltop, chord(y)*0.68) - polyval(aerofoilbottom, chord(y)*0.68);
 Ks = 8.1;%lookup from graph
-E_sp = materialLib{1}.E;%Youngs modulus of spar web 
+E_sp = materialLib{3}.E;%Youngs modulus of spar web 
 
 Shear_Load = HorizontalTail.Shearforce; %N
 Torque_Load = HorizontalTail.Torque; %Nm
@@ -348,7 +348,7 @@ c = chord(z) * (0.7-0.15); %Distance between spars
 b2front = polyval(aerofoiltop, chord(z)*0.15) - polyval(aerofoilbottom, chord(z)*0.15);
 b2rear = polyval(aerofoiltop, chord(z)*0.7) - polyval(aerofoilbottom, chord(z)*0.7);
 Ks = 8.1;%lookup from graph
-E_sp = materialLib{1}.E;%Youngs modulus of spar web 
+E_sp = materialLib{3}.E;%Youngs modulus of spar web 
 
 Shear_Load = VerticalTail.ShearForce_vt(z); %N
 Torque_Load = VerticalTail.Torque; %Nm

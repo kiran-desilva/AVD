@@ -11,7 +11,7 @@ materialLib{1}.G = 26e9; %N/m^2 (26-28)
 materialLib{1}.K = 67e9; %N/m^2 (67-74)
 materialLib{1}.tensile_strength = 530e6; %Pa (530-580)
 materialLib{1}.yield_strength = 460e6; %Pa (460-530)
-materialLib{1}.shear_yield = ??; %Pa
+materialLib{1}.shear_yield = 0.5*460e6; %Pa
 materialLib{1}.rho = 2.77e3; %kg/m^3 (2.77-2.82)
 
 %for lower wing skin-stringer
