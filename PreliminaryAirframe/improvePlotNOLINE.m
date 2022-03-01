@@ -10,7 +10,7 @@ function [] = improvePlotNOLINE(figure)
     box_thickness = 1;
     axis_tick_font_size = 15;
     axis_label_font_size = 20;
-    legend_font_size = 15;
+    legend_font_size = 12;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
     % Use h as handle for current figure

@@ -9,7 +9,7 @@ function [t1_t2,t_min_hoop,t_min_long,t_min_cap] = fuselage_pressure_load(materi
     [~,~,abs_ceiling_p,~] = atmosisa(abs_ceiling_alt_m);
     [~,~,cabin_p,~] = atmosisa(cabin_alt_m);
 
-    delta_p = (cabin_p - abs_ceiling_p); %Pa
+    delta_p = (cabin_p - abs_ceiling_p) %Pa
 
     df = 1.68 ; %m fuselage diameter
 

@@ -33,6 +33,8 @@ cruisealt_ft = 40000;
 cruisealt_m = distdim(cruisealt_ft,'ft','m');
 
 n_max = 2.5;
+% n_max = 2.1 + (24000/(6896+10000));
+% n_max = n_max_cs25;
 n_min = -1;
 
 syms v cl 
@@ -75,7 +77,9 @@ Ude_Vb = 66*fts_to_ms;
 
 % using uref, density and cl_alpha at sea level , idk if this is right ngl 
 Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,uref_func(0))));
-Vb = Vc - (1.32*uref_func(cruisealt_m));
+
+
+% Vb = Vc - (1.32*uref_func(cruisealt_m));
 
 
 % Vb = Vs1*sqrt(1+double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb)));
@@ -98,6 +102,10 @@ Vb = Vc - (1.32*uref_func(cruisealt_m));
 Vb_delta_n  = double(delta_n(Vb,cl_alpha_w_0,ws_tow,rho_0,Ude_Vb));
 Vc_delta_n = double(delta_n(Vc,cl_alpha_w_0,ws_tow,rho_0,Ude_Vc));
 Vd_delta_n = double(delta_n(Vd,cl_alpha_w_0,ws_tow,rho_0,Ude_Vd));
+
+%calcualte intersection with Va
+rough_gust_line_eq = @(v) polyval(polyfit([0 Vb],[1 1+Vb_delta_n],1),v);
+Va_gust_n = rough_gust_line_eq(Va);
 %%%%%%%%%%%%%%%%%% %%
 
 
@@ -111,20 +119,19 @@ SC_plot = fplot(subs(n,cl,cl_max_pos),'-.','color','black');
 fplot(subs(n,cl,cl_max_neg),'-.','color','black')
 
 %%Important Speeds
-xline(Va,'--','Va','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
-xline(Vc,'--','Vc','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
-xline(Vs1,'--','Vs1','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
-xline(Vd,'--','Vd','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
-xline(Vb,'--','Vb','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
+xline(Va,'--','V_{A}','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
+xline(Vc,'--','V_{C}','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
+xline(Vs1,'--','V_{s1}','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
+xline(Vd,'--','V_{D}','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
+xline(Vb,'--','V_{B}','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
 
 %%Manouver Envelope - UltimateLoad
 n_ul_max = 1.5*2.5;
 n_ul_min = 1.5*-1;
 
-% Va_ul = Vs1*sqrt(n_ul_max);
-Va_ul = Va;
-% Vf_ul = Vf*sqrt(abs(n_ul_min)); 
-Vf_ul = Vf;
+Va_ul = Vs1*sqrt(n_ul_max);
+Vf_ul = Vf*sqrt(abs(n_ul_min)); 
+
 
 ULM_color = 'red';
 ULM_linewidth = 2;
@@ -155,26 +162,31 @@ plot([Vd Vd],[n_max 0],'color',LLM_color,'linewidth',LLM_linewidth)
 GE_color = 'green';
 GE_linewidth = 2;
 
-plot([0 Vb],[1 1+Vb_delta_n],'--','color','green')
+Vb_gust = plot([0 Vb],[1 1+Vb_delta_n],'--','color','green');
 plot([0 Vb],[1 1-Vb_delta_n],'--','color','green')
 
-plot([0 Vc],[1 1+Vc_delta_n],'--','color','green')
-plot([0 Vc],[1 1-Vc_delta_n],'--','color','green')
+Vc_gust = plot([0 Vc],[1 1+Vc_delta_n],'-.','color','green');
+plot([0 Vc],[1 1-Vc_delta_n],'-.','color','green')
 
-plot([0 Vd],[1 1+Vd_delta_n],'--','color','green')
-plot([0 Vd],[1 1-Vd_delta_n],'--','color','green')
+Vd_gust = plot([0 Vd],[1 1+Vd_delta_n],':','color','green','linewidth',1.5);
+plot([0 Vd],[1 1-Vd_delta_n],':','color','green','linewidth',1.5)
 
-GE_plot = plot([0 Vb Vc Vd Vd Vc Vb 0], [1 1+Vb_delta_n 1+Vc_delta_n 1+Vd_delta_n 1-Vd_delta_n 1-Vc_delta_n 1-Vb_delta_n 1],'color',GE_color,'linewidth',GE_linewidth);
+GE_plot = plot([Va Vb Vc Vd Vd Vc Vb Va], [Va_gust_n 1+Vb_delta_n 1+Vc_delta_n 1+Vd_delta_n 1-Vd_delta_n 1-Vc_delta_n 1-Vb_delta_n 2-Va_gust_n],'color',GE_color,'linewidth',GE_linewidth);
 
+%Ultimate Gust Envelope
+GE_UL_color = 'magenta';
+GE_UL_linewidth = 2;
+
+% GE_UL_plot = plot([Va Vb Vc Vd Vd Vc Vb Va], 1.5*[Va_gust_n 1+Vb_delta_n 1+Vc_delta_n 1+Vd_delta_n 1-Vd_delta_n 1-Vc_delta_n 1-Vb_delta_n 2-Va_gust_n],'color',GE_UL_color,'linewidth',GE_UL_linewidth);
 
 
 xlabel("EAS (m/s)")
 ylabel("Load Factor")
 
-legend([ULM_plot LLM_plot GE_plot SC_plot],'Ultimate Load Manouever Envelope','Limit Load Manouever Envelope','Gust Envelope','Stall Load Factor Constraint','location','southwest')
+legend([ULM_plot LLM_plot GE_plot Vb_gust Vc_gust Vd_gust SC_plot],'Ultimate Load Manouever Envelope','Limit Load Manouever Envelope','Gust Envelope','Gust at V_{B}','Gust at V_{C}','Gust at V_{D}','Accelerated Stall Load Factor Constraint','location','southwest')
 
-%xlim([0 150])
-ylim([-3 4])
+xlim([0 150]) 
+ylim([-2.5 4])
 
 improvePlotNOLINE(gcf);
 
