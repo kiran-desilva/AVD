@@ -88,6 +88,8 @@ rear_web_height = abs(top_af_fit(geometry.spar.rear_x_c) - bottom_af_fit(geometr
 geometry.web_height_func = @(y) max(front_web_height, rear_web_height)*geometry.c(y); 	%% TODO: Play with the max function, try min or avg instead
 																						%% 	  max should however give largest stress
 
+                                                                                        
+save('af_geometry', 'geometry')
 %Material library has different units need to chage it
 load materialLib
 material = materialLib{1};
@@ -96,9 +98,9 @@ material = materialLib{1};
 
 
 %% TODO:
-design_params.stringer_pitch = 0.0364;
-design_params.stringer_thickness = 3E-4;
-design_params.stringer_web_height = 36E-3;
+design_params.stringer_pitch = 0.0869;
+design_params.stringer_thickness = 0.0011;
+design_params.stringer_web_height = 0.0226;
 design_params.flange_to_web_ratio = 0.3;
 
 bending_moment_dist = fit(limiting_loadcase_distributions.points', limiting_loadcase_distributions.bm', 'smoothingspline');
@@ -162,7 +164,10 @@ elseif mode == 1
     out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
     improvePlot(gcf);
     wing_layout = out;
-    save('wing_layout')
+    wing_layout.stringer_pitch = design_params.stringer_pitch;
+    wing_layout.stringer_thickness = design_params.stringer_thickness;
+    wing_layout.stringer_web_height = design_params.stringer_web_height;
+    save('wing_layout', 'wing_layout')
     return;
 else 
     load('optimisation')
