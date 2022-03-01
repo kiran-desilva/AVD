@@ -6,7 +6,7 @@ load('loadcase.mat')
 %Constants
 lbs_to_n = 4.4482216153;
 ft_to_m = 0.3048;
-ulf = 1.5*2.5;
+% ulf = 1.5*2.5;
 
 %%Weights and CG from Report UNITS IN LBS AND FT
 
@@ -243,7 +243,7 @@ Va_flight.Fr = res(2);
 
 
 Va_flight.x = load_dist.x;
-Va_flight.load = sectional_load(Va_flight.Ff,Va_flight.Fr,Va_flight.Lt)*ulf;
+Va_flight.load = sectional_load(Va_flight.Ff,Va_flight.Fr,Va_flight.Lt)*loadcase{1}.n;
 Va_flight.Fi = load_dist.Fi;
 Va_flight.Fi_cg = load_dist.Fi_cg;
 Va_flight.shear = shear_force(Va_flight.load);
@@ -278,7 +278,7 @@ Vd_flight.Fr = res(2);
 
 
 Vd_flight.x = load_dist.x;
-Vd_flight.load = sectional_load(Vd_flight.Ff,Vd_flight.Fr,Vd_flight.Lt)*ulf;
+Vd_flight.load = sectional_load(Vd_flight.Ff,Vd_flight.Fr,Vd_flight.Lt)*loadcase{2}.n;
 Vd_flight.Fi = load_dist.Fi;
 Vd_flight.Fi_cg = load_dist.Fi_cg;
 Vd_flight.shear = shear_force(Vd_flight.load);

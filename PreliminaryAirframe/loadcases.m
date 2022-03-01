@@ -17,8 +17,8 @@ cm = @(aoa) cm_0; %looking at thoery of wing sections, cm changes negligibly wit
 %%LOAD CASE 1 -> SYMMETRIC AT VA%%
 idx = 1;
 
-loadcase{idx}.n = vn.n_max*1.5;
-loadcase{idx}.lift = vn.n_max * vn.Mtow; % the limit lift load
+loadcase{idx}.n = vn.Va_nmax*1.5;
+loadcase{idx}.lift = vn.Va_nmax * vn.Mtow; % the limit lift load
 loadcase{idx}.v = vn.Va; %eas
 
 loadcase{idx}.alt = vn.cruisealt_m;
@@ -35,7 +35,8 @@ loadcase{idx}.m = loadcase{idx}.cm * (0.5*1.225 * (loadcase{idx}.v^2) * vn.Sref 
 %%LOAD CASE 2 -> SYMMETRIC AT VD%%
 idx = 2; 
 
-loadcase{idx}.lift = vn.n_max * vn.Mtow; %same as above
+loadcase{idx}.n = vn.Vd_nmax * 1.5;
+loadcase{idx}.lift = vn.Vd_nmax * vn.Mtow; %same as above
 loadcase{idx}.v = vn.Vd; %eas
 
 loadcase{idx}.alt = vn.cruisealt_m;

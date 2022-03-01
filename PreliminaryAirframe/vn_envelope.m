@@ -193,6 +193,9 @@ improvePlotNOLINE(gcf);
 saveas(gcf,"Figures/Vndiagram",'epsc')
 
 vn.Va = Va;
+vn.Va_nmax = max([Va_gust_n n_max]);
+vn.Vd_nmax = n_max;
+
 vn.Vd = Vd;
 vn.cl_alpha_w = cl_alpha_w_cruise;
 vn.cl_max = cl_max_pos;
