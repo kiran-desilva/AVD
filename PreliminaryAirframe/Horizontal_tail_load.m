@@ -5,7 +5,7 @@ close all
 %loading on horizontal tail as a factor of unit lift force
 
 s_h = 2.3887; %m
-U = 3.75 * 221.3; %FAR 25 3.75 * CRUISE
+U = 3.75 * 137.2501; %FAR 25 3.75 * VD
 AR_h = 3.9;
 rho = 1.225; 
 Sref_h = 1.9283; 
