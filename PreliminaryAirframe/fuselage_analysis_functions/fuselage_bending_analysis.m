@@ -71,7 +71,7 @@ function [weight,booms,max_principle_stress,weight_per_length,fig] = fuselage_be
                                                                                                             'MaxHeadSize',.1);
         xlabel('X coordinate [m]')
         ylabel('y coordinate [m]')
-        zlabel('Stress due to bending')
+        zlabel('Scaled Stress')
         legend('','Boom Area','Scaled stress')
         grid on
         view([330 10])

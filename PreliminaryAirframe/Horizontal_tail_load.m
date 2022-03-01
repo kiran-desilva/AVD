@@ -5,7 +5,7 @@ close all
 %loading on horizontal tail as a factor of unit lift force
 
 s_h = 2.3887; %m
-U = 3.75 * 221.3; %FAR 25 3.75 * CRUISE
+U = 3.75 * 137.2501; %FAR 25 3.75 * VD
 AR_h = 3.9;
 rho = 1.225; 
 Sref_h = 1.9283; 
@@ -20,7 +20,7 @@ W0 = 3128.2 * 9.81; %takeoff weight
 Lwing = ULF * W0; 
 Vdive = 137.25;
 Cm0 = -0.0266;
-M0w = 0.5 * rho * Vdive^2 * Sref_w * Cm0;
+M0w = 0.5 * rho * (Vdive*ULF)^2 * Sref_w * Cm0;
 
 L_Htail = (Lwing * (X_cg - X_acWing) + M0w) / (X_acHtail - X_cg); 
 
@@ -29,8 +29,9 @@ gamma0 = (8 * s_h * 1) / (pi * AR_h * rho * U * Sref_h); %L = 1
 gamma = @(y) gamma0 * sqrt(1 - (y ./ (s_h/2)).^2); 
 TailLoadinit = rho * U .* gamma(y); 
 TailLoadintegral = trapz(y,TailLoadinit); 
-TailLoad = @(y) L_Htail * rho * U * gamma(y) / TailLoadintegral; %unit overall tail lift
+TailLoad = @(y) L_Htail * rho * U * gamma(y) / TailLoadintegral; %overall tail lift
 HorizontalTail.TailLoad = TailLoad(y);
+HorizontalTail.y = y; 
 
 figure
 plot(y, TailLoad(y))
@@ -132,10 +133,10 @@ xlabel("y (m)", 'interpreter', 'Latex')
 ylabel("Horizontal Tail Torque distribution (Nm)", 'interpreter', 'Latex')
 grid on
 
-Torque = sum(HorizontalTail.HTorsiondist) - cumsum(HorizontalTail.HTorsiondist) + HorizontalTail.HTorsiondist; 
+HorizontalTail.Torque = sum(HorizontalTail.HTorsiondist) - cumsum(HorizontalTail.HTorsiondist) + HorizontalTail.HTorsiondist; 
 
 figure
-plot(y, Torque)
+plot(y, HorizontalTail.Torque)
 xlabel("y (m)", 'interpreter', 'Latex')
 ylabel("Horizontal Tail Torque (Nm)", 'interpreter', 'Latex')
 grid on

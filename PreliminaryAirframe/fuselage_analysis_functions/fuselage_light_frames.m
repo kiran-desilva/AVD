@@ -41,8 +41,11 @@ function [frames,fig] = fuselage_light_frames(frame_material,sectionType,booms,s
     end
 
     %manufacturing constraints -> need to come back to this later
-    hmin = 1e-3;
-    hmax = 0.1;
+    % hmin = 1e-3;
+    % hmax = 0.1;
+    hmin = 1.2 * stringer.web_height; % constrained by stringer height -> at least 1.2* stringer height
+    hmax = 5e-2; % od - id for fuselage
+
     bmin = 1e-3;
     bmax = 0.1;
     tmin = 1e-3;
@@ -53,7 +56,7 @@ function [frames,fig] = fuselage_light_frames(frame_material,sectionType,booms,s
         ceq = [t_eq(x(2),x(3)) - x(1)];
     end
 
-    min_area_result = fmincon(@(x) area_eq(x(1),x(2),x(3)),[.01 .01 .01],[],[],[],[],[hmin,bmin,tmin],[hmax,bmax,tmax],@ix_constraint);
+    min_area_result = fmincon(@(x) area_eq(x(1),x(2),x(3)),[.01 .01 .01],[],[],[],[],[tmin,bmin,hmin],[tmax,bmax,hmax],@ix_constraint);
     
     % min_area_result = fmincon(@(x) obj(x(1),x(2)),[.01 .01],[],[],[],[],[hmin bmin],[hmax,bmax]);
     frames.t = min_area_result(1);

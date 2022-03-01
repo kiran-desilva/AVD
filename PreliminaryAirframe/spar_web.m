@@ -9,6 +9,8 @@ close all
 %% Calculating web thickness
 
 load('limiting_loadcase_distributions');
+load('materialLib.mat');
+load('VerticalTail.mat');
 
 c_root = 1.767;
 c_tip = 0.533;
@@ -87,7 +89,7 @@ c = chord(y) * (0.77-0.1); %Distance between spars
 b2front = polyval(aerofoiltop, chord(y)*0.1) - polyval(aerofoilbottom, chord(y)*0.1);
 b2rear = polyval(aerofoiltop, chord(y)*0.77) - polyval(aerofoilbottom, chord(y)*0.77);
 Ks = 8.1;%lookup from graph
-E_sp = 70e9;%Youngs modulus of spar web 
+E_sp = materialLib{3}.E;%Youngs modulus of spar web 
 
 Shear_Load = limiting_loadcase_distributions.shear; %N
 Torque_Load = limiting_loadcase_distributions.torque; %Nm
@@ -95,7 +97,7 @@ Torque_Load = limiting_loadcase_distributions.torque; %Nm
 Shearflow_Shearfront = Shear_Load ./ (2 .* b2front); %N/m
 Shearflow_Shearrear = Shear_Load ./ (2 .* b2rear); %N/mm note here we assume that each spar takes half of vertical load despite having different heights
 
-Shearflow_Torque = Torque_Load ./ (0.5 * c * (b2front + b2rear) * 2); %T/2A
+Shearflow_Torque = Torque_Load ./ (0.5 * c .* (b2front + b2rear) * 2); %T/2A
 
 Shearflow_Fspar = Shearflow_Shearfront + Shearflow_Torque;
 Shearflow_Rspar = Shearflow_Shearrear - Shearflow_Torque;
@@ -104,16 +106,16 @@ wing.t_fs = (Shearflow_Fspar .* b2front ./ (Ks * E_sp)).^(1/3);
 wing.t_rs = (Shearflow_Rspar .* b2rear ./ (Ks * E_sp)).^(1/3); 
 
 figure
-plot(y, t_fs)
+plot(y, wing.t_fs)
 hold on
-plot(y,t_rs)
+plot(y,wing.t_rs)
 hold off
 
-Shearstress_Fs = ShearflowFspar / wing.t_fs;
-Shearstress_Rs = ShearflowRspar / wing.t_rs; 
+Shearstress_Fs = Shearflow_Fspar / wing.t_fs;
+Shearstress_Rs = Shearflow_Rspar / wing.t_rs; 
 
 %% Shear flow in the skin
-E_sk = 
+E_sk = materialLib{4}.E; %N/m^2 (71-74.6)
 t_skin = 
 Shearflow_skin = Shearflow_Torque;
 Shearstress_skin = Shearflow_Torque ./ t_skin; 
@@ -146,7 +148,7 @@ semispan = span/2;
 
 chord = @(y) -(c_root - c_tip)/semispan*y + c_root; %chord distribution
 
-coords = [0.000000  0.000000;
+coordsH = [0.000000  0.000000;
   0.005000  0.009780;
   0.007500  0.011790;
   0.012500  0.014900;
@@ -199,14 +201,14 @@ coords = [0.000000  0.000000;
   0.950000 -0.002880;
   1.000000  0.000000];
 
-aerofoiltop = polyfit(coords(1:25,1), coords(1:25,2), 20);
-pointstop = polyval(aerofoiltop, coords(:,1));
-aerofoilbottom = polyfit(coords(26:51,1), coords(26:51,2), 20);
-pointsbottom = polyval(aerofoilbottom, coords(:,1));
+aerofoiltop = polyfit(coordsH(1:26,1), coordsH(1:26,2), 20);
+pointstopH = polyval(aerofoiltop, coordsH(1:26,1));
+aerofoilbottom = polyfit(coordsH(27:52,1), coordsH(27:52,2), 20);
+pointsbottomH = polyval(aerofoilbottom, coordsH(1:26,1));
 figure
-plot(coords(:,1), pointstop)
+plot(coordsH(1:26,1), pointstopH)
 hold on
-plot(coords(:,1), pointsbottom)
+plot(coordsH(1:26,1), pointsbottomH)
 hold off
 axis equal
 
@@ -217,15 +219,15 @@ c = chord(y) * (0.68-0.15); %Distance between spars
 b2front = polyval(aerofoiltop, chord(y)*0.15) - polyval(aerofoilbottom, chord(y)*0.15);
 b2rear = polyval(aerofoiltop, chord(y)*0.68) - polyval(aerofoilbottom, chord(y)*0.68);
 Ks = 8.1;%lookup from graph
-E_sp = ;%Youngs modulus of spar web 
+E_sp = materialLib{3}.E;%Youngs modulus of spar web 
 
 Shear_Load = HorizontalTail.Shearforce; %N
-Torque_Load = HorizontalTail.HTorsiondist; %Nm
+Torque_Load = HorizontalTail.Torque; %Nm
 
 Shearflow_Shearfront = Shear_Load ./ (2 .* b2front); %N/m
 Shearflow_Shearrear = Shear_Load ./ (2 .* b2rear); %N/mm note here we assume that each spar takes half of vertical load despite having different heights
 
-Shearflow_Torque = Torque_Load ./ (0.5 * c * (b2front + b2rear) * 2); %T/2A
+Shearflow_Torque = Torque_Load ./ (0.5 * c .* (b2front + b2rear) * 2); %T/2A
 
 Shearflow_Fspar = Shearflow_Shearfront + Shearflow_Torque;
 Shearflow_Rspar = Shearflow_Shearrear - Shearflow_Torque;
@@ -239,30 +241,30 @@ hold on
 plot(y,HorizontalTail.t_rs)
 hold off
 
-Shearstress_Fs = ShearflowFspar / HorizontalTail.t_fs;
-Shearstress_Rs = ShearflowRspar / HorizontalTail.t_rs; 
+Shearstress_Fs = Shearflow_Fspar / HorizontalTail.t_fs;
+Shearstress_Rs = Shearflow_Rspar / HorizontalTail.t_rs; 
 
 %% Shear flow in the skin
-E_sk = 
-t_skin = 
-Shearflow_skin = Shearflow_Torque;
-Shearstress_skin = Shearflow_Torque ./ t_skin; 
-stringer_pitch = 
-Stresscrit = 8.1*E*(t_skin/stringer_pitch)^2; %Shear buckling stress (note: double check why this is)
-Trescastress = %Tresca shear yielding stress
-sigma_0 = %stringer panel critical buckling stress
-sigma_crit = %stringer panel sigma crit
-
-Rc = sigma_0 / sigma_crit; %compressive stress ratio
-Rs = Shearstress_skin / Trescastress; 
-
-criteria_sc = Rs^2 + Rc;
-
-if criteria_sc <= 0.99
-    disp("Good design (Criteria satisfied)")
-else 
-    disp("Bad design (Criteria not satisfied)")
-end
+% E_sk = 
+% t_skin = 
+% Shearflow_skin = Shearflow_Torque;
+% Shearstress_skin = Shearflow_Torque ./ t_skin; 
+% stringer_pitch = 
+% Stresscrit = 8.1*E*(t_skin/stringer_pitch)^2; %Shear buckling stress (note: double check why this is)
+% Trescastress = %Tresca shear yielding stress
+% sigma_0 = %stringer panel critical buckling stress
+% sigma_crit = %stringer panel sigma crit
+% 
+% Rc = sigma_0 / sigma_crit; %compressive stress ratio
+% Rs = Shearstress_skin / Trescastress; 
+% 
+% criteria_sc = Rs^2 + Rc;
+% 
+% if criteria_sc <= 0.99
+%     disp("Good design (Criteria satisfied)")
+% else 
+%     disp("Bad design (Criteria not satisfied)")
+% end
 
 %% VERTICAL TAIL
 %% Calculating web thickness
@@ -275,7 +277,7 @@ span = 1.1818;
 
 chord = @(y) -(c_root - c_tip)/span*y + c_root; %chord distribution
 
-coords = [0.000000  0.000000;
+coordsV = [0.000000  0.000000;
   0.005000  0.012080;
   0.007500  0.014560;
   0.012500  0.018420;
@@ -328,14 +330,14 @@ coords = [0.000000  0.000000;
   0.950000  -.003460;
   1.000000  0.000000];
 
-aerofoiltop = polyfit(coords(1:25,1), coords(1:25,2), 20);
-pointstop = polyval(aerofoiltop, coords(:,1));
-aerofoilbottom = polyfit(coords(26:51,1), coords(26:51,2), 20);
-pointsbottom = polyval(aerofoilbottom, coords(:,1));
+aerofoiltop = polyfit(coordsV(1:26,1), coordsV(1:26,2), 20);
+pointstop = polyval(aerofoiltop, coordsV(1:26,1));
+aerofoilbottom = polyfit(coordsV(27:52,1), coordsV(27:52,2), 20);
+pointsbottom = polyval(aerofoilbottom, coordsV(1:26,1));
 figure
-plot(coords(:,1), pointstop)
+plot(coordsV(1:26,1), pointstop)
 hold on
-plot(coords(:,1), pointsbottom)
+plot(coordsV(1:26,1), pointsbottom)
 hold off
 axis equal
 
@@ -346,15 +348,15 @@ c = chord(z) * (0.7-0.15); %Distance between spars
 b2front = polyval(aerofoiltop, chord(z)*0.15) - polyval(aerofoilbottom, chord(z)*0.15);
 b2rear = polyval(aerofoiltop, chord(z)*0.7) - polyval(aerofoilbottom, chord(z)*0.7);
 Ks = 8.1;%lookup from graph
-E_sp = ;%Youngs modulus of spar web 
+E_sp = materialLib{3}.E;%Youngs modulus of spar web 
 
-Shear_Load = VerticalTail.Shearforce_vt; %N
-Torque_Load = VerticalTail.VTorsiondist; %Nm
+Shear_Load = VerticalTail.ShearForce_vt(z); %N
+Torque_Load = VerticalTail.Torque; %Nm
 
 Shearflow_Shearfront = Shear_Load ./ (2 .* b2front); %N/m
 Shearflow_Shearrear = Shear_Load ./ (2 .* b2rear); %N/mm note here we assume that each spar takes half of vertical load despite having different heights
 
-Shearflow_Torque = Torque_Load ./ (0.5 * c * (b2front + b2rear) * 2); %T/2A
+Shearflow_Torque = Torque_Load ./ (0.5 * c .* (b2front + b2rear) * 2); %T/2A
 
 Shearflow_Fspar = Shearflow_Shearfront + Shearflow_Torque;
 Shearflow_Rspar = Shearflow_Shearrear - Shearflow_Torque;
@@ -368,30 +370,30 @@ hold on
 plot(z,VerticalTail.t_rs)
 hold off
 
-Shearstress_Fs = ShearflowFspar / VerticalTail.t_fs;
-Shearstress_Rs = ShearflowRspar / VerticalTail.t_rs; 
+Shearstress_Fs = Shearflow_Fspar / VerticalTail.t_fs;
+Shearstress_Rs = Shearflow_Rspar / VerticalTail.t_rs; 
 
 %% Shear flow in the skin
-E_sk = 
-t_skin = 
-Shearflow_skin = Shearflow_Torque;
-Shearstress_skin = Shearflow_Torque ./ t_skin; 
-stringer_pitch = 
-Stresscrit = 8.1*E*(t_skin/stringer_pitch)^2; %Shear buckling stress (note: double check why this is)
-Trescastress = %Tresca shear yielding stress
-sigma_0 = %stringer panel critical buckling stress
-sigma_crit = %stringer panel sigma crit
-
-Rc = sigma_0 / sigma_crit; %compressive stress ratio
-Rs = Shearstress_skin / Trescastress; 
-
-criteria_sc = Rs^2 + Rc;
-
-if criteria_sc <= 0.99
-    disp("Good design (Criteria satisfied)")
-else 
-    disp("Bad design (Criteria not satisfied)")
-end
+% E_sk = 
+% t_skin = 
+% Shearflow_skin = Shearflow_Torque;
+% Shearstress_skin = Shearflow_Torque ./ t_skin; 
+% stringer_pitch = 
+% Stresscrit = 8.1*E*(t_skin/stringer_pitch)^2; %Shear buckling stress (note: double check why this is)
+% Trescastress = %Tresca shear yielding stress
+% sigma_0 = %stringer panel critical buckling stress
+% sigma_crit = %stringer panel sigma crit
+% 
+% Rc = sigma_0 / sigma_crit; %compressive stress ratio
+% Rs = Shearstress_skin / Trescastress; 
+% 
+% criteria_sc = Rs^2 + Rc;
+% 
+% if criteria_sc <= 0.99
+%     disp("Good design (Criteria satisfied)")
+% else 
+%     disp("Bad design (Criteria not satisfied)")
+% end
 
 save("wing.mat");
 save("HorizontalTail.mat");
