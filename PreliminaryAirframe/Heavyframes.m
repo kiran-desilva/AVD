@@ -133,6 +133,8 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
     directstressmax = Nmax / Ad; %Pa
     shearstressmax = Smax / As; %Pa
     bendingstressmax = (Mmax*yc) / Ixx; %Pa
+    
+    IXX = (Mmax*yc) / yielddirect
 
     f1 = -yielddirect + directstressmax == 0;
     f2 = -yieldshear + shearstressmax == 0;
