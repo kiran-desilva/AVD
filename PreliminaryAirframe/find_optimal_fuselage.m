@@ -9,7 +9,7 @@ load materialLib
 
 %get limiting loadcase
 loadcase = fuselageLoading.Vd_flight;
-material = materialLib{1};
+material = materialLib{4};
 
 %determine min skin thickness 
 

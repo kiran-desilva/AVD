@@ -56,7 +56,7 @@ function [frames,fig] = fuselage_light_frames(frame_material,sectionType,booms,s
         ceq = [t_eq(x(2),x(3)) - x(1)];
     end
 
-    min_area_result = fmincon(@(x) area_eq(x(1),x(2),x(3)),[.01 .01 .01],[],[],[],[],[hmin,bmin,tmin],[hmax,bmax,tmax],@ix_constraint);
+    min_area_result = fmincon(@(x) area_eq(x(1),x(2),x(3)),[.01 .01 .01],[],[],[],[],[tmin,bmin,hmin],[tmax,bmax,hmax],@ix_constraint);
     
     % min_area_result = fmincon(@(x) obj(x(1),x(2)),[.01 .01],[],[],[],[],[hmin bmin],[hmax,bmax]);
     frames.t = min_area_result(1);
