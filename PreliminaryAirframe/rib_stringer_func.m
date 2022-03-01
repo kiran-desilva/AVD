@@ -179,6 +179,8 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
             output.F_array = [output.F_array, F];
             output.rib_array = [output.rib_array, geometry.semispan];
             output.panel_thickness = [output.panel_thickness, panel_thickness];
+            output.sigma_0 = [output.sigma_0, sigma_0];
+            output.sigma_crit = [output.sigma_crit, sigma_cr];
             break;
         end
 
