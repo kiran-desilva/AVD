@@ -70,7 +70,7 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
     end
     
     Ntot = sum(N,2);  %sum together total stresses due to all forces on frame
-    Mtot = sum(M,2);
+    Mtot = sum(M,2); 
     Stot = sum(S,2); 
     
     theta = linspace(0,360,360);

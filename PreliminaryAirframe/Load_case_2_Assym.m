@@ -29,6 +29,8 @@ xlabel("z (m)", 'interpreter', 'Latex')
 ylabel("Shear Force (N)", 'interpreter', 'Latex')
 grid on
 
+Verticaltail.Shearforce = VerticalTail.ShearForce_vt(z);
+
 figure
 plot(z, VerticalTail.BendingMoment_vt(z))
 xlabel("z (m)", 'interpreter', 'Latex')
