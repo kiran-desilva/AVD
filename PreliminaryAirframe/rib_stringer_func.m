@@ -102,7 +102,8 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 	output.F_array = [];
 	output.rib_array = [];
     output.panel_thickness = [];
-    
+    output.sigma_crit = [];
+    output.sigma_0 = [];
     
 	stringer.flange_width = design_params.stringer_web_height*design_params.flange_to_web_ratio;
 	stringer.cross_sec_area = design_params.stringer_thickness*design_params.stringer_web_height + 2*stringer.flange_width*design_params.stringer_thickness;% TODO: As appropriate for the selected stringer type
@@ -175,6 +176,9 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 
         if spanwise_station > geometry.semispan
 			total_volume = total_volume + panel_eff_area*(geometry.semispan - (spanwise_station - rib_spacing)); % panel untill the end
+            output.F_array = [output.F_array, F];
+            output.rib_array = [output.rib_array, geometry.semispan];
+            output.panel_thickness = [output.panel_thickness, panel_thickness];
             break;
         end
 
@@ -186,7 +190,8 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 		output.F_array = [output.F_array, F];
 		output.rib_array = [output.rib_array, spanwise_station];
         output.panel_thickness = [output.panel_thickness, panel_thickness];
-        
+        output.sigma_0 = [output.sigma_0, sigma_0];
+        output.sigma_crit = [output.sigma_crit, sigma_cr];
         
 		
 		% intercepts(stringers_to_cut) = spanwise_station;

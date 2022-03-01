@@ -51,4 +51,5 @@ xlabel("y [m]")
 ylabel("Torque [Nm]")
 improvePlot(gcf)
 
-save('limiting_loadcase_distributions');
+save('limiting_loadcase_distributions', 'limiting_loadcase_distributions');
+
