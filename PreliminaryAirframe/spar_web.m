@@ -115,26 +115,26 @@ Shearstress_Fs = Shearflow_Fspar / wing.t_fs;
 Shearstress_Rs = Shearflow_Rspar / wing.t_rs; 
 
 %% Shear flow in the skin
-% E_sk = 
-% t_skin = 
-% Shearflow_skin = Shearflow_Torque;
-% Shearstress_skin = Shearflow_Torque ./ t_skin; 
-% stringer_pitch = 
-% Stresscrit = 8.1*E*(t_skin/stringer_pitch)^2; %Shear buckling stress (note: double check why this is)
-% Trescastress = %Tresca shear yielding stress
-% sigma_0 = %stringer panel critical buckling stress
-% sigma_crit = %stringer panel sigma crit
-% 
-% Rc = sigma_0 / sigma_crit; %compressive stress ratio
-% Rs = Shearstress_skin / Trescastress; 
-% 
-% criteria_sc = Rs^2 + Rc;
-% 
-% if criteria_sc <= 0.99
-%     disp("Good design (Criteria satisfied)")
-% else 
-%     disp("Bad design (Criteria not satisfied)")
-% end
+E_sk = materialLib{4}.E; %N/m^2 (71-74.6)
+t_skin = 
+Shearflow_skin = Shearflow_Torque;
+Shearstress_skin = Shearflow_Torque ./ t_skin; 
+stringer_pitch = 
+Stresscrit = 8.1*E*(t_skin/stringer_pitch)^2; %Shear buckling stress (note: double check why this is)
+Trescastress = %Tresca shear yielding stress
+sigma_0 = %stringer panel critical buckling stress
+sigma_crit = %stringer panel sigma crit
+
+Rc = sigma_0 / sigma_crit; %compressive stress ratio
+Rs = Shearstress_skin / Trescastress; 
+
+criteria_sc = Rs^2 + Rc;
+
+if criteria_sc <= 0.99
+    disp("Good design (Criteria satisfied)")
+else 
+    disp("Bad design (Criteria not satisfied)")
+end
 
 %% HORIZONTAL TAIL
 %% Calculating web thickness

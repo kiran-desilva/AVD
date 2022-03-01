@@ -24,22 +24,14 @@ M0w = 0.5 * rho * (Vdive*ULF)^2 * Sref_w * Cm0;
 
 L_Htail = (Lwing * (X_cg - X_acWing) + M0w) / (X_acHtail - X_cg); 
 
-% y = linspace(-s_h/2,s_h/2,100);
-% gamma0 = (8 * s_h * 1) / (pi * AR_h * rho * U * Sref_h); %L = 1
-% gamma = @(y) gamma0 * sqrt(1 - (y ./ (s_h/2)).^2); 
-% TailLoadinit = rho * U .* gamma(y); 
-% TailLoadintegral = trapz(y,TailLoadinit); 
-% TailLoad = @(y) L_Htail * rho * U * gamma(y) / TailLoadintegral; %unit overall tail lift
-% HorizontalTail.TailLoad = TailLoad(y);
-
 y = linspace(-s_h/2,s_h/2,100);
-gamma0 = (8 * s_h * L_Htail) / (pi * AR_h * rho * U * Sref_h); %L = 1
+gamma0 = (8 * s_h * 1) / (pi * AR_h * rho * U * Sref_h); %L = 1
 gamma = @(y) gamma0 * sqrt(1 - (y ./ (s_h/2)).^2); 
-%TailLoadinit = rho * U .* gamma(y); 
-%TailLoadintegral = trapz(y,TailLoadinit); 
-TailLoad = @(y) L_Htail * rho * U * gamma(y) / TailLoadintegral; %unit overall tail lift
+TailLoadinit = rho * U .* gamma(y); 
+TailLoadintegral = trapz(y,TailLoadinit); 
+TailLoad = @(y) L_Htail * rho * U * gamma(y) / TailLoadintegral; %overall tail lift
 HorizontalTail.TailLoad = TailLoad(y);
-
+HorizontalTail.y = y; 
 
 figure
 plot(y, TailLoad(y))
