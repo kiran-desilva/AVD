@@ -5,6 +5,7 @@ clc
 close all
 
 load("fuselageLoading.mat");
+load materialLib;
 
 
 %% WINGS FRONT SPAR
@@ -47,18 +48,18 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
 %LOADS: VERTICAL LOADS 
 %ANGLES: DOWNWARDS = 0DEG
 %TORQUE
-
-    load("materialLib");
+    materialLib = struct();
+    load materialLib;
+    
     yielddirect = materialLib{1}.tensile_yield;
     yieldshear = materialLib{1}.shear_yield;
-    %yieldbending = ;SAME AS DIRECT?
 
-    syms t lf Ad As %thicknesses equal
-    H = 0.05; %wall-to-wall thickness    
+       
     
-    Ixx = ((H-2*t)^3)*t/12 + 2*((t^3)*lf/12 + t*lf*((H-2*t)+t)^2 /4); %second moment f=of area of I beam
-    %A = 2*tf*lf + lw*tw;    %frame sectionalarea
-    yc = 0.025; %section thickness / 2 (defined by fuselage paramaters)
+    ixx =@(t,H,lf) ((H-2*t)^3)*t/12 + 2*((t^3)*lf/12 + t*lf*((H-2*t)+t)^2 /4); %second moment f=of area of I beam
+    A =@(t,H,lf) 2*t*lf + (H-2*t)*t;    %frame sectionalarea
+
+    % yc = 0.025; %section thickness / 2 (defined by fuselage paramaters)
     R = D/2;
     
     for i = 1:length(L)
@@ -130,21 +131,45 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
     Mmax = max(abs(Mtot));
     Smax = max(abs(Stot));
 
-    directstressmax = Nmax / Ad; %Pa
-    shearstressmax = Smax / As; %Pa
-    bendingstressmax = (Mmax*yc) / Ixx; %Pa
-    
-    IXX = (Mmax*yc) / yielddirect
+    Ad_req = Nmax/yielddirect;
+    As_req = Smax/yieldshear;
 
-    f1 = -yielddirect + directstressmax == 0;
-    f2 = -yieldshear + shearstressmax == 0;
-    f3 = -yielddirect + bendingstressmax == 0;
+    A_req = max([Ad_req,As_req]);
+    ixx_req = @(H) (Mmax*0.5*H)/yielddirect;
 
-    Ad = double(solve(f1,Ad));
-    As = double(solve(f2,As));
-    areas = [Ad,As];
-    A = max(areas);
-    f4 = A == 2*t*lf + (H-2*t)*t;    %frame sectionalarea
+    lb = [1e-3,1e-3,1e-3];
+    ub = [1e-1,H_max,0.5]; %lol a meter
+
+    opts = optimoptions('fmincon','Display','iter','Algorithm','interior-point','MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'UseParallel',true)
+    [res,f,flag] = fmincon(@(x) A(x(1),x(2),x(3)),x0,[],[],[],[],lb,ub,@(x) cons(x,constraints),opts)
+    res 
+    f
+
+    t = res(1)
+    H = res(2)
+    lf = res(3)
+    sol_ixx_req = ixx_req(H)
+    sol_ixx = ixx(t,H,lf)
+    sol_A_req = A_req
+    sol_A = A(t,H,lf)
+
+
+    % %x = [t H lf]
+
+
+    % % directstressmax = Nmax / Ad; %Pa
+    % % shearstressmax = Smax / As; %Pa
+    % bendingstressmax = (Mmax*yc) / Ixx; %Pa
+
+    % f1 = -yielddirect + directstressmax == 0;
+    % f2 = -yieldshear + shearstressmax == 0;
+    % f3 = -yielddirect + bendingstressmax == 0;
+
+    % Ad = double(solve(f1,Ad));
+    % As = double(solve(f2,As));
+    % areas = [Ad,As];
+    % A = max(areas);
+    % f4 = A == 2*t*lf + (H-2*t)*t;    %frame sectionalarea
     
 %     area_eq = @(t,lf) 2*t*lf + (H-2*t)*t;
 %     
@@ -156,16 +181,13 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
     
     
     
-    eqns = [f3 f4];
-    vars = [t; lf];
-    Sol = solve(eqns, vars);
-    t = double(Sol.t((imag(Sol.t)==0)));
-    lf = double(Sol.lf((imag(Sol.t)==0)));
+    % eqns = [f3 f4];
+    % vars = [t; lf];
+    % Sol = solve(eqns, vars);
+    % t = double(Sol.t((imag(Sol.t)==0)));
+    % lf = double(Sol.lf((imag(Sol.t)==0)));
     
-%     function [c,ceq] = cons(x)
-%         c = 0;
-%         ceq = ixx_eq(lf,t) - 
-%     end
+
 end
 
 function [N, M, S] = SectionalLoadCalc(P, Q, T, D)
