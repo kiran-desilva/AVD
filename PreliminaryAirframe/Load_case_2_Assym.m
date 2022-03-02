@@ -60,7 +60,7 @@ xlabel("z (m)", 'interpreter', 'Latex')
 ylabel("Vertical Tail Torque (Nm)", 'interpreter', 'Latex')
 grid on
 
-save("VerticalTail.mat");
+save("VerticalTail.mat",'VerticalTail');
 
 function [Torsion] = Torsion(z, c_V, VTailLoad)
     CoF = (0.7-0.15) .* c_V(z) / 2 + 0.15 .* c_V(z); %center of flexure midway between spars
