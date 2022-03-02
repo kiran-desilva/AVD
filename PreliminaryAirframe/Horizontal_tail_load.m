@@ -1,7 +1,5 @@
-function [Loaddist, Shearforce, Bendingmoment, Torque] = HTAILCALC(Load)
+function [Loaddist, Shearforce, Bendingmoment, Torque] = Horizontal_tail_load(Load)
     %loading on horizontal tail as a factor of unit lift force
-    load('fuselageLoading.mat');
-
     s_h = 2.3887; %m
     %U = 3.75 * 137.2501; %FAR 25 3.75 * VD
     AR_h = 3.9;
@@ -33,15 +31,15 @@ function [Loaddist, Shearforce, Bendingmoment, Torque] = HTAILCALC(Load)
     %HorizontalTail.y = y; 
     
     integral = @(y) sqrt(1 - (y ./ (s_h/2)).^2); 
-    A = L_Htail / (trapz(integral)); 
+    A = L_Htail / (trapz(y,integral(y))); 
     TailLoad = @(y) A * sqrt(1 - (y ./ (s_h/2)).^2); %overall tail lift
     Loaddist = TailLoad(y);
 
-    figure
-    plot(y, TailLoad(y))
-    xlabel("y (m)", 'interpreter', 'Latex')
-    ylabel("Horizontal Tail Load (N)", 'interpreter', 'Latex')
-    grid on
+%     figure
+%     plot(y, TailLoad(y))
+%     xlabel("y (m)", 'interpreter', 'Latex')
+%     ylabel("Horizontal Tail Load (N)", 'interpreter', 'Latex')
+%     grid on
 
     R = WH - L_Htail; %vertical reaction from vertical stab
 
@@ -50,16 +48,16 @@ function [Loaddist, Shearforce, Bendingmoment, Torque] = HTAILCALC(Load)
     Bendingmoment = cumtrapz(y,shearforce); 
 
     figure
-    plot(y, Shearforce)
-    xlabel("y (m)", 'interpreter', 'Latex')
-    ylabel("Horizontal Tail Shear Force (N)", 'interpreter', 'Latex')
-    grid on
-
-    figure
-    plot(y, Bendingmoment)
-    xlabel("y (m)", 'interpreter', 'Latex')
-    ylabel("Horizontal Tail Bending Moments (Nm)", 'interpreter', 'Latex')
-    grid on
+%     plot(y, Shearforce)
+%     xlabel("y (m)", 'interpreter', 'Latex')
+%     ylabel("Horizontal Tail Shear Force (N)", 'interpreter', 'Latex')
+%     grid on
+% 
+%     figure
+%     plot(y, Bendingmoment)
+%     xlabel("y (m)", 'interpreter', 'Latex')
+%     ylabel("Horizontal Tail Bending Moments (Nm)", 'interpreter', 'Latex')
+%     grid on
 
     coordsouter = [0.000000  0.000000;
       0.005000  0.009780;
@@ -118,9 +116,9 @@ function [Loaddist, Shearforce, Bendingmoment, Torque] = HTAILCALC(Load)
     %axis equal
 
     section = polyshape(coordsouter(:,1),coordsouter(:,2));
-    figure
-    plot(section)
-    axis equal
+%     figure
+%     plot(section)
+%     axis equal
 
     [xbar,ybar] = centroid(section);
 
@@ -130,21 +128,19 @@ function [Loaddist, Shearforce, Bendingmoment, Torque] = HTAILCALC(Load)
     c_H = @(y) ((ctip - croot)/ytip) * (abs(y) - ytip) + ctip; 
 
     HTorsiondist = Torsion(y, c_H, TailLoad, xbar, WH);
-    figure
-    plot(y, HTorsiondist)
-    xlabel("y (m)", 'interpreter', 'Latex')
-    ylabel("Horizontal Tail Torque distribution (Nm)", 'interpreter', 'Latex')
-    grid on
+%     figure
+%     plot(y, HTorsiondist)
+%     xlabel("y (m)", 'interpreter', 'Latex')
+%     ylabel("Horizontal Tail Torque distribution (Nm)", 'interpreter', 'Latex')
+%     grid on
 
     Torque = sum(HTorsiondist) - cumsum(HTorsiondist) + HTorsiondist; 
 
-    figure
-    plot(y, Torque)
-    xlabel("y (m)", 'interpreter', 'Latex')
-    ylabel("Horizontal Tail Torque (Nm)", 'interpreter', 'Latex')
-    grid on
-
-    save('HorizontalTail.mat', 'HorizontalTail');
+%     figure
+%     plot(y, Torque)
+%     xlabel("y (m)", 'interpreter', 'Latex')
+%     ylabel("Horizontal Tail Torque (Nm)", 'interpreter', 'Latex')
+%     grid on
 
     function [Torsion] = Torsion(y, c_H, TailLoad, xbar, WH)
         CoF = (0.68-0.15) .* c_H(y) / 2 + 0.15 .* c_H(y); %center of flexure midway between spars
