@@ -20,6 +20,43 @@ A2 = wing_load(1.5*2.5, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_dis
 
 A3 = wing_load(1.5*2.5, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, true, true, "Landing: ");
 
+close all
+figure;
+hold on;
+plot(A1.points, A1.shear, 'r');
+plot(A2.points, A2.shear, 'g');
+plot(A3.points, A3.shear, 'b');
+xlabel('y [m]')
+ylabel('Shear Force [N]')
+grid on;
+improvePlot(gcf)
+legend('Load Case 1', 'Load Case 2', 'Load Case 3')
+hold off;
+
+figure;
+hold on;
+plot(A1.points, A1.bm, 'r');
+plot(A2.points, A2.bm, 'g');
+plot(A3.points, A3.bm, 'b');
+xlabel('y [m]')
+ylabel('Bending Moment [Nm]')
+grid on;
+improvePlot(gcf)
+legend('Load Case 1', 'Load Case 2', 'Load Case 3')
+hold off;
+
+figure;
+hold on;
+plot(A1.points, A1.torque, 'r');
+plot(A2.points, A2.torque, 'g');
+plot(A3.points, A3.torque, 'b');
+xlabel('y [m]')
+ylabel('Torque [Nm]')
+grid on;
+improvePlot(gcf)
+legend('Load Case 1', 'Load Case 2', 'Load Case 3')
+hold off;
+
 torque_dists = [A1.torque; A2.torque; A3.torque];
 [~, max_torque_idx] = max(abs(torque_dists), [], [1], 'linear');
 
@@ -34,6 +71,7 @@ limiting_loadcase_distributions.torque = torque_dists(max_torque_idx);
 limiting_loadcase_distributions.bm = bm_dists(max_bm_idx);
 limiting_loadcase_distributions.shear = shear_dists(max_shear_idx);
 
+figure;
 subplot(3, 1, 1);
 plot(limiting_loadcase_distributions.points, limiting_loadcase_distributions.shear);
 grid on;

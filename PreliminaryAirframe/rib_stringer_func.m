@@ -102,6 +102,7 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 	output.F_array = [];
 	output.rib_array = [];
     output.panel_thickness = [];
+    output.panel_thickness_eff = [];
     output.sigma_crit = [];
     output.sigma_0 = [];
     
@@ -181,6 +182,7 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
             output.panel_thickness = [output.panel_thickness, panel_thickness];
             output.sigma_0 = [output.sigma_0, sigma_0];
             output.sigma_crit = [output.sigma_crit, sigma_cr];
+            output.panel_thickness_eff = [output.panel_thickness_eff, eff_thickness];
             break;
         end
 
@@ -194,6 +196,7 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
         output.panel_thickness = [output.panel_thickness, panel_thickness];
         output.sigma_0 = [output.sigma_0, sigma_0];
         output.sigma_crit = [output.sigma_crit, sigma_cr];
+        output.panel_thickness_eff = [output.panel_thickness_eff, eff_thickness];
         
 		
 		% intercepts(stringers_to_cut) = spanwise_station;
