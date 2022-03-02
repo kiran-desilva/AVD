@@ -56,8 +56,16 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
 
        
     
-    ixx =@(t,H,lf) ((H-2*t)^3)*t/12 + 2*((t^3)*lf/12 + t*lf*((H-2*t)+t)^2 /4); %second moment f=of area of I beam
-    A =@(t,H,lf) 2*t*lf + (H-2*t)*t;    %frame sectionalarea
+    % ixx = @(t,H,lf) ((H-(2*t))^3)*t/12 + 2*((t^3)*lf/12 + t*lf*((H-(2*t))+t)^2 /4); %second moment f=of area of I beam
+    % A = @(t,H,lf) 2*t*lf + (H-2*t)*t;    %frame sectionalarea
+
+    % ixx = @(t,tf,H,lf) ((H-(2*tf))^3)*t/12 + 2*((tf^3)*lf/12 + t*lf*((H-(2*tf))+tf)^2 /4); %second moment f=of area of I beam
+    % A = @(t,tf,H,lf) 2*tf*lf + (H-2*tf)*t;    %frame sectionalarea
+
+    ixx = @(t,tf,H,lf) (H^3*t)/12 + 2*((tf^3)*lf/12 + tf*lf*((H+tf)^2 )/4); %second moment f=of area of I beam
+    A = @(t,tf,H,lf) 2*tf*lf + (H*t);    %frame sectionalarea
+
+   
 
     % yc = 0.025; %section thickness / 2 (defined by fuselage paramaters)
     R = D/2;
@@ -127,7 +135,7 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
     title(LoadcaseSTR)
 
     
-    Nmax = max(abs(Ntot));   %find max vals of stresses
+    Nmax = max(abs(Ntot));%find max vals of stresses
     Mmax = max(abs(Mtot));
     Smax = max(abs(Stot));
 
@@ -135,57 +143,66 @@ function [t, lf] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR)
     As_req = Smax/yieldshear;
 
     A_req = max([Ad_req,As_req]);
-    ixx_req = @(H) (Mmax*0.5*H)/yielddirect;
 
-    lb = [1e-3,1e-3,1e-3];
-    ub = [1e-1,H_max,0.5]; %lol a meter
-
-    opts = optimoptions('fmincon','Display','iter','Algorithm','interior-point','MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'UseParallel',true)
-    [res,f,flag] = fmincon(@(x) A(x(1),x(2),x(3)),x0,[],[],[],[],lb,ub,@(x) cons(x,constraints),opts)
-    res 
-    f
-
-    t = res(1)
-    H = res(2)
-    lf = res(3)
-    sol_ixx_req = ixx_req(H)
-    sol_ixx = ixx(t,H,lf)
-    sol_A_req = A_req
-    sol_A = A(t,H,lf)
+    ixx_req = @(H,tf) (Mmax*0.5*(H+(2*tf)))/yielddirect;
 
 
-    % %x = [t H lf]
-
-
-    % % directstressmax = Nmax / Ad; %Pa
-    % % shearstressmax = Smax / As; %Pa
-    % bendingstressmax = (Mmax*yc) / Ixx; %Pa
-
-    % f1 = -yielddirect + directstressmax == 0;
-    % f2 = -yieldshear + shearstressmax == 0;
-    % f3 = -yielddirect + bendingstressmax == 0;
-
-    % Ad = double(solve(f1,Ad));
-    % As = double(solve(f2,As));
-    % areas = [Ad,As];
-    % A = max(areas);
-    % f4 = A == 2*t*lf + (H-2*t)*t;    %frame sectionalarea
     
-%     area_eq = @(t,lf) 2*t*lf + (H-2*t)*t;
-%     
-%     ixx_eq = matlabFunction(Ixx) % function handle @(lf,t)
-%     
-%     
-%     
-%     fmincon(
-    
-    
-    
-    % eqns = [f3 f4];
-    % vars = [t; lf];
-    % Sol = solve(eqns, vars);
-    % t = double(Sol.t((imag(Sol.t)==0)));
-    % lf = double(Sol.lf((imag(Sol.t)==0)));
+
+    constraints.ixx_req = ixx_req;
+    constraints.A_req = A_req;
+    constraints.ixx = ixx;
+    constraints.A = A;
+
+    % function [c,ceq] = cons(x,constraints)
+    %     c = [constraints.ixx_req(x(2))-constraints.ixx(x(1),x(2),x(3));
+    %     constraints.A_req - constraints.A(x(1),x(2),x(3));];
+    %     % (2*x(1))-x(2)]; % constrain height to be at elast 2*thickness
+    %     ceq = [];
+    % end
+
+    function [c,ceq] = cons(x,constraints)
+        c = [constraints.ixx_req(x(3),x(2))-constraints.ixx(x(1),x(2),x(3),x(4));
+        constraints.A_req - constraints.A(x(1),x(2),x(3),x(4));
+        (2*x(2) + x(3) - 0.05)];
+        % (2*x(2))-x(3)]; % constrain height to be at elast 2*thickness
+        ceq = [];
+    end
+
+
+    H_max = 0.05; %wall-to-wall thickness 
+    % x0 = [1.5e-3,H_max,1e-3];
+
+    % lb = [1e-3,1e-3,1e-3];
+    % ub = [0.5,0.5,0.5]; %lol a meter
+
+    x0 = [1.1e-3,1.1e-3,H_max,1e-3];
+
+    lb = [1e-3,1e-3,1e-3,1e-3];
+    ub = [0.05,0.05,H_max,0.5]; %lol a meter
+
+
+    options = optimoptions('fmincon','Algorithm','interior-point','Display','iter','UseParallel',true)
+
+    gs = GlobalSearch('Display','iter','PlotFcn',@gsplotbestf);
+    problem = createOptimProblem('fmincon','objective',...
+                            @(x) A(x(1),x(2),x(3),x(4)),...
+                            'x0',x0,...
+                            'lb',lb,...
+                            'nonlcon',@(x) cons(x,constraints),...
+                            'options',options);
+
+    [res,f,exit] = run(gs,problem);
+    % [res,f,exit] = fmincon(problem);
+
+    t = res(1);
+    tf =res(2);
+    H = res(3);
+    lf = res(4);
+    sol_ixx_req = ixx_req(H,tf);
+    sol_ixx = ixx(t,tf,H,lf);
+    sol_A_req = A_req;
+    sol_A = A(t,tf,H,lf);
     
 
 end
@@ -193,25 +210,25 @@ end
 function [N, M, S] = SectionalLoadCalc(P, Q, T, D)
 
     R = D/2;
-    theta = linspace(0,360,360);
+    theta = linspace(0,2*pi,360);
 
     %tangential load case 
 
-    NT = (P/(2*pi)) .* ((sind(theta)./2) - (pi - theta) .* cosd(theta));
-    MT = (P * R / (2 * pi)) .* (1.5 .* sind(theta) + (pi - theta).*(cosd(theta) - 1));
-    ST = (P/(2*pi)) * ((pi - theta) .*sind(theta) - 1 - (cosd(theta)./2));
+    NT = (P/(2*pi)) .* ((sin(theta)./2) - (pi - theta) .* cos(theta));
+    MT = (P * R / (2 * pi)) .* (1.5 .* sin(theta) + (pi - theta).*(cos(theta) - 1));
+    ST = (P/(2*pi)) * ((pi - theta) .*sin(theta) - 1 - (cos(theta)./2));
 
     %radial load case
 
-    NR = (Q/(2*pi)) .* (1.5.*cosd(theta) + (pi - theta).*sind(theta));
-    MR = (Q*R/(2*pi)) .* (0.5.*cosd(theta) - (pi - theta).*sind(theta) + 1);
-    SR = (Q/(2*pi)).* ((pi - theta).*cosd(theta) - 0.5.*sind(theta));
+    NR = (Q/(2*pi)) .* (1.5.*cos(theta) + (pi - theta).*sin(theta));
+    MR = (Q*R/(2*pi)) .* (0.5.*cos(theta) - (pi - theta).*sin(theta) + 1);
+    SR = (Q/(2*pi)).* ((pi - theta).*cos(theta) - 0.5.*sin(theta));
 
     %moment case
 
-    NM = (T/(2*pi*R)).*(1.5.*cosd(theta) + (pi - theta).*sind(theta));
-    MM = (T/(2*pi)).*(pi - 2.*sind(theta) - theta);
-    SM = (T/(2*pi*R)).*(1+2.*cosd(theta));
+    NM = (T/(2*pi*R)).*(1.5.*cos(theta) + (pi - theta).*sin(theta));
+    MM = (T/(2*pi)).*(pi - 2.*sin(theta) - theta);
+    SM = (T/(2*pi*R)).*(1+2.*cos(theta));
 
     N = NT + NR + NM;
     M = MT + MR + MM;
