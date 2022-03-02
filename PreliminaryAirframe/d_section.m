@@ -20,10 +20,11 @@ frac_A1=b./a; %b/a if b>a
 frac_B1=a./sqrt(R1.*t1); %if b>a
 frac_A2=a./b; %a/b if a>b
 frac_B2=b./sqrt(R1.*t1); %if a>b
-K_S=zeros(1,length(a));
-for i=1:length(a)
-    K_S(i)=d_cell_k_s(a(i),b(i),R1(i),t1(i));
-end
+% K_S=zeros(1,length(a));
+K_S=[19,17,14.5,13,11,10,8,7.25];
+% for i=1:length(a)
+%     K_S(i)=d_cell_k_s(a(i),b(i),R1(i),t1(i));
+% end
 E_panel=72e+09; %Young's modulus of Panel material
 tau_cr=K_S.*E_panel.*(t1./b).^2; %buckling stress of curved panel in shear
 tresca=145e+06; %Tresca shear yielding stress is the same as the shear yield strength [Pa]
