@@ -20,7 +20,7 @@ W0 = 3128.2 * 9.81; %takeoff weight
 Lwing = ULF * W0; 
 Vdive = 137.25;
 Cm0 = -0.0266;
-M0w = 0.5 * rho * (Vdive*ULF)^2 * Sref_w * Cm0;
+M0w = 0.5 * rho * (Vdive)^2 * Sref_w * Cm0;
 
 L_Htail = (Lwing * (X_cg - X_acWing) + M0w) / (X_acHtail - X_cg); 
 
@@ -141,7 +141,7 @@ xlabel("y (m)", 'interpreter', 'Latex')
 ylabel("Horizontal Tail Torque (Nm)", 'interpreter', 'Latex')
 grid on
 
-save('HorizontalTail.mat');
+save('HorizontalTail.mat', 'HorizontalTail');
 
 function [Torsion] = Torsion(y, c_H, TailLoad, xbar, WH)
     CoF = (0.68-0.15) .* c_H(y) / 2 + 0.15 .* c_H(y); %center of flexure midway between spars
