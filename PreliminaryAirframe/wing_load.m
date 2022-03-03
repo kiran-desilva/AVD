@@ -143,7 +143,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 	lift.pitching_moment_load = 0.5*rho0*Vinf_eas^2*c(spanwise_disc).^2*cm0;
 
 	% Fuel tank contribution
-	x_fuel_percent_c = 0.5; % DOES THIS ASSUMPTION MAKE SENSE
+	x_fuel_percent_c = 0.413575;
 	fuel.torque(x1, x2) = -fuel.loading(x1, x2)*(x_fuel_percent_c - x_sc_assumption_percent_c)*(c(x1) + c(x2))/2;
 
 	% Wing weight contribution
@@ -168,8 +168,6 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 		lift.torsional_load = 0;
 
 		lift.pitching_moment_load = 0;
-
-		%% Ah ffs might have to include some flap loads
     end
     
     combined_load = double(uc.loading(spanwise_disc) + fuel.loading(x1_arr, x2_arr) + lift.L_dist + wing.inertial_loading);
@@ -184,7 +182,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 	bm_dist = sum(dM) - cumsum(dM) + dM;
     
     %lift.pitching_moment_load = 0;
-	torsional_dist = double(uc.torsional_load(spanwise_disc) + wing.torsional_load + lift.pitching_moment_load + lift.torsional_load);
+	torsional_dist = double(uc.torsional_load(spanwise_disc) + wing.torsional_load + lift.pitching_moment_load + lift.torsional_load + fuel.torque(x1_arr, x2_arr));
     
     temp = movsum(torsional_dist, 2)*delta_s/2;
     dT = [temp(2:end), 0];
