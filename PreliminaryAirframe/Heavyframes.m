@@ -12,14 +12,14 @@ load materialLib;
 %% WINGS FRONT SPAR
 D_wing = 1.58;
 Loads_wingf = [4.2*fuselageLoading.Vd_flight.Ff/2, 4.2*fuselageLoading.Vd_flight.Ff/2];
-angles_wingf = [deg2rad(50), deg2rad(50)]; %CHANGE THIS  
+angles_wingf = [deg2rad(50), deg2rad(-50)]; %CHANGE THIS  
 Torque_wingf = [0,0];
 [HeavyFrames.wing.twFRONT, HeavyFrames.wing.lfwFRONT, HeavyFrames.wing.Hfront, HeavyFrames.wing.tffront, HeavyFrames.wing.massfront] = framedimensioncalc(Loads_wingf, Torque_wingf, angles_wingf, D_wing, "Wing Front Spar Heavy Frame");
 
 %% WINGS REAR SPAR
 D_wing = 1.58;
 Loads_wingr = [4.2*fuselageLoading.Vd_flight.Fr/2, 4.2*fuselageLoading.Vd_flight.Fr/2];
-angles_wingr = [deg2rad(50), deg2rad(50)]; %CHANGE THIS
+angles_wingr = [deg2rad(50), deg2rad(-50)]; %CHANGE THIS
 Torque_wingr = [0,0];
 [HeavyFrames.wing.twREAR, HeavyFrames.wing.lfwREAR, HeavyFrames.wing.Hrear, HeavyFrames.wing.tfrear, HeavyFrames.wing.massrear] = framedimensioncalc(Loads_wingr, Torque_wingr, angles_wingr, D_wing, "Wing Rear Spar Heavy Frame");
 
@@ -67,14 +67,14 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     R = D/2;
     
     for i = 1:length(L)
-        P(i) = L(i)*sind(angles(i));
-        Q(i) = L(i)*cosd(angles(i));
+        P(i) = L(i)*sin(angles(i));
+        Q(i) = L(i)*cos(angles(i));
         T(i) = Torque(i);
         
         if i == 1
             offset = 0;
         else
-            offset = angles(1) + angles(i);
+            offset = angles(1) - angles(i);
         end
         
         [N(:,i), M(:,i), S(:,i)] = SectionalLoadCalc(P(i), Q(i), T(i), D, offset); 
@@ -167,7 +167,7 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     function [c,ceq] = cons(x,constraints)
         c = [constraints.ixx_req(x(3),x(2))-constraints.ixx(x(1),x(2),x(3),x(4));
         constraints.A_req - constraints.A(x(1),x(2),x(3),x(4));
-        (2*x(2) + x(3) - 0.05)];
+        (2*x(2) + x(3) - 0.1)];
         % (2*x(2))-x(3)]; % constrain height to be at elast 2*thickness
         ceq = [];
     end
@@ -179,13 +179,13 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     % lb = [1e-3,1e-3,1e-3];
     % ub = [0.5,0.5,0.5]; %lol a meter
 
-    x0 = [1.1e-3,1.1e-3,H_max,1e-3];
+    x0 = [2.5e-3,2.5e-3,H_max,0.3];
 
     lb = [1e-3,1e-3,1e-3,1e-3];
-    ub = [0.05,0.05,H_max,0.5]; %lol a meter
+    ub = [0.05,0.05,0.1,0.25]; %lol a meter
 
 
-    options = optimoptions('fmincon','Algorithm','interior-point','Display','iter','UseParallel',true)
+    options = optimoptions('fmincon','ScaleProblem',true,'ConstraintTolerance',1e-20,'MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'Display','iter','UseParallel',true)
 
     gs = GlobalSearch('Display','iter','PlotFcn',@gsplotbestf);
     problem = createOptimProblem('fmincon','objective',...
@@ -196,8 +196,8 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
                             'nonlcon',@(x) cons(x,constraints),...
                             'options',options);
 
-    [res,f,exit] = run(gs,problem);
-    % [res,f,exit] = fmincon(problem);
+     [res,f,exit] = run(gs,problem);
+%     [res,f,exit] = fmincon(problem);
 
     t = res(1)
     tf =res(2)
