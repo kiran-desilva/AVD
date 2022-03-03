@@ -159,7 +159,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 		xG = 5.16;
 		xT = 10.3474;
 		W = 3128.2*0.85; % landing weight is 85% of mass takeoff weight
-		F_uc = W*g*(xcg - xT)/(xG - xT); % Points up!! => positive
+		F_uc = W*g*(xcg - xT)/(2*(xG - xT)); % Points up!! => positive
 
 		uc.loading(x) = piecewise((x >= uc.spanwise_start) & (x <= uc.spanwise_end), F_uc/abs(uc.spanwise_start - uc.spanwise_end), 0);
 		uc.torsional_load(x) = -uc.loading(x)*(uc.attachment_point_percent_c - x_sc_assumption_percent_c)*c(x);
