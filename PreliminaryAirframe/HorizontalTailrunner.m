@@ -14,10 +14,11 @@ load('fuselageLoading.mat');
 
 %[LoaddistOEI ,ShearforceOEI, BendingmomentOEI, TorqueOEI] = Horizontal_tail_load((fuselageLoading.oei.load)*1.5);
 
-save('HorizontalTail.mat', 'HorizontalTail');
+s_h = 2.3887; %m
+y = linspace(-s_h/2,s_h/2,100);
+HorizontalTail.y = y; 
 
-    s_h = 2.3887; %m
-    y = linspace(-s_h/2,s_h/2,100);
+save('HorizontalTail.mat', 'HorizontalTail');
 
     figure
     plot(y, HorizontalTail.LoaddistFO)
