@@ -23,7 +23,7 @@ frac_B1=a./sqrt(R1.*t1); %if b>a
 frac_A2=a./b; %a/b if a>b
 frac_B2=b./sqrt(R1.*t1); %if a>b
 % K_S=zeros(1,length(a));
-K_S=[9,10,10.5,11,12,13.5, 13.5, 13, 12,10.5,9.5,8.5,7.5,7,7];
+K_S=[9,10,10.5,11,12,13.5, 13.5,13, 12,10.5,10,9.5,9,8,8];
 % for i=1:length(a)
 %     K_S(i)=d_cell_k_s(a(i),b(i),R1(i),t1(i));
 % end
