@@ -163,11 +163,14 @@ elseif mode == 1
     disp(design_params);
     out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true, @fudger);
     improvePlot(gcf);
+    
     wing_layout = out;
     wing_layout.stringer_pitch = design_params.stringer_pitch;
     wing_layout.stringer_thickness = design_params.stringer_thickness;
     wing_layout.stringer_web_height = design_params.stringer_web_height;
     wing_layout.geometry = geometry;
+    wing_layout.bm_fit = bending_moment_dist;
+    
     disp(['Max stress ', num2str(max(out.sigma_0)/1e6) ' MPa (Compressive)'])
     disp(['Material tensile yield stress ', num2str(material.tensile_yield/1e6) ' MPa'])
     disp(['Difference (Yield - max stress): ', num2str((material.tensile_yield - max(out.sigma_0))/1e6) ' MPa'])
@@ -278,6 +281,7 @@ elseif mode == 1
     tail_layout.stringer_thickness = design_params.stringer_thickness;
     tail_layout.stringer_web_height = design_params.stringer_web_height;
     tail_layout.geometry = geometry;
+    tail_layout.bm_fit = tp_bending_moment_dist;
     
     disp(['Max stress ', num2str(max(out.sigma_0)/1e6) ' MPa (Compressive)'])
     disp(['Material tensile yield stress ', num2str(material.tensile_yield/1e6) ' MPa'])
