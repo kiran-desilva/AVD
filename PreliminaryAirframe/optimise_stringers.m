@@ -152,7 +152,8 @@ if mode == 0
     optimisation.area_arr = area_arr;
     optimisation.area_mesh_arr = area_mesh_arr;
 elseif mode == 1
-    f = @(x) optimiser_func(x, geometry, material, design_params, bending_moment_dist);
+%{
+    f = @(x) optimiser_func(x, geometry, material, design_params, bending_moment_dist, @fudger);
     %options = optimoptions(@fmincon,'Display','iter')
     options = optimset('TolCon',1e-18,'TolX',1e-19,'PlotFcns',@optimplotfval, 'UseParallel', false);
     x = fmincon(f, [100e-3; 0.0011; 0.0226], [], [], [], [], [5e-4; 5e-4; 5e-4], [1; 100e-3; 30e-3], [], options)
@@ -161,13 +162,113 @@ elseif mode == 1
     design_params.stringer_thickness = x(2);
     design_params.stringer_web_height = x(3);
     disp(design_params);
-    out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
+    out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true, @fudger);
     improvePlot(gcf);
     wing_layout = out;
     wing_layout.stringer_pitch = design_params.stringer_pitch;
     wing_layout.stringer_thickness = design_params.stringer_thickness;
     wing_layout.stringer_web_height = design_params.stringer_web_height;
     save('wing_layout', 'wing_layout')
+  %}  
+    ctip = 0.4083;
+    croot = 0.8166;
+
+    geometry.semispan = 2.3887/2;
+    
+    geometry.sweep_deg = 26.65;
+    geometry.spar.front_x_c = 0.15;
+    geometry.spar.rear_x_c = 0.68;
+    geometry.airfoil = NaN; %% TODO:
+    geometry.A0 = 0.0757;
+    
+    geometry.c = @(y) ((ctip - croot)/geometry.semispan) * (abs(y) - geometry.semispan) + ctip; 
+    
+    airfoilcoords.top = [0.000000  0.000000;
+      0.005000  0.009780;
+      0.007500  0.011790;
+      0.012500  0.014900;
+      0.025000  0.020350;
+      0.050000  0.028100;
+      0.075000  0.033940;
+      0.100000  0.038710;
+      0.150000  0.046200;
+      0.200000  0.051730;
+      0.250000  0.055760;
+      0.300000  0.058440;
+      0.350000  0.059780;
+      0.400000  0.059810;
+      0.450000  0.057980;
+      0.500000  0.054800;
+      0.550000  0.050560;
+      0.600000  0.045480;
+      0.650000  0.039740;
+      0.700000  0.033500;
+      0.750000  0.026950;
+      0.800000  0.020290;
+      0.850000  0.013820;
+      0.900000  0.007860;
+      0.950000  0.002880;
+      1.000000  0.000000;
+      0.000000  0.000000;];
+  
+   airfoilcoords.bottom = [0.005000 -0.009780;
+      0.007500 -0.011790;
+      0.012500 -0.014900;
+      0.025000 -0.020350;
+      0.050000 -0.028100;
+      0.075000 -0.033940;
+      0.100000 -0.038710;
+      0.150000 -0.046200;
+      0.200000 -0.051730;
+      0.250000 -0.055760;
+      0.300000 -0.058440;
+      0.350000 -0.059780;
+      0.400000 -0.059810;
+      0.450000 -0.057980;
+      0.500000 -0.054800;
+      0.550000 -0.050560;
+      0.600000 -0.045480;
+      0.650000 -0.039740;
+      0.700000 -0.033500;
+      0.750000 -0.026950;
+      0.800000 -0.020290;
+      0.850000 -0.013820;
+      0.900000 -0.007860;
+      0.950000 -0.002880;
+      1.000000  0.000000];
+  
+    top_af_fit = fit(airfoilcoords.top(:, 1), airfoilcoords.top(:, 2), 'smoothingspline');
+    bottom_af_fit = fit(airfoilcoords.bottom(:, 1), airfoilcoords.bottom(:, 2), 'smoothingspline'); 
+
+    geometry.box_width_func = @(y) abs(geometry.spar.front_x_c - geometry.spar.rear_x_c)*geometry.c(y);
+    front_web_height = abs(top_af_fit(geometry.spar.front_x_c) - bottom_af_fit(geometry.spar.front_x_c));
+    rear_web_height = abs(top_af_fit(geometry.spar.rear_x_c) - bottom_af_fit(geometry.spar.rear_x_c));
+    geometry.web_height_func = @(y) max(front_web_height, rear_web_height)*geometry.c(y);
+    
+    material = materialLib{1};
+    
+    load('HorizontalTail.mat');
+    
+    design_params.stringer_pitch = 0.0869;
+    design_params.stringer_thickness = 0.0011;
+    design_params.stringer_web_height = 0.01;
+    design_params.flange_to_web_ratio = 0.3;
+    
+    tp_bending_moment_dist = fit(HorizontalTail.y', -HorizontalTail.bendingmoment', 'smoothingspline');
+    
+    f_tail = @(x) optimiser_func(x, geometry, material, design_params, tp_bending_moment_dist, @fudger2);
+    %options = optimoptions(@fmincon,'Display','iter')
+    options = optimset('TolCon',1e-7,'TolX',1e-7,'PlotFcns',@optimplotfval, 'UseParallel', false);
+    x = fmincon(f_tail, [100e-3; 0.0011; 0.01], [], [], [], [], [5e-4; 5e-4; 5e-4], [1; 100e-3; 30e-3], [], options);
+    
+    design_params.stringer_pitch = x(1);
+    design_params.stringer_thickness = x(2);
+    design_params.stringer_web_height = x(3);
+    disp(design_params);
+    
+    out = rib_stringer_func(geometry, material, design_params, tp_bending_moment_dist, true, @fudger2);
+    improvePlot(gcf);
+    
     return;
 else 
     load('optimisation')
@@ -199,7 +300,7 @@ design_params.stringer_pitch = optimisation.point_arr(1, optimisation.min_idx);
 design_params.stringer_thickness = optimisation.point_arr(2, optimisation.min_idx);
 design_params.stringer_web_height = optimisation.point_arr(3, optimisation.min_idx);
 disp(design_params);
-out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true);
+out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true, @fudger);
 improvePlot(gcf)
 
 figure;
@@ -208,16 +309,27 @@ xlabel("Spanwise Station [m]");
 ylabel("F Factor");
 grid on;
 
-function output_vol = optimiser_func(x, geometry, material, design_params, bending_moment_dist)
+function output_vol = optimiser_func(x, geometry, material, design_params, bending_moment_dist, fudger)
     design_params.stringer_pitch = x(1);
     design_params.stringer_thickness = x(2);
     design_params.stringer_web_height = x(3);
-    %disp(design_params)
     try
-        out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, false);
+        out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, false, fudger);
         output_vol = out.total_volume;
     catch ME
         output_vol = NaN;
     end
     
+end
+
+function fudge = fudger2(y)
+    fudge = 0.7;
+end
+
+function fudge = fudger(y)
+    if y < 3.5
+        fudge = 0.95;
+    else
+        fudge = 0.5;
+    end
 end
