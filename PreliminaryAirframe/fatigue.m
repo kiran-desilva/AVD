@@ -30,6 +30,6 @@ max_stress_psi = max_stress_1g/6895
 plot(test_space, round(panel_thickness_fit(test_space), 4)/1000, 'b');
 grid on;
 xlabel('y [m]');
-ylabel('t [mm]');
+ylabel('Panel Thickness [mm]');
 improvePlot(gcf);
 saveas(gcf, fullfile(fig_path, 'panel_thickness_wing'), 'epsc');
