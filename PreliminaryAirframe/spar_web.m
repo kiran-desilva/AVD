@@ -85,7 +85,7 @@ hold off
 axis equal
 
 %% 
-y = linspace(0,(span/2),1000);
+y = [0:0.001:(span/2)];
 %a = %web panel spacing design
 c = chord(y) * (0.77-0.1); %Distance between spars
 b2front = (aerofoiltop(0.1) - aerofoilbottom(0.1)).*chord(y);
@@ -93,25 +93,37 @@ b2rear = (aerofoiltop(0.77) - aerofoilbottom(0.77)).*chord(y);
 Ks = 8.1;%lookup from graph
 E_sp = materialLib{3}.E;%Youngs modulus of spar web 
 
-Shear_Load = limiting_loadcase_distributions.shear; %N
-Torque_Load = limiting_loadcase_distributions.torque; %Nm
+Shear_Load = fit(limiting_loadcase_distributions.points', limiting_loadcase_distributions.shear', 'cubicspline'); %N
+Torque_Load = fit(limiting_loadcase_distributions.points', limiting_loadcase_distributions.torque', 'cubicspline'); %Nm
 
-Shearflow_Shearfront = Shear_Load ./ (2 .* b2front); %N/m
-Shearflow_Shearrear = Shear_Load ./ (2 .* b2rear); %N/mm note here we assume that each spar takes half of vertical load despite having different heights
+Shearflow_Shearfront = Shear_Load(y)' ./ (2 .* b2front); %N/m
+Shearflow_Shearrear = Shear_Load(y)' ./ (2 .* b2rear); %N/mm note here we assume that each spar takes half of vertical load despite having different heights
 
-Shearflow_Torque = Torque_Load ./ (0.5 * c .* (b2front + b2rear) * 2); %T/2A
+Shearflow_Torque = Torque_Load(y)' ./ (0.5 * c .* (b2front + b2rear) * 2); %T/2A
 
 Shearflow_Fspar = Shearflow_Shearfront + Shearflow_Torque;
 Shearflow_Rspar = abs(Shearflow_Shearrear - Shearflow_Torque);
 
-wing.t_fs = (Shearflow_Fspar .* b2front ./ (Ks * E_sp)).^(1/3);
-wing.t_rs = (Shearflow_Rspar .* b2rear ./ (Ks * E_sp)).^(1/3); 
+t_fs = (Shearflow_Fspar .* (b2front.^2) ./ (Ks * E_sp)).^(1/3);
+t_rs = (Shearflow_Rspar .* (b2rear.^2) ./ (Ks * E_sp)).^(1/3); 
+
+wing.t_fs = t_fs;
+wing.t_rs = t_rs; 
+
+wing.t_fs(wing.t_fs < 0.001) = 0.001; 
+wing.t_rs(wing.t_rs < 0.001) = 0.001; 
 
 figure
 plot(y, wing.t_fs)
 hold on
 plot(y,wing.t_rs)
+hold on
+plot(y, t_fs)
+hold on
+plot(y,t_rs)
 hold off
+legend("Actual front spar web thickness", "Actual rear spar web thickness","Calculated front spar web thickness","Calculated rear spar web thickness")
+grid on
 
 Shearstress_Fs = Shearflow_Fspar / wing.t_fs;
 Shearstress_Rs = Shearflow_Rspar / wing.t_rs; 
@@ -217,7 +229,7 @@ axis equal
 
 %% 
 s_h = 2.3887;
-y = linspace(-s_h/2,s_h/2,100);
+y = [0:0.001:s_h/2];
 %a = %web panel spacing design
 c = chord(y) * (0.68-0.15); %Distance between spars
 b2front = (aerofoiltop(0.15) - aerofoilbottom(0.15)).*chord(y);
@@ -225,25 +237,40 @@ b2rear = (aerofoiltop(0.68) - aerofoilbottom(0.68)).*chord(y);
 Ks = 8.1;%lookup from graph
 E_sp = materialLib{3}.E;%Youngs modulus of spar web 
 
-Shear_Load = HorizontalTail.ShearforceFO; %N
-Torque_Load = HorizontalTail.TorqueFO; %Nm
+Shear_Load = fit(HorizontalTail.y', HorizontalTail.ShearforceFO', 'cubicspline'); %N
+Torque_Load = fit(HorizontalTail.y', HorizontalTail.TorqueFO', 'cubicspline'); %Nm
 
-Shearflow_Shearfront = Shear_Load ./ (2 .* b2front); %N/m
-Shearflow_Shearrear = Shear_Load ./ (2 .* b2rear); %N/mm note here we assume that each spar takes half of vertical load despite having different heights
+Shearflow_Shearfront = Shear_Load(y)' ./ (2 .* b2front); %N/m
+Shearflow_Shearrear = Shear_Load(y)' ./ (2 .* b2rear); %N/mm note here we assume that each spar takes half of vertical load despite having different heights
 
-Shearflow_Torque = Torque_Load ./ (0.5 * c .* (b2front + b2rear) * 2); %T/2A
+Shearflow_Torque = Torque_Load(y)' ./ (0.5 * c .* (b2front + b2rear) * 2); %T/2A
 
 Shearflow_Fspar = Shearflow_Shearfront + Shearflow_Torque;
 Shearflow_Rspar = abs(Shearflow_Shearrear - Shearflow_Torque);
 
-HorizontalTail.t_fs = (Shearflow_Fspar .* b2front ./ (Ks * E_sp)).^(1/3);
-HorizontalTail.t_rs = (Shearflow_Rspar .* b2rear ./ (Ks * E_sp)).^(1/3); 
+t_fs = (Shearflow_Fspar .* (b2front.^2) ./ (Ks * E_sp)).^(1/3);
+t_rs = (Shearflow_Rspar .* (b2rear.^2) ./ (Ks * E_sp)).^(1/3); 
 
+HorizontalTail.t_fs = t_fs;
+HorizontalTail.t_rs = t_rs;
+
+HorizontalTail.t_fs(HorizontalTail.t_fs < 0.001) = 0.001; 
+HorizontalTail.t_rs(HorizontalTail.t_rs < 0.001) = 0.001; 
+ 
 figure
 plot(y, HorizontalTail.t_fs)
 hold on
 plot(y,HorizontalTail.t_rs)
+hold on
+plot(y, t_fs)
+hold on
+plot(y,t_rs)
 hold off
+legend("Actual front spar web thickness", "Actual rear spar web thickness","Calculated front spar web thickness","Calculated rear spar web thickness")
+axis([0 0.5*s_h 0 0.0015])
+grid on
+
+
 
 Shearstress_Fs = Shearflow_Fspar / HorizontalTail.t_fs;
 Shearstress_Rs = Shearflow_Rspar / HorizontalTail.t_rs; 

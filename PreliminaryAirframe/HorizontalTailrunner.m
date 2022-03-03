@@ -3,6 +3,7 @@ clc
 close all
 
 load('fuselageLoading.mat');
+fig_path = fullfile('./Figures/horizontaltail/loads');
 
 %%
 %Va_flight
@@ -21,25 +22,33 @@ HorizontalTail.y = y;
 save('HorizontalTail.mat', 'HorizontalTail');
 
     figure
+    subplot(4,1,1)
     plot(y, HorizontalTail.LoaddistFO)
-    xlabel("y (m)", 'interpreter', 'Latex')
-    ylabel("Horizontal Tail Load (N)", 'interpreter', 'Latex')
+    %xlabel("y (m)", 'interpreter', 'Latex')
+    title("Nose off: Load (N)", 'interpreter', 'Latex')
     grid on
+    improvePlot(gcf)
 
-    figure
+    subplot(4,1,2)
     plot(y, HorizontalTail.ShearforceFO)
-    xlabel("y (m)", 'interpreter', 'Latex')
-    ylabel("Horizontal Tail Shear Force (N)", 'interpreter', 'Latex')
+   % xlabel("y (m)", 'interpreter', 'Latex')
+    title("Nose off: Shear Force (N)", 'interpreter', 'Latex')
     grid on
+    improvePlot(gcf)
 
-    figure
+    subplot(4,1,3)
     plot(y, HorizontalTail.BendingmomentFO)
-    xlabel("y (m)", 'interpreter', 'Latex')
-    ylabel("Horizontal Tail Bending Moments (Nm)", 'interpreter', 'Latex')
+   % xlabel("y (m)", 'interpreter', 'Latex')
+    title("Nose off: Bending Moments (Nm)", 'interpreter', 'Latex')
     grid on
-    
-    figure
+    improvePlot(gcf)
+
+    subplot(4,1,4)
     plot(y, HorizontalTail.TorqueFO)
-    xlabel("y (m)", 'interpreter', 'Latex')
-    ylabel("Horizontal Tail Torque (Nm)", 'interpreter', 'Latex')
+    %label("y (m)", 'interpreter', 'Latex')
+    title("Nose off: Torque (Nm)", 'interpreter', 'Latex')
     grid on
+    improvePlot(gcf)
+
+    
+    saveas(gcf, fullfile(fig_path, 'Htailloads'), 'epsc')

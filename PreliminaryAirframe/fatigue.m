@@ -22,5 +22,5 @@ plot(panel_thickness_fit, rib_arr, panel_thickness_arr);
 
 stresses = comp_load_per_length(test_space)./panel_thickness_fit(test_space);
 [~, idx] = max(abs(stresses));
-max_stress_1g = stresses(idx)/2.5 % TODO: CHECK if it should be divided by 2.5
+max_stress_1g = stresses(idx)/2.8 % TODO: CHECK if it should be divided by 2.5
 max_stress_psi = max_stress_1g/6895

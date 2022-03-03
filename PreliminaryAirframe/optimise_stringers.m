@@ -2,6 +2,7 @@ clear
 clc
 close all
 addpath(fullfile('.', 'helper_funcs')); 
+fig_path = fullfile('./Figures/wing');
 
 airfoilcoords.top = [1.00000     0.00000;
 0.95033     0.00986;
@@ -155,7 +156,12 @@ elseif mode == 1
     f = @(x) optimiser_func(x, geometry, material, design_params, bending_moment_dist, @fudger);
     %options = optimoptions(@fmincon,'Display','iter')
     options = optimset('TolCon',1e-18,'TolX',1e-19,'PlotFcns',@optimplotfval, 'UseParallel', false);
+    figure;
+    hold on;
     x = fmincon(f, [100e-3; 0.0011; 0.0226], [], [], [], [], [5e-4; 5e-4; 5e-4], [1; 100e-3; 30e-3], [], options)
+    grid on;
+    saveas(gcf, fullfile(fig_path, 'wing_layout_optim'), 'epsc')
+    hold off;
     
     design_params.stringer_pitch = x(1);
     design_params.stringer_thickness = x(2);
@@ -163,6 +169,7 @@ elseif mode == 1
     disp(design_params);
     out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, true, @fudger);
     improvePlot(gcf);
+    saveas(gcf, fullfile(fig_path, 'wing_layout'), 'epsc')
     
     wing_layout = out;
     wing_layout.stringer_pitch = design_params.stringer_pitch;
@@ -266,8 +273,14 @@ elseif mode == 1
     f_tail = @(x) optimiser_func(x, geometry, material, design_params, tp_bending_moment_dist, @fudger2);
     %options = optimoptions(@fmincon,'Display','iter')
     options = optimset('TolCon',1e-7,'TolX',1e-7,'PlotFcns',@optimplotfval, 'UseParallel', false);
+    
+    figure;
+    hold on;
     x = fmincon(f_tail, [120e-3; 0.001; 0.012], [], [], [], [], [9e-4; 9e-4; 9e-4], [1; 100e-3; 30e-3], [], options);
-
+    grid on;
+    saveas(gcf, fullfile(fig_path, 'tailplane_layout_optim'), 'epsc')
+    hold off;
+    
     design_params.stringer_pitch = x(1);
     design_params.stringer_thickness = x(2);
     design_params.stringer_web_height = x(3);
@@ -275,6 +288,7 @@ elseif mode == 1
     
     out = rib_stringer_func(geometry, material, design_params, tp_bending_moment_dist, true, @fudger2);
     improvePlot(gcf);
+    saveas(gcf, fullfile(fig_path, 'tailplane_layout'), 'epsc')
     
     tail_layout = out;
     tail_layout.stringer_pitch = design_params.stringer_pitch;

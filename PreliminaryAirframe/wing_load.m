@@ -143,7 +143,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 	lift.pitching_moment_load = 0.5*rho0*Vinf_eas^2*c(spanwise_disc).^2*cm0;
 
 	% Fuel tank contribution
-	x_fuel_percent_c = 0.5; % DOES THIS ASSUMPTION MAKE SENSE
+	x_fuel_percent_c = 0.413575;
 	fuel.torque(x1, x2) = -fuel.loading(x1, x2)*(x_fuel_percent_c - x_sc_assumption_percent_c)*(c(x1) + c(x2))/2;
 
 	% Wing weight contribution
@@ -151,25 +151,23 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 	wing.torsional_load = -wing.inertial_loading.*(wing.centroid_x_percent_c - x_sc_assumption_percent_c).*(c(x1_arr) + c(x2_arr))/2; % dimensionalise by avg cord between x1 and x2
 
 	% UC weight contribution (update if isLanding)
-	uc.attachment_point_percent_c = (c(1.18) - 0.1)/c(1.18);
+	uc.attachment_point_percent_c = (c(1.18) - 0.1)/ c(1.18);
 	uc.torsional_load(x) = -uc.loading(x)*(uc.attachment_point_percent_c - x_sc_assumption_percent_c)*c(x);
 
 	if (isLanding)
 		xcg = 4.55; % measured from the nose in m
 		xG = 5.16;
 		xT = 10.3474;
-		W = 3128.2*lbs_to_kg*0.85; % landing weight is 85% of mass takeoff weight
-		F_uc = W*g*(xcg - xT)/(xG - xT); % Points up!! => positive
+		W = 3128.2*0.85; % landing weight is 85% of mass takeoff weight
+		F_uc = W*g*(xcg - xT)/(2*(xG - xT)); % Points up!! => positive
 
-		uc.loading(x) = piecewise((x >= uc.spanwise_start) & (x <= uc.spanwise_end), F_uc, 0);
+		uc.loading(x) = piecewise((x >= uc.spanwise_start) & (x <= uc.spanwise_end), F_uc/abs(uc.spanwise_start - uc.spanwise_end), 0);
 		uc.torsional_load(x) = -uc.loading(x)*(uc.attachment_point_percent_c - x_sc_assumption_percent_c)*c(x);
 
 		lift.L_dist = 0;
 		lift.torsional_load = 0;
 
 		lift.pitching_moment_load = 0;
-
-		%% Ah ffs might have to include some flap loads
     end
     
     combined_load = double(uc.loading(spanwise_disc) + fuel.loading(x1_arr, x2_arr) + lift.L_dist + wing.inertial_loading);
@@ -184,7 +182,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 	bm_dist = sum(dM) - cumsum(dM) + dM;
     
     %lift.pitching_moment_load = 0;
-	torsional_dist = double(uc.torsional_load(spanwise_disc) + wing.torsional_load + lift.pitching_moment_load + lift.torsional_load);
+	torsional_dist = double(uc.torsional_load(spanwise_disc) + wing.torsional_load + lift.pitching_moment_load + lift.torsional_load + fuel.torque(x1_arr, x2_arr));
     
     temp = movsum(torsional_dist, 2)*delta_s/2;
     dT = [temp(2:end), 0];
