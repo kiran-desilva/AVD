@@ -1,5 +1,5 @@
 function K_corrected = catchpole_calculator(h_over_b, t_s_over_t, poissons_ratio, use3D)
-	if h_over_b < 0 || h_over_b > 0.9 || t_s_over_t < 0.45 || t_s_over_t > 2
+	if h_over_b < 0 || h_over_b > 0.9 || t_s_over_t < 0.43 || t_s_over_t > 2
         error(['Tried to sample catchpole diagram out of distribution, got h/b = ', num2str(h_over_b), ', t_s/t = ', num2str(t_s_over_t)]);
     end
 

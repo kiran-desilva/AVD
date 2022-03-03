@@ -6,6 +6,7 @@ clc
 clear
 
 load wing_layout.mat
+load materialLib.mat
 %% Daiqing method from Excel
 
 % % Assume rib at every 0.5m
@@ -22,7 +23,7 @@ end
 
 ribs_check.s(ribs_check.ribs_n)=geometry.semispan-ribs_check.ribs_loc_1(ribs_check.ribs_n);
 
-ribs_check.E_panel=72e+09; %Young's modulus of panel (???) [72 GPa]
+ribs_check.E_panel=materialLib{1, 1}.E; %Young's modulus of panel (???) [72 GPa]
 ribs_check.t_s=design_params.stringer_thickness; %thickness of stringer
 ribs_check.t_e=3*ribs_check.t_s/2; % effective thickness of the panel [m] - assuming stiffness ratio is 0.5
 

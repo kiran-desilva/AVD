@@ -154,8 +154,8 @@ if mode == 0
 elseif mode == 1
     f = @(x) optimiser_func(x, geometry, material, design_params, bending_moment_dist);
     %options = optimoptions(@fmincon,'Display','iter')
-    options = optimset('TolCon',1e-18,'TolX',1e-19,'PlotFcns',@optimplotfval, 'UseParallel', true);
-    x = fmincon(f, [0.0869; 0.0011; 0.0226], [], [], [], [], [5e-4; 5e-4; 5e-4], [1; 100e-3; 30e-3], [], options)
+    options = optimset('TolCon',1e-18,'TolX',1e-19,'PlotFcns',@optimplotfval, 'UseParallel', false);
+    x = fmincon(f, [100e-3; 0.0011; 0.0226], [], [], [], [], [5e-4; 5e-4; 5e-4], [1; 100e-3; 30e-3], [], options)
     
     design_params.stringer_pitch = x(1);
     design_params.stringer_thickness = x(2);
@@ -180,7 +180,7 @@ else
 end
 
 [optimisation.min_area, optimisation.min_idx] = min(area_arr);
-save('optimisation')
+save('optimisation', 'optimisation')
 
 figure;
 hold on;

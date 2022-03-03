@@ -102,6 +102,7 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 	output.F_array = [];
 	output.rib_array = [];
     output.panel_thickness = [];
+    output.panel_thickness_eff = [];
     output.sigma_crit = [];
     output.sigma_0 = [];
     
@@ -161,13 +162,13 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 		%% Draw a rib
 		spanwise_station = spanwise_station + rib_spacing;
 
-		fudge_nr = 0.95;
+		fudge_nr = @fudger;
                 
-		previous_stringers_to_cut = intercepts < spanwise_station + fudge_nr*delta_matrix(spanwise_station) & intercepts > spanwise_station - rib_spacing + fudge_nr*delta_matrix(spanwise_station - rib_spacing);
+		previous_stringers_to_cut = intercepts < spanwise_station + fudge_nr(spanwise_station)*delta_matrix(spanwise_station) & intercepts > spanwise_station - rib_spacing + fudge_nr(spanwise_station)*delta_matrix(spanwise_station - rib_spacing);
 
 		if any(previous_stringers_to_cut) 
             tmp_delta = delta_matrix(spanwise_station - rib_spacing);
-			intercepts(previous_stringers_to_cut) = (spanwise_station - rib_spacing + fudge_nr*tmp_delta(previous_stringers_to_cut)); % cut the previous stringers which didnt reach far enough
+			intercepts(previous_stringers_to_cut) = (spanwise_station - rib_spacing + fudge_nr(spanwise_station)*tmp_delta(previous_stringers_to_cut)); % cut the previous stringers which didnt reach far enough
 			% now we have to redo the current iteration because the number of stringers changed (as some previous ones were cut)
 			spanwise_station = spanwise_station - rib_spacing;
 			num_stringers = num_stringers - sum(previous_stringers_to_cut, 'all');
@@ -181,6 +182,7 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
             output.panel_thickness = [output.panel_thickness, panel_thickness];
             output.sigma_0 = [output.sigma_0, sigma_0];
             output.sigma_crit = [output.sigma_crit, sigma_cr];
+            output.panel_thickness_eff = [output.panel_thickness_eff, eff_thickness];
             break;
         end
 
@@ -194,6 +196,7 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
         output.panel_thickness = [output.panel_thickness, panel_thickness];
         output.sigma_0 = [output.sigma_0, sigma_0];
         output.sigma_crit = [output.sigma_crit, sigma_cr];
+        output.panel_thickness_eff = [output.panel_thickness_eff, eff_thickness];
         
 		
 		% intercepts(stringers_to_cut) = spanwise_station;
@@ -224,4 +227,12 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 
 	output.total_volume = total_volume;
 	output.total_weight = total_volume*material.rho;
+end
+
+function fudge = fudger(y)
+    if y < 3.5
+        fudge = 0.95;
+    else
+        fudge = 0.5;
+    end
 end
