@@ -155,10 +155,24 @@ if mode == 0
 elseif mode == 1
     f = @(x) optimiser_func(x, geometry, material, design_params, bending_moment_dist, @fudger);
     %options = optimoptions(@fmincon,'Display','iter')
-    options = optimset('TolCon',1e-18,'TolX',1e-19,'PlotFcns',@optimplotfval, 'UseParallel', false);
-    figure;
+    options = optimset('TolCon',1e-18,'TolX',1e-60,'PlotFcns',@optimplotfval, 'UseParallel', false, 'Display', 'iter');
+    %figure;
     hold on;
-    x = fmincon(f, [100e-3; 0.0011; 0.0226], [], [], [], [], [5e-4; 5e-4; 5e-4], [1; 100e-3; 30e-3], [], options)
+    %[0.0776678749706972;0.00110105978311690;0.0208070972507536]
+    x = fmincon(f, [0.09;0.0011;0.02], [], [], [], [], [5e-4; 5e-4; 5e-4], [1; 100e-3; 30e-3], [], options)
+    %{
+    options = optimoptions('fmincon','ScaleProblem',true,'ConstraintTolerance',1e-20,'MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'Display','final','UseParallel',false)
+
+    gs = MultiStart('Display','iter','PlotFcn',@gsplotbestf, 'UseParallel', true);
+    problem = createOptimProblem('fmincon','objective',...
+                            f,...
+                            'x0',[100e-3; 0.0011; 0.0226],...
+                            'lb', [5e-4; 5e-4; 5e-4],...
+                            'ub', [1; 100e-3; 30e-3],...
+                            'nonlcon', [],...
+                            'options',options);
+    [x,f,exit] = run(gs,problem, 20);
+    %}
     grid on;
     saveas(gcf, fullfile(fig_path, 'wing_layout_optim'), 'epsc')
     hold off;
@@ -272,11 +286,23 @@ elseif mode == 1
     
     f_tail = @(x) optimiser_func(x, geometry, material, design_params, tp_bending_moment_dist, @fudger2);
     %options = optimoptions(@fmincon,'Display','iter')
-    options = optimset('TolCon',1e-7,'TolX',1e-7,'PlotFcns',@optimplotfval, 'UseParallel', false);
+    options = optimset('PlotFcns',@optimplotfval, 'UseParallel', false);
     
-    figure;
     hold on;
     x = fmincon(f_tail, [120e-3; 0.001; 0.012], [], [], [], [], [9e-4; 9e-4; 9e-4], [1; 100e-3; 30e-3], [], options);
+    %{
+    options = optimoptions('fmincon','ScaleProblem',true,'ConstraintTolerance',1e-20,'MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'Display','final','UseParallel',false);
+
+    gs = MultiStart('Display','iter','PlotFcn',@gsplotbestf, 'UseParallel', false);
+    problem = createOptimProblem('fmincon','objective',...
+                            f_tail,...
+                            'x0',[120e-3; 0.001; 0.012],...
+                            'lb', [9e-4; 9e-4; 9e-4],...
+                            'ub', [1; 100e-3; 30e-3],...
+                            'nonlcon', [],...
+                            'options',options);
+    [x,f,exit] = run(gs,problem, 20);
+    %}
     grid on;
     saveas(gcf, fullfile(fig_path, 'tailplane_layout_optim'), 'epsc')
     hold off;
