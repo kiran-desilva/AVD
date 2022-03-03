@@ -21,34 +21,79 @@ HorizontalTail.y = y;
 
 save('HorizontalTail.mat', 'HorizontalTail');
 
+
+figure 
+plot(y, ShearforceVA)
+hold on
+plot(y, ShearforceVD)
+hold on
+plot(y, HorizontalTail.ShearforceFO)
+hold off
+grid on
+improvePlot(gcf)
+xlabel("Span (m)")
+ylabel("Shear Force (N)")
+legend("Va", "Vd", "Front off")
+saveas(gcf, fullfile(fig_path, 'tailshearforce'), 'epsc')
+
+figure 
+plot(y, BendingmomentVA)
+hold on
+plot(y, BendingmomentVD)
+hold on
+plot(y, HorizontalTail.BendingmomentFO)
+hold off
+grid on
+improvePlot(gcf)
+xlabel("Span (m)")
+ylabel("Bending Moment (Nm)")
+legend("Va Load", "Vd Load", "Front off Load")
+saveas(gcf, fullfile(fig_path, 'tailbendingmoments'), 'epsc')
+
+figure 
+plot(y, TorqueVA)
+hold on
+plot(y, TorqueVD)
+hold on
+plot(y, HorizontalTail.TorqueFO)
+hold off
+grid on
+improvePlot(gcf)
+xlabel("Span (m)")
+ylabel("Torque (Nm)")
+legend("Va Load", "Vd Load", "Front off Load")
+saveas(gcf, fullfile(fig_path, 'tailtorque'), 'epsc')
+
+
+
     figure
-    subplot(4,1,1)
-    plot(y, HorizontalTail.LoaddistFO)
-    %xlabel("y (m)", 'interpreter', 'Latex')
-    title("Nose off: Load (N)", 'interpreter', 'Latex')
-    grid on
-    improvePlot(gcf)
+%     subplot(4,1,1)
+%     plot(y, HorizontalTail.LoaddistFO)
+%     %xlabel("y (m)", 'interpreter', 'Latex')
+%     title("Nose off: Load (N)", 'interpreter', 'Latex')
+%     grid on
+%     improvePlot(gcf)
 
-    subplot(4,1,2)
+    subplot(3,1,1)
     plot(y, HorizontalTail.ShearforceFO)
-   % xlabel("y (m)", 'interpreter', 'Latex')
-    title("Nose off: Shear Force (N)", 'interpreter', 'Latex')
+    xlabel("y (m)")
+    ylabel("SF (N)")
     grid on
     improvePlot(gcf)
 
-    subplot(4,1,3)
+    subplot(3,1,2)
     plot(y, HorizontalTail.BendingmomentFO)
-   % xlabel("y (m)", 'interpreter', 'Latex')
-    title("Nose off: Bending Moments (Nm)", 'interpreter', 'Latex')
+    xlabel("y (m)")
+    ylabel("BM (Nm)")
     grid on
     improvePlot(gcf)
 
-    subplot(4,1,4)
+    subplot(3,1,3)
     plot(y, HorizontalTail.TorqueFO)
-    %label("y (m)", 'interpreter', 'Latex')
-    title("Nose off: Torque (Nm)", 'interpreter', 'Latex')
+    xlabel("y (m)")
+    ylabel("Torque (Nm)")
     grid on
     improvePlot(gcf)
 
     
-    saveas(gcf, fullfile(fig_path, 'Htailloads'), 'epsc')
+    saveas(gcf, fullfile(fig_path, 'FOtailload'), 'epsc')

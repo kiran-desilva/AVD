@@ -163,8 +163,9 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     function [c,ceq] = cons(x,constraints)
         c = [constraints.ixx_req(x(3),x(2))-constraints.ixx(x(1),x(2),x(3),x(4));
         constraints.A_req - constraints.A(x(1),x(2),x(3),x(4));
-        (2*x(2) - x(3))]; % constrain height to be at elast 2*thickness 
-        ceq = [];
+        (2*x(2) + x(3) - 0.1)];
+        % (2*x(2))-x(3)]; % constrain height to be at elast 2*thickness
+        ceq = zeros(size(x));
     end
 
 
