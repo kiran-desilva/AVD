@@ -174,6 +174,8 @@ elseif mode == 1
     [x,f,exit] = run(gs,problem, 20);
     %}
     grid on;
+    ylabel('Weight [kg]')
+    improvePlot(gcf);
     saveas(gcf, fullfile(fig_path, 'wing_layout_optim'), 'epsc')
     hold off;
     
@@ -304,6 +306,8 @@ elseif mode == 1
     [x,f,exit] = run(gs,problem, 20);
     %}
     grid on;
+    ylabel('Weight [kg]')
+    improvePlot(gcf);
     saveas(gcf, fullfile(fig_path, 'tailplane_layout_optim'), 'epsc')
     hold off;
     
