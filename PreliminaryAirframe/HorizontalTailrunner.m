@@ -67,31 +67,31 @@ saveas(gcf, fullfile(fig_path, 'tailtorque'), 'epsc')
 
 
     figure
-    subplot(4,1,1)
-    plot(y, HorizontalTail.LoaddistFO)
-    %xlabel("y (m)", 'interpreter', 'Latex')
-    title("Nose off: Load (N)", 'interpreter', 'Latex')
-    grid on
-    improvePlot(gcf)
+%     subplot(4,1,1)
+%     plot(y, HorizontalTail.LoaddistFO)
+%     %xlabel("y (m)", 'interpreter', 'Latex')
+%     title("Nose off: Load (N)", 'interpreter', 'Latex')
+%     grid on
+%     improvePlot(gcf)
 
-    subplot(4,1,2)
+    subplot(3,1,1)
     plot(y, HorizontalTail.ShearforceFO)
-   % xlabel("y (m)", 'interpreter', 'Latex')
-    title("Nose off: Shear Force (N)", 'interpreter', 'Latex')
+    xlabel("y (m)")
+    ylabel("SF (N)")
     grid on
     improvePlot(gcf)
 
-    subplot(4,1,3)
+    subplot(3,1,2)
     plot(y, HorizontalTail.BendingmomentFO)
-   % xlabel("y (m)", 'interpreter', 'Latex')
-    title("Nose off: Bending Moments (Nm)", 'interpreter', 'Latex')
+    xlabel("y (m)")
+    ylabel("BM (Nm)")
     grid on
     improvePlot(gcf)
 
-    subplot(4,1,4)
+    subplot(3,1,3)
     plot(y, HorizontalTail.TorqueFO)
-    %label("y (m)", 'interpreter', 'Latex')
-    title("Nose off: Torque (Nm)", 'interpreter', 'Latex')
+    xlabel("y (m)")
+    ylabel("Torque (Nm)")
     grid on
     improvePlot(gcf)
 
