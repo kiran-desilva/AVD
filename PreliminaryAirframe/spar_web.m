@@ -14,6 +14,8 @@ load('VerticalTail.mat');
 load('HorizontalTail.mat');
 load('wing_layout.mat');
 
+fig_path = fullfile('./Figures/wing');
+
 c_root = 1.767;
 c_tip = 0.533;
 span = 8.94;
@@ -124,6 +126,10 @@ plot(y,t_rs)
 hold off
 legend("Actual front spar web thickness", "Actual rear spar web thickness","Calculated front spar web thickness","Calculated rear spar web thickness")
 grid on
+improvePlot(gcf)
+saveas(gcf, fullfile(fig_path, 'Wingsparweb'), 'epsc')
+
+
 
 Shearstress_Fs = Shearflow_Fspar / wing.t_fs;
 Shearstress_Rs = Shearflow_Rspar / wing.t_rs; 
@@ -156,6 +162,7 @@ end
 
 %% HORIZONTAL TAIL
 %% Calculating web thickness
+fig_path = fullfile('./Figures/horizontaltail');
 c_root = 0.8166;
 c_tip = 0.4083;
 span = 2.3887;
@@ -269,6 +276,8 @@ hold off
 legend("Actual front spar web thickness", "Actual rear spar web thickness","Calculated front spar web thickness","Calculated rear spar web thickness")
 axis([0 0.5*s_h 0 0.0015])
 grid on
+improvePlot(gcf)
+saveas(gcf, fullfile(fig_path, 'Htailsparweb'), 'epsc')
 
 
 
