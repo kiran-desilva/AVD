@@ -262,7 +262,7 @@ elseif mode == 1
     f_tail = @(x) optimiser_func(x, geometry, material, design_params, tp_bending_moment_dist, @fudger2);
     %options = optimoptions(@fmincon,'Display','iter')
     options = optimset('TolCon',1e-7,'TolX',1e-7,'PlotFcns',@optimplotfval, 'UseParallel', false);
-    x = fmincon(f_tail, [120e-3; 0.001; 0.012], [], [], [], [], [5e-4; 5e-4; 5e-4], [1; 100e-3; 30e-3], [], options);
+    x = fmincon(f_tail, [120e-3; 0.001; 0.012], [], [], [], [], [9e-4; 9e-4; 9e-4], [1; 100e-3; 30e-3], [], options);
 
     design_params.stringer_pitch = x(1);
     design_params.stringer_thickness = x(2);
@@ -337,10 +337,10 @@ function output_vol = optimiser_func(x, geometry, material, design_params, bendi
 end
 
 function fudge = fudger2(y)
-    if y < 1
-        fudge = 0.9;
+    if y < 0.6
+        fudge = 1.1;
     else
-        fudge = 0.6;
+        fudge = 0.87;
     end
 end
 
