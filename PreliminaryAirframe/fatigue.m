@@ -27,7 +27,7 @@ stresses = comp_load_per_length(test_space)./panel_thickness_fit(test_space);
 max_stress_1g = stresses(idx)/2.8 % TODO: CHECK if it should be divided by 2.5
 max_stress_psi = max_stress_1g/6895
 
-plot(test_space, round(panel_thickness_fit(test_space), 4)/1000);
+plot(test_space, round(panel_thickness_fit(test_space), 4)/1000, 'b');
 grid on;
 xlabel('y [m]');
 ylabel('t [mm]');
