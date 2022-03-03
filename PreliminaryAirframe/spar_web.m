@@ -225,8 +225,8 @@ b2rear = (aerofoiltop(0.68) - aerofoilbottom(0.68)).*chord(y);
 Ks = 8.1;%lookup from graph
 E_sp = materialLib{3}.E;%Youngs modulus of spar web 
 
-Shear_Load = HorizontalTail.Shearforce; %N
-Torque_Load = HorizontalTail.Torque; %Nm
+Shear_Load = HorizontalTail.ShearforceFO; %N
+Torque_Load = HorizontalTail.TorqueFO; %Nm
 
 Shearflow_Shearfront = Shear_Load ./ (2 .* b2front); %N/m
 Shearflow_Shearrear = Shear_Load ./ (2 .* b2rear); %N/mm note here we assume that each spar takes half of vertical load despite having different heights

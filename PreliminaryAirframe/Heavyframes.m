@@ -127,7 +127,7 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     figure
     plot(theta, Ntot)
     hold on
-    plot(theta, Mtot))
+    plot(theta, Mtot)
     hold on
     plot(theta, Stot)
     hold off

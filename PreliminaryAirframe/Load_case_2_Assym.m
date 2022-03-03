@@ -62,7 +62,7 @@ title("OEI: Shear Force (N)", 'interpreter', 'Latex')
 grid on
 subplot(5,1,5)
 plot(z, VerticalTail.BendingMoment_vt(z))
-xlabel("z (m)", 'interpreter', 'Latex')
+xlabel("Span z (m)", 'interpreter', 'Latex')
 title("OEI: Bending Moment (Nm)", 'interpreter', 'Latex')
 grid on
 
