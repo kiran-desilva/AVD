@@ -151,7 +151,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 	wing.torsional_load = -wing.inertial_loading.*(wing.centroid_x_percent_c - x_sc_assumption_percent_c).*(c(x1_arr) + c(x2_arr))/2; % dimensionalise by avg cord between x1 and x2
 
 	% UC weight contribution (update if isLanding)
-	uc.attachment_point_percent_c = (c(1.18) - 0.1)/c(1.18);
+	uc.attachment_point_percent_c = (c(1.18) - 0.1)/ c(1.18);
 	uc.torsional_load(x) = -uc.loading(x)*(uc.attachment_point_percent_c - x_sc_assumption_percent_c)*c(x);
 
 	if (isLanding)
