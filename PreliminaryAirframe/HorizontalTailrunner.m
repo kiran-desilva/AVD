@@ -7,11 +7,11 @@ fig_path = fullfile('./Figures/horizontaltail/loads');
 
 %%
 %Va_flight
-[LoaddistVA ,ShearforceVA, BendingmomentVA, TorqueVA] = Horizontal_tail_load((fuselageLoading.Va_flight.Lt)*4.2);
+[HorizontalTail.LoaddistVA ,HorizontalTail.ShearforceVA, HorizontalTail.BendingmomentVA, HorizontalTail.TorqueVA] = Horizontal_tail_load((fuselageLoading.Va_flight.Lt)*4.2);
 
 [LoaddistVD ,ShearforceVD, BendingmomentVD, TorqueVD] = Horizontal_tail_load((fuselageLoading.Vd_flight.Lt)*3.75);
 
-[HorizontalTail.LoaddistFO ,HorizontalTail.ShearforceFO, HorizontalTail.BendingmomentFO, HorizontalTail.TorqueFO] = Horizontal_tail_load((fuselageLoading.front_off.Lt)*1.5);
+[LoaddistFO ,ShearforceFO, BendingmomentFO, TorqueFO] = Horizontal_tail_load((fuselageLoading.front_off.Lt)*1.5);
 
 %[LoaddistOEI ,ShearforceOEI, BendingmomentOEI, TorqueOEI] = Horizontal_tail_load((fuselageLoading.oei.load)*1.5);
 
@@ -23,11 +23,11 @@ save('HorizontalTail.mat', 'HorizontalTail');
 
 
 figure 
-plot(y, ShearforceVA)
+plot(y, HorizontalTail.ShearforceVA, 'r')
 hold on
-plot(y, ShearforceVD)
+plot(y, ShearforceVD, 'g')
 hold on
-plot(y, HorizontalTail.ShearforceFO)
+plot(y, ShearforceFO, 'b')
 hold off
 grid on
 improvePlot(gcf)
@@ -37,11 +37,11 @@ legend("Va", "Vd", "Front off")
 saveas(gcf, fullfile(fig_path, 'tailshearforce'), 'epsc')
 
 figure 
-plot(y, BendingmomentVA)
+plot(y, HorizontalTail.BendingmomentVA, 'r')
 hold on
-plot(y, BendingmomentVD)
+plot(y, BendingmomentVD, 'g')
 hold on
-plot(y, HorizontalTail.BendingmomentFO)
+plot(y, BendingmomentFO, 'b')
 hold off
 grid on
 improvePlot(gcf)
@@ -51,11 +51,11 @@ legend("Va Load", "Vd Load", "Front off Load")
 saveas(gcf, fullfile(fig_path, 'tailbendingmoments'), 'epsc')
 
 figure 
-plot(y, TorqueVA)
+plot(y, HorizontalTail.TorqueVA, 'r')
 hold on
-plot(y, TorqueVD)
+plot(y, TorqueVD, 'g')
 hold on
-plot(y, HorizontalTail.TorqueFO)
+plot(y, TorqueFO, 'b')
 hold off
 grid on
 improvePlot(gcf)
@@ -75,25 +75,25 @@ saveas(gcf, fullfile(fig_path, 'tailtorque'), 'epsc')
 %     improvePlot(gcf)
 
     subplot(3,1,1)
-    plot(y, HorizontalTail.ShearforceFO)
+    plot(y, HorizontalTail.ShearforceVA)
     xlabel("y (m)")
     ylabel("SF (N)")
     grid on
     improvePlot(gcf)
 
     subplot(3,1,2)
-    plot(y, HorizontalTail.BendingmomentFO)
+    plot(y, HorizontalTail.BendingmomentVA)
     xlabel("y (m)")
     ylabel("BM (Nm)")
     grid on
     improvePlot(gcf)
 
     subplot(3,1,3)
-    plot(y, HorizontalTail.TorqueFO)
+    plot(y, HorizontalTail.TorqueVA)
     xlabel("y (m)")
     ylabel("Torque (Nm)")
     grid on
     improvePlot(gcf)
 
     
-    saveas(gcf, fullfile(fig_path, 'FOtailload'), 'epsc')
+    saveas(gcf, fullfile(fig_path, 'VAtailload'), 'epsc')
