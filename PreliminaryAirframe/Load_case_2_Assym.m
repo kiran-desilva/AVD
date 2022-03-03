@@ -41,29 +41,29 @@ VerticalTail.Torque = sum(VerticalTail.VTorsiondist) - cumsum(VerticalTail.VTors
 figure; 
 subplot(5,1,1)
 plot(z, VerticalTail.VTorsiondist)
-xlabel("z (m)", 'interpreter', 'Latex')
-ylabel("OEI: Vertical Tail Combined Torque (Nm)", 'interpreter', 'Latex')
+%xlabel("z (m)", 'interpreter', 'Latex')
+title("OEI: Vertical Tail Combined Torque (Nm)", 'interpreter', 'Latex')
 grid on
 subplot(5,1,2)
 plot(z, VerticalTail.Torque)
-xlabel("z (m)", 'interpreter', 'Latex')
-ylabel("OEI: Vertical Tail Torque Distribution (Nm)", 'interpreter', 'Latex')
+%xlabel("z (m)", 'interpreter', 'Latex')
+title("OEI: Vertical Tail Torque Distribution (Nm)", 'interpreter', 'Latex')
 grid on
 subplot(5,1,3)
 tailloadplot(1:1000) = VerticalTail.VTailLoad;
 plot(z, tailloadplot)
-xlabel("z (m)", 'interpreter', 'Latex')
-ylabel("OEI: Vertical Tail Combined Load (N)", 'interpreter', 'Latex')
+%xlabel("z (m)", 'interpreter', 'Latex')
+title("OEI: Vertical Tail Combined Load (N)", 'interpreter', 'Latex')
 grid on
 subplot(5,1,4)
 plot(z, VerticalTail.ShearForce_vt(z))
-xlabel("z (m)", 'interpreter', 'Latex')
-ylabel("OEI: Shear Force (N)", 'interpreter', 'Latex')
+%xlabel("z (m)", 'interpreter', 'Latex')
+title("OEI: Shear Force (N)", 'interpreter', 'Latex')
 grid on
 subplot(5,1,5)
 plot(z, VerticalTail.BendingMoment_vt(z))
 xlabel("z (m)", 'interpreter', 'Latex')
-ylabel("OEI: Bending Moment (Nm)", 'interpreter', 'Latex')
+title("OEI: Bending Moment (Nm)", 'interpreter', 'Latex')
 grid on
 
 

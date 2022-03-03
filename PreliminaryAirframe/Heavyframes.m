@@ -10,16 +10,16 @@ load materialLib;
 
 
 %% WINGS FRONT SPAR
-D_wing = 1.58;
+D_wing = 1.68;
 Loads_wingf = [4.2*fuselageLoading.Vd_flight.Ff/2, 4.2*fuselageLoading.Vd_flight.Ff/2];
-angles_wingf = [deg2rad(50), deg2rad(-50)]; %CHANGE THIS  
+angles_wingf = [deg2rad(30), deg2rad(-30)]; %CHANGE THIS  
 Torque_wingf = [0,0];
 [HeavyFrames.wing.twFRONT, HeavyFrames.wing.lfwFRONT, HeavyFrames.wing.Hfront, HeavyFrames.wing.tffront, HeavyFrames.wing.massfront] = framedimensioncalc(Loads_wingf, Torque_wingf, angles_wingf, D_wing, "Wing Front Spar Heavy Frame");
 
 %% WINGS REAR SPAR
-D_wing = 1.58;
+D_wing = 1.68;
 Loads_wingr = [4.2*fuselageLoading.Vd_flight.Fr/2, 4.2*fuselageLoading.Vd_flight.Fr/2];
-angles_wingr = [deg2rad(50), deg2rad(-50)]; %CHANGE THIS
+angles_wingr = [deg2rad(30), deg2rad(-30)]; %CHANGE THIS
 Torque_wingr = [0,0];
 [HeavyFrames.wing.twREAR, HeavyFrames.wing.lfwREAR, HeavyFrames.wing.Hrear, HeavyFrames.wing.tfrear, HeavyFrames.wing.massrear] = framedimensioncalc(Loads_wingr, Torque_wingr, angles_wingr, D_wing, "Wing Rear Spar Heavy Frame");
 
@@ -127,7 +127,7 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     figure
     plot(theta, Ntot)
     hold on
-    plot(theta, Mtot/(sum(T)))
+    plot(theta, Mtot))
     hold on
     plot(theta, Stot)
     hold off
@@ -181,8 +181,8 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
 
     x0 = [2.5e-3,2.5e-3,H_max,0.3];
 
-    lb = [1e-3,1e-3,1e-3,1e-3];
-    ub = [0.05,0.05,0.1,0.25]; %lol a meter
+    lb = [2.5e-3,2.5e-3,1e-3,1e-3];
+    ub = [0.05,0.01,0.1,0.25]; %lol a meter
 
 
     options = optimoptions('fmincon','ScaleProblem',true,'ConstraintTolerance',1e-20,'MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'Display','iter','UseParallel',true)
