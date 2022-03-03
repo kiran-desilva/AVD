@@ -13,6 +13,7 @@ cl_max_neg = -0.684;
 
 %clean clalpha for wing at takeoff
 cl_alpha_w_0 = 5.6007;
+% cl_alpha_w_0 = 5.72;
 % cl_alpha_w_0 = 7;
 %clean clalpha at cruise altitude
 cl_alpha_w_cruise =  5.42;
@@ -33,6 +34,7 @@ cruisealt_ft = 40000;
 cruisealt_m = distdim(cruisealt_ft,'ft','m');
 
 n_max = 2.5;
+% n_max = 2.1 + (24000/(10361+10000));
 % n_max = 2.1 + (24000/(6896+10000));
 % n_max = n_max_cs25;
 n_min = -1;
@@ -106,6 +108,7 @@ Vd_delta_n = double(delta_n(Vd,cl_alpha_w_0,ws_tow,rho_0,Ude_Vd));
 %calcualte intersection with Va
 rough_gust_line_eq = @(v) polyval(polyfit([0 Vb],[1 1+Vb_delta_n],1),v);
 Va_gust_n = rough_gust_line_eq(Va);
+Va_delta_n = Va_gust_n - 1;
 %%%%%%%%%%%%%%%%%% %%
 
 
@@ -126,8 +129,8 @@ xline(Vd,'--','V_{D}','LabelOrientation','horizontal','linewidth',1,'fontsize',1
 xline(Vb,'--','V_{B}','LabelOrientation','horizontal','linewidth',1,'fontsize',12)
 
 %%Manouver Envelope - UltimateLoad
-n_ul_max = 1.5*2.5;
-n_ul_min = 1.5*-1;
+n_ul_max = 1.5*n_max;
+n_ul_min = 1.5*n_min;
 
 Va_ul = Vs1*sqrt(n_ul_max);
 Vf_ul = Vf*sqrt(abs(n_ul_min)); 
@@ -171,7 +174,13 @@ plot([0 Vc],[1 1-Vc_delta_n],'-.','color','green')
 Vd_gust = plot([0 Vd],[1 1+Vd_delta_n],':','color','green','linewidth',1.5);
 plot([0 Vd],[1 1-Vd_delta_n],':','color','green','linewidth',1.5)
 
-GE_plot = plot([Va Vb Vc Vd Vd Vc Vb Va], [Va_gust_n 1+Vb_delta_n 1+Vc_delta_n 1+Vd_delta_n 1-Vd_delta_n 1-Vc_delta_n 1-Vb_delta_n 2-Va_gust_n],'color',GE_color,'linewidth',GE_linewidth);
+Vas =[Va Vb Vc Vd Vd Vc Vb Va];
+Ns=[Va_gust_n 1+Vb_delta_n 1+Vc_delta_n 1+Vd_delta_n 1-Vd_delta_n 1-Vc_delta_n 1-Vb_delta_n 2-Va_gust_n];
+
+% Vas =[Vb Vc Vd Vd Vc Vb];
+% Ns=[1+Vb_delta_n 1+Vc_delta_n 1+Vd_delta_n 1-Vd_delta_n 1-Vc_delta_n 1-Vb_delta_n];
+
+GE_plot = plot(Vas,Ns ,'color',GE_color,'linewidth',GE_linewidth);
 
 %Ultimate Gust Envelope
 GE_UL_color = 'magenta';
@@ -190,7 +199,7 @@ ylim([-2.5 4])
 
 improvePlotNOLINE(gcf);
 
-saveas(gcf,"Figures/Vndiagram",'epsc')
+% saveas(gcf,"Figures/Vndiagram",'epsc')
 
 vn.Va = Va;
 vn.Va_nmax = max([Va_gust_n n_max]);
@@ -206,4 +215,4 @@ vn.ws_tow = ws_tow;
 vn.cruisealt_m = cruisealt_m;
 vn.n_max = n_max;
 
-save('vn.mat','vn')
+% save('vn.mat','vn')
