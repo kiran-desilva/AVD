@@ -32,4 +32,4 @@ grid on;
 xlabel('y [m]');
 ylabel('t [mm]');
 improvePlot(gcf);
-saveas(gcf, fullfile(fig_path, 'panel_thickness_wing'), 'epsc')
+saveas(gcf, fullfile(fig_path, 'panel_thickness_wing'), 'epsc');
