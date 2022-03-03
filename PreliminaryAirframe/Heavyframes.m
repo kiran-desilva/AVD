@@ -58,10 +58,9 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     % ixx = @(t,tf,H,lf) ((H-(2*tf))^3)*t/12 + 2*((tf^3)*lf/12 + t*lf*((H-(2*tf))+tf)^2 /4); %second moment f=of area of I beam
     % A = @(t,tf,H,lf) 2*tf*lf + (H-2*tf)*t;    %frame sectionalarea
 
-    ixx = @(t,tf,H,lf) (H^3*t)/12 + 2*((tf^3)*lf/12 + tf*lf*((H+tf)^2 )/4); %second moment f=of area of I beam
+%     ixx = @(t,tf,H,lf) (H^3*t)/12 + 2*((tf^3)*lf/12 + tf*lf*((H+tf)^2 )/4); %second moment f=of area of I beam
     A = @(t,tf,H,lf) 2*tf*lf + (H*t);    %frame sectionalarea
-
-   
+    ixx = @(t,tf,H,lf) (H^3*t)/12 + tf*lf*((H)^2 )/4; %thin walled
 
     % yc = 0.025; %section thickness / 2 (defined by fuselage paramaters)
     R = D/2;
@@ -149,9 +148,6 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
 
     ixx_req = @(H,tf) (Mmax*0.5*(H+(2*tf)))/yielddirect;
 
-
-    
-
     constraints.ixx_req = ixx_req;
     constraints.A_req = A_req;
     constraints.ixx = ixx;
@@ -179,9 +175,9 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     % lb = [1e-3,1e-3,1e-3];
     % ub = [0.5,0.5,0.5]; %lol a meter
 
-    x0 = [2.5e-3,2.5e-3,H_max,0.3];
+    x0 = [3e-3,3e-3,H_max,0.3];
 
-    lb = [2.5e-3,2.5e-3,1e-3,1e-3];
+    lb = [2.5e-3,2.5e-3,1e-2,1e-3];
     ub = [0.05,0.01,0.1,0.25]; %lol a meter
 
 
