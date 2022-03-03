@@ -152,7 +152,6 @@ if mode == 0
     optimisation.area_arr = area_arr;
     optimisation.area_mesh_arr = area_mesh_arr;
 elseif mode == 1
-%{
     f = @(x) optimiser_func(x, geometry, material, design_params, bending_moment_dist, @fudger);
     %options = optimoptions(@fmincon,'Display','iter')
     options = optimset('TolCon',1e-18,'TolX',1e-19,'PlotFcns',@optimplotfval, 'UseParallel', false);
@@ -168,8 +167,12 @@ elseif mode == 1
     wing_layout.stringer_pitch = design_params.stringer_pitch;
     wing_layout.stringer_thickness = design_params.stringer_thickness;
     wing_layout.stringer_web_height = design_params.stringer_web_height;
+    disp(['Max stress ', num2str(max(out.sigma_0)/1e6) ' MPa (Compressive)'])
+    disp(['Material tensile yield stress ', num2str(material.tensile_yield/1e6) ' MPa'])
+    disp(['Difference (Yield - max stress): ', num2str((material.tensile_yield - max(out.sigma_0))/1e6) ' MPa'])
+    
     save('wing_layout', 'wing_layout')
-  %}  
+  
     ctip = 0.4083;
     croot = 0.8166;
 
@@ -254,13 +257,13 @@ elseif mode == 1
     design_params.stringer_web_height = 0.01;
     design_params.flange_to_web_ratio = 0.3;
     
-    tp_bending_moment_dist = fit(HorizontalTail.y', -HorizontalTail.bendingmoment', 'smoothingspline');
+    tp_bending_moment_dist = fit(HorizontalTail.y', HorizontalTail.BendingmomentFO', 'smoothingspline');
     
     f_tail = @(x) optimiser_func(x, geometry, material, design_params, tp_bending_moment_dist, @fudger2);
     %options = optimoptions(@fmincon,'Display','iter')
     options = optimset('TolCon',1e-7,'TolX',1e-7,'PlotFcns',@optimplotfval, 'UseParallel', false);
-    x = fmincon(f_tail, [100e-3; 0.0011; 0.01], [], [], [], [], [5e-4; 5e-4; 5e-4], [1; 100e-3; 30e-3], [], options);
-    
+    x = fmincon(f_tail, [120e-3; 0.001; 0.012], [], [], [], [], [5e-4; 5e-4; 5e-4], [1; 100e-3; 30e-3], [], options);
+
     design_params.stringer_pitch = x(1);
     design_params.stringer_thickness = x(2);
     design_params.stringer_web_height = x(3);
@@ -268,6 +271,16 @@ elseif mode == 1
     
     out = rib_stringer_func(geometry, material, design_params, tp_bending_moment_dist, true, @fudger2);
     improvePlot(gcf);
+    
+    tail_layout = out;
+    tail_layout.stringer_pitch = design_params.stringer_pitch;
+    tail_layout.stringer_thickness = design_params.stringer_thickness;
+    tail_layout.stringer_web_height = design_params.stringer_web_height;
+    
+    disp(['Max stress ', num2str(max(out.sigma_0)/1e6) ' MPa (Compressive)'])
+    disp(['Material tensile yield stress ', num2str(material.tensile_yield/1e6) ' MPa'])
+    disp(['Difference (Yield - max stress): ', num2str((material.tensile_yield - max(out.sigma_0))/1e6) ' MPa'])
+    save('tail_layout', 'tail_layout')
     
     return;
 else 
@@ -315,21 +328,26 @@ function output_vol = optimiser_func(x, geometry, material, design_params, bendi
     design_params.stringer_web_height = x(3);
     try
         out = rib_stringer_func(geometry, material, design_params, bending_moment_dist, false, fudger);
-        output_vol = out.total_volume;
+        output_vol = out.total_volume*material.rho;
     catch ME
+        %disp(ME.message)
         output_vol = NaN;
     end
     
 end
 
 function fudge = fudger2(y)
-    fudge = 0.7;
+    if y < 1
+        fudge = 0.9;
+    else
+        fudge = 0.6;
+    end
 end
 
 function fudge = fudger(y)
     if y < 3.5
         fudge = 0.95;
     else
-        fudge = 0.5;
+        fudge = 0.85;
     end
 end
