@@ -38,7 +38,7 @@
 %%		  this value is proportional to weight and thus
 %%		  should be minimised
 
-function output = rib_stringer_func(geometry, material, design_params, bending_moment_dist, doPlot)
+function output = rib_stringer_func(geometry, material, design_params, bending_moment_dist, doPlot, fudger)
 	spanwise_station = 0; % Start at root
 
 	x_leading_edge = @(y) -tand(geometry.sweep_deg)*y + geometry.c(0)/2;
@@ -150,7 +150,7 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 		F = sigma_cr * sqrt(rib_spacing/(comp_load_per_length*material.E));
 		
 
-		assert(F < 1, 'F stands for fuuucked') 
+		assert(F < 0.95, 'F stands for fuuucked') 
 
 		%% FARRAR efficiency factor
 		%A_s_over_bt = stringer.cross_sec_area/(design_params.stringer_pitch*panel_thickness);
@@ -162,7 +162,7 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 		%% Draw a rib
 		spanwise_station = spanwise_station + rib_spacing;
 
-		fudge_nr = @fudger;
+		fudge_nr = fudger;
                 
 		previous_stringers_to_cut = intercepts < spanwise_station + fudge_nr(spanwise_station)*delta_matrix(spanwise_station) & intercepts > spanwise_station - rib_spacing + fudge_nr(spanwise_station)*delta_matrix(spanwise_station - rib_spacing);
 
@@ -227,12 +227,4 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 
 	output.total_volume = total_volume;
 	output.total_weight = total_volume*material.rho;
-end
-
-function fudge = fudger(y)
-    if y < 3.5
-        fudge = 0.95;
-    else
-        fudge = 0.5;
-    end
 end
