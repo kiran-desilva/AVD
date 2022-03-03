@@ -158,7 +158,7 @@ function distributions = wing_load(n, Vinf_eas, wing_fuel_weight_kg, cl_dist, sp
 		xcg = 4.55; % measured from the nose in m
 		xG = 5.16;
 		xT = 10.3474;
-		W = 3128.2*lbs_to_kg*0.85; % landing weight is 85% of mass takeoff weight
+		W = 3128.2*0.85; % landing weight is 85% of mass takeoff weight
 		F_uc = W*g*(xcg - xT)/(xG - xT); % Points up!! => positive
 
 		uc.loading(x) = piecewise((x >= uc.spanwise_start) & (x <= uc.spanwise_end), F_uc/abs(uc.spanwise_start - uc.spanwise_end), 0);
