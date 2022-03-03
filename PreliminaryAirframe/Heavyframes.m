@@ -165,7 +165,7 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
         constraints.A_req - constraints.A(x(1),x(2),x(3),x(4));
         (2*x(2) + x(3) - 0.1)];
         % (2*x(2))-x(3)]; % constrain height to be at elast 2*thickness
-        ceq = [];
+        ceq = zeros(size(x));
     end
 
 
@@ -178,10 +178,12 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     x0 = [3e-3,3e-3,H_max,0.3];
 
     lb = [2.5e-3,2.5e-3,1e-2,1e-3];
-    ub = [0.05,0.01,0.1,0.25]; %lol a meter
-
-
-    options = optimoptions('fmincon','ScaleProblem',true,'ConstraintTolerance',1e-20,'MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'Display','iter','UseParallel',true)
+    ub = [0.06,0.02,0.2,0.3]; %lol a meter
+    
+    [a, b] = cons(ub, constraints);
+    assert(all(a(1:end-1) <= 0), 'ub not large enough');
+    
+    options = optimoptions('fmincon','ScaleProblem',true,'ConstraintTolerance',1e-20,'MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'Display','final','UseParallel',true)
 
     gs = GlobalSearch('Display','iter','PlotFcn',@gsplotbestf);
     problem = createOptimProblem('fmincon','objective',...
