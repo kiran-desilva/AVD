@@ -200,7 +200,7 @@ function output = rib_stringer_func(geometry, material, design_params, bending_m
 		
 		% intercepts(stringers_to_cut) = spanwise_station;
 		total_volume = total_volume + panel_eff_area*rib_spacing;
-		total_volume = total_volume + geometry.A0*geometry.c(spanwise_station)^2*2E-3;	% account for ribs as well, might be kinda dodgy tho
+		total_volume = total_volume + geometry.A0*geometry.c(spanwise_station)^2*1E-3;	% account for ribs as well, might be kinda dodgy tho
 																						% bcs we dont know rib thickness yet
     end
 
