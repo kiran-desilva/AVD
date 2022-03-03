@@ -167,6 +167,7 @@ elseif mode == 1
     wing_layout.stringer_pitch = design_params.stringer_pitch;
     wing_layout.stringer_thickness = design_params.stringer_thickness;
     wing_layout.stringer_web_height = design_params.stringer_web_height;
+    wing_layout.geometry = geometry;
     disp(['Max stress ', num2str(max(out.sigma_0)/1e6) ' MPa (Compressive)'])
     disp(['Material tensile yield stress ', num2str(material.tensile_yield/1e6) ' MPa'])
     disp(['Difference (Yield - max stress): ', num2str((material.tensile_yield - max(out.sigma_0))/1e6) ' MPa'])
@@ -276,6 +277,7 @@ elseif mode == 1
     tail_layout.stringer_pitch = design_params.stringer_pitch;
     tail_layout.stringer_thickness = design_params.stringer_thickness;
     tail_layout.stringer_web_height = design_params.stringer_web_height;
+    tail_layout.geometry = geometry;
     
     disp(['Max stress ', num2str(max(out.sigma_0)/1e6) ' MPa (Compressive)'])
     disp(['Material tensile yield stress ', num2str(material.tensile_yield/1e6) ' MPa'])
