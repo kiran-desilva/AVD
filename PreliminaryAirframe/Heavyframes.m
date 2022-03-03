@@ -14,7 +14,7 @@ D_wing = 1.68;
 Loads_wingf = [4.2*fuselageLoading.Vd_flight.Ff/2, 4.2*fuselageLoading.Vd_flight.Ff/2];
 angles_wingf = [deg2rad(30), deg2rad(-30)]; %CHANGE THIS  
 Torque_wingf = [0,0];
-%[HeavyFrames.wing.twFRONT, HeavyFrames.wing.lfwFRONT, HeavyFrames.wing.Hfront, HeavyFrames.wing.tffront, HeavyFrames.wing.massfront] = framedimensioncalc(Loads_wingf, Torque_wingf, angles_wingf, D_wing, "Wing Front Spar Heavy Frame");
+[HeavyFrames.wing.twFRONT, HeavyFrames.wing.lfwFRONT, HeavyFrames.wing.Hfront, HeavyFrames.wing.tffront, HeavyFrames.wing.massfront] = framedimensioncalc(Loads_wingf, Torque_wingf, angles_wingf, D_wing, "Wing Front Spar Heavy Frame");
 
 %% WINGS REAR SPAR
 D_wing = 1.68;
@@ -163,9 +163,7 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     function [c,ceq] = cons(x,constraints)
         c = [constraints.ixx_req(x(3),x(2))-constraints.ixx(x(1),x(2),x(3),x(4));
         constraints.A_req - constraints.A(x(1),x(2),x(3),x(4));
-        -1];
-        %(2*x(2) + x(3) - 0.1)];
-        %(2*x(2))-x(3)]; % constrain height to be at elast 2*thickness
+        (2*x(2) - x(3))]; % constrain height to be at elast 2*thickness 
         ceq = [];
     end
 
