@@ -14,30 +14,30 @@ ribs_check.ribs_loc_1=wing_layout.rib_array; %input that need to get; location o
 ribs_check.ribs_n=length(ribs_check.ribs_loc_1);
 
 for i=1:ribs_check.ribs_n %chord at each spanwise location of rib
-    ribs_check.chord(i)=feval(geometry.c,ribs_check.ribs_loc_1(i));
+    ribs_check.chord(i)=feval(wing_layout.geometry.c,ribs_check.ribs_loc_1(i));
 end
 
 for i=2:length(ribs_check.ribs_loc_1) 
     ribs_check.s(i-1)=ribs_check.ribs_loc_1(i)-ribs_check.ribs_loc_1(i-1); %displacement between 2 ribs
 end
 
-ribs_check.s(ribs_check.ribs_n)=geometry.semispan-ribs_check.ribs_loc_1(ribs_check.ribs_n);
+ribs_check.s(ribs_check.ribs_n)=wing_layout.geometry.semispan-ribs_check.ribs_loc_1(ribs_check.ribs_n);
 
 ribs_check.E_panel=materialLib{1, 1}.E; %Young's modulus of panel (???) [72 GPa]
-ribs_check.t_s=design_params.stringer_thickness; %thickness of stringer
+ribs_check.t_s=wing_layout.stringer_thickness; %thickness of stringer
 ribs_check.t_e=3*ribs_check.t_s/2; % effective thickness of the panel [m] - assuming stiffness ratio is 0.5
 
 %input max M of each section to be considered for each rib
 for i=1:ribs_check.ribs_n
-    ribs_check.M(i)=feval(bending_moment_dist,ribs_check.ribs_loc_1(i));
-    ribs_check.h_c(i)=feval(geometry.web_height_func,ribs_check.ribs_loc_1(i)); % wing box height %assume wing box is constant height - need to modify
+    ribs_check.M(i)=feval(wing_layout.bm_fit,ribs_check.ribs_loc_1(i));
+    ribs_check.h_c(i)=feval(wing_layout.geometry.web_height_func,ribs_check.ribs_loc_1(i)); % wing box height %assume wing box is constant height - need to modify
 end
 
 ribs_check.I=(ribs_check.chord.*(ribs_check.t_e)^3/12 + ribs_check.chord.*(ribs_check.t_e).*(ribs_check.h_c./2).^2); %[m^4]
 ribs_check.F=(ribs_check.M.^2.*ribs_check.s.*ribs_check.h_c.*ribs_check.t_e.*ribs_check.chord)./(2*ribs_check.E_panel.*ribs_check.I.^2);
 wing_layout.rib_thickness=((ribs_check.F.*ribs_check.h_c.^2)./(3.62*ribs_check.E_panel.*ribs_check.chord)).^(1/3); %required rib thickness for optimal design
 
-save wing_layout.mat
+%save wing_layout.mat
 
 % sigma_y=350E+06; %yield stress
 % design_t_r=F./(sigma_y.*chord);
