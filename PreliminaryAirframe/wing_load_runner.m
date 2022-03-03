@@ -19,7 +19,7 @@ A1 = wing_load(1.5*2.8, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_dis
 tmp = loadcase{2};
 A2 = wing_load(1.5*2.5, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{2}.cm, false, false, "Load Case 2: ");
 
-A3 = wing_load(1.5*2.5, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, true, false, "Landing: ");
+A3 = wing_load(1.5, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, true, false, "Landing: ");
 
 tmp = loadcase{1};
 A11 = wing_load(1.5*2.8, tmp.v, 0, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, false, false, "Load Case 1: ");
@@ -27,7 +27,7 @@ A11 = wing_load(1.5*2.8, tmp.v, 0, polyval(cl_fit.poly, spanwise_disc), spanwise
 tmp = loadcase{2};
 A22 = wing_load(1.5*2.5, tmp.v, 0, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{2}.cm, false, false, "Load Case 2: ");
 
-A33 = wing_load(1.5*2.5, tmp.v, 0, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, true, false, "Landing: ");
+A33 = wing_load(1.5, tmp.v, 0, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, true, false, "Landing: ");
 
 close all
 figure;
