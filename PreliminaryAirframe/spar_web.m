@@ -116,13 +116,13 @@ wing.t_fs(wing.t_fs < 0.001) = 0.001;
 wing.t_rs(wing.t_rs < 0.001) = 0.001; 
 
 figure
-plot(y, t_fs)
+plot(y, t_fs, 'r--')
 hold on
-plot(y,t_rs)
+plot(y,t_rs, 'b--')
 hold on
-plot(y, wing.t_fs)
+plot(y, wing.t_fs, 'r')
 hold on
-plot(y,wing.t_rs)
+plot(y,wing.t_rs, 'b')
 hold off
 legend("Calculated front spar web thickness","Calculated rear spar web thickness","Actual front spar web thickness", "Actual rear spar web thickness")
 xlabel("Span (m)")
@@ -267,12 +267,13 @@ HorizontalTail.t_fs(HorizontalTail.t_fs < 0.001) = 0.001;
 HorizontalTail.t_rs(HorizontalTail.t_rs < 0.001) = 0.001; 
  
 figure
-plot(y, t_fs)
+plot(y, t_fs, 'r--')
 hold on
-plot(y,t_rs)
-plot(y, HorizontalTail.t_fs)
+plot(y,t_rs, 'b--')
 hold on
-plot(y,HorizontalTail.t_rs)
+plot(y, HorizontalTail.t_fs, 'r')
+hold on
+plot(y,HorizontalTail.t_rs, 'b')
 hold off
 legend("Calculated front spar web thickness","Calculated rear spar web thickness","Actual front spar web thickness", "Actual rear spar web thickness")
 axis([0 0.5*s_h 0 0.0015])
