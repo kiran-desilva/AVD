@@ -48,7 +48,7 @@ function [StringerPanel] = fuselage_gen_table(fuselage)
     };
     LightFrames.Data = {
         round(fuselage.frames.weight,1);
-        fuselage.frames.L;
+        round(fuselage.frames.L,2);
         fuselage.frames.number;
         'C';
         round(fuselage.frames.t*(1e3),1);
