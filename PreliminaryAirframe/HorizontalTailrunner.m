@@ -31,8 +31,8 @@ plot(y, ShearforceFO, 'b')
 hold off
 grid on
 improvePlot(gcf)
-xlabel("Span (m)")
-ylabel("Shear Force (N)")
+xlabel("Span [m]")
+ylabel("Shear Force [N]")
 legend("Va Load Case", "Vd Load Case", "Front off Load Case")
 saveas(gcf, fullfile(fig_path, 'tailshearforce'), 'epsc')
 
@@ -45,8 +45,8 @@ plot(y, BendingmomentFO, 'b')
 hold off
 grid on
 improvePlot(gcf)
-xlabel("Span (m)")
-ylabel("Bending Moment (Nm)")
+xlabel("Span [m]")
+ylabel("Bending Moment [Nm]")
 legend("Va Load Case", "Vd Load Case", "Front off Load Case")
 saveas(gcf, fullfile(fig_path, 'tailbendingmoments'), 'epsc')
 
@@ -59,8 +59,8 @@ plot(y, TorqueFO, 'b')
 hold off
 grid on
 improvePlot(gcf)
-xlabel("Span (m)")
-ylabel("Torque (Nm)")
+xlabel("Span [m]")
+ylabel("Torque [Nm]")
 legend("Va Load Case", "Vd Load Case", "Front off Load Case")
 saveas(gcf, fullfile(fig_path, 'tailtorque'), 'epsc')
 
@@ -76,22 +76,22 @@ saveas(gcf, fullfile(fig_path, 'tailtorque'), 'epsc')
 
     subplot(3,1,1)
     plot(y, HorizontalTail.ShearforceVA)
-    xlabel("y (m)")
-    ylabel("SF (N)")
+    xlabel("y [m]")
+    ylabel("SF [N]")
     grid on
     improvePlot(gcf)
 
     subplot(3,1,2)
     plot(y, HorizontalTail.BendingmomentVA)
-    xlabel("y (m)")
-    ylabel("BM (Nm)")
+    xlabel("y [m]")
+    ylabel("BM [Nm]")
     grid on
     improvePlot(gcf)
 
     subplot(3,1,3)
     plot(y, HorizontalTail.TorqueVA)
-    xlabel("y (m)")
-    ylabel("Torque (Nm)")
+    xlabel("y [m]")
+    ylabel("Torque [Nm]")
     grid on
     improvePlot(gcf)
 
