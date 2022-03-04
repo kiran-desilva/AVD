@@ -55,13 +55,13 @@ figure;
 subplot(3,1,1)
 plot(z, VerticalTail.ShearForce_vt(z))
 xlabel("Span (m)")
-title("SF (N)")
+ylabel("SF (N)")
 improvePlot(gcf)
 grid on
 subplot(3,1,2)
 plot(z, VerticalTail.BendingMoment_vt(z))
 xlabel("Span (m)")
-title("BM (Nm)")
+ylabel("BM (Nm)")
 improvePlot(gcf)
 grid on
 subplot(3,1,3)
