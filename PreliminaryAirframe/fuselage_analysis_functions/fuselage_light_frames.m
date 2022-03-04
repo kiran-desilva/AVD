@@ -43,7 +43,7 @@ function [frames,fig] = fuselage_light_frames(frame_material,sectionType,booms,s
     %manufacturing constraints -> need to come back to this later
     % hmin = 1e-3;
     % hmax = 0.1;
-    hmin = 1.2 * stringer.web_height; % constrained by stringer height -> at least 1.2* stringer height
+    hmin = 1.5 * stringer.web_height; % constrained by stringer height -> at least 1.2* stringer height
     hmax = 5e-2; % od - id for fuselage
 
     bmin = 1e-3;
@@ -71,7 +71,7 @@ function [frames,fig] = fuselage_light_frames(frame_material,sectionType,booms,s
         %plot function space
         fig = figure("Name",'light_frame_ix_optimization');
         b_range = linspace(bmin,bmax,1000);
-        h_range = linspace(hmin,hmax,1000);
+        h_range = linspace(0.003,hmax,1000);
         [B,H] = meshgrid(b_range,h_range);
         T = t_eq(B,H);
         Area = area_eq(T,B,H);
@@ -89,6 +89,7 @@ function [frames,fig] = fuselage_light_frames(frame_material,sectionType,booms,s
         legend("Solution Surface","Optimum Solution")
         xlim([0 0.02])
         ylim([0 0.02])
+        zlim([0 0.05])
         view([130 20])
     end
 end

@@ -193,6 +193,13 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
 
     x0 = [3e-3,3e-3,H_max,0.3];
 
+<<<<<<< HEAD
+    lb = [1e-2,1e-3,1e-3,1e-3];
+    ub = [0.05,0.05,H_max,0.1];
+
+
+    options = optimoptions('fmincon','ScaleProblem',true,'EnableFeasibilityMode',true,'ConstraintTolerance',1e-20,'MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'Display','iter','UseParallel',true)
+=======
     lb = [2.5e-3,2.5e-3,1e-2,1e-3];
     ub = [0.06,0.02,0.2,0.3]; %lol a meter
     
@@ -200,6 +207,7 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     assert(all(a(1:end-1) <= 0), 'ub not large enough');
     
     options = optimoptions('fmincon','ScaleProblem',true,'ConstraintTolerance',1e-20,'MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'Display','final','UseParallel',true)
+>>>>>>> 4f7b48cf076db060473350d04d2a82f063444171
 
     gs = GlobalSearch('Display','iter','PlotFcn',@gsplotbestf);
     problem = createOptimProblem('fmincon','objective',...
@@ -236,14 +244,14 @@ function [N, M, S] = SectionalLoadCalc(P, Q, T, D, offset)
 
     %tangential load case 
 
-    NT = (P/(2*pi)) .* ((sin(theta+offset)./2) - (pi - theta+offset) .* cos(theta+offset));
-    MT = (P * R / (2 * pi)) .* (1.5 .* sin(theta+offset) + (pi - theta+offset).*(cos(theta+offset) - 1));
+    NT = (P/(2*pi)) .* ((sin(theta+offset)./2) - (pi - (theta+offset)) .* cos(theta+offset));
+    MT = (P * R / (2 * pi)) .* (1.5 .* sin(theta+offset) + (pi - (theta+offset)).*(cos(theta+offset) - 1));
     ST = (P/(2*pi)) * ((pi - theta+offset) .*sin(theta+offset) - 1 - (cos(theta+offset)./2));
 
     %radial load case
 
-    NR = (Q/(2*pi)) .* (1.5.*cos(theta+offset) + (pi - theta+offset).*sin(theta+offset));
-    MR = (Q*R/(2*pi)) .* (0.5.*cos(theta+offset) - (pi - theta+offset).*sin(theta+offset) + 1);
+    NR = (Q/(2*pi)) .* (1.5.*cos(theta+offset) + (pi - (theta+offset)).*sin(theta+offset));
+    MR = (Q*R/(2*pi)) .* (0.5.*cos(theta+offset) - (pi - (theta+offset)).*sin(theta+offset) + 1);
     SR = (Q/(2*pi)).* ((pi - theta+offset).*cos(theta+offset) - 0.5.*sin(theta+offset));
 
     %moment case
