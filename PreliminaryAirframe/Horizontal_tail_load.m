@@ -47,7 +47,7 @@ function [Loaddist, Shearforce, Bendingmoment, Torque] = Horizontal_tail_load(Lo
     Shearforce = shearforce;
     Bendingmoment = cumtrapz(y,shearforce); 
 
-    figure
+   % figure
 %     plot(y, Shearforce)
 %     xlabel("y (m)", 'interpreter', 'Latex')
 %     ylabel("Horizontal Tail Shear Force (N)", 'interpreter', 'Latex')

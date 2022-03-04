@@ -2,6 +2,7 @@ clear
 clc
 close all
 
+fig_path = fullfile('./Figures/wing/loading');
 
 load('loadcase.mat')
 load('cl_fit.mat')
@@ -13,20 +14,20 @@ spanwise_disc = spanwise_disc(1:end-1) + delta;
 fuel_weight_kg = 486.748216106;
 %% NOTE: LOAD CASE 2 SEEMS MOST LIMITING
 tmp = loadcase{1};
-A1 = wing_load(1.5*2.8, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, false, true, "Load Case 1: ");
+A1 = wing_load(1.5*2.8, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, false, false, "Load Case 1: ");
 
 tmp = loadcase{2};
-A2 = wing_load(1.5*2.5, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{2}.cm, false, true, "Load Case 2: ");
+A2 = wing_load(1.5*2.5, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{2}.cm, false, false, "Load Case 2: ");
 
-A3 = wing_load(1.5*2.5, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, true, true, "Landing: ");
+A3 = wing_load(1.5, tmp.v, fuel_weight_kg, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, true, false, "Landing: ");
 
 tmp = loadcase{1};
-A11 = wing_load(1.5*2.8, tmp.v, 0, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, false, true, "Load Case 1: ");
+A11 = wing_load(1.5*2.8, tmp.v, 0, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, false, false, "Load Case 1: ");
 
 tmp = loadcase{2};
-A22 = wing_load(1.5*2.5, tmp.v, 0, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{2}.cm, false, true, "Load Case 2: ");
+A22 = wing_load(1.5*2.5, tmp.v, 0, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{2}.cm, false, false, "Load Case 2: ");
 
-A33 = wing_load(1.5*2.5, tmp.v, 0, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, true, true, "Landing: ");
+A33 = wing_load(1.5, tmp.v, 0, polyval(cl_fit.poly, spanwise_disc), spanwise_disc, loadcase{1}.cm, true, false, "Landing: ");
 
 close all
 figure;
@@ -43,7 +44,8 @@ xlabel('y [m]')
 ylabel('Shear Force [N]')
 grid on;
 improvePlot(gcf)
-legend('Load Case 1', 'Load Case 2', 'Load Case 3')
+legend('Load Case 1 MTOW', 'Load Case 2 MTOW', 'Load Case 3 MTOW', 'Load Case 1 MZFW', 'Load Case 2 MZFW', 'Load Case 3 MZFW')
+saveas(gcf, fullfile(fig_path, 'shear_force'), 'epsc')
 hold off;
 
 figure;
@@ -60,7 +62,8 @@ xlabel('y [m]')
 ylabel('Bending Moment [Nm]')
 grid on;
 improvePlot(gcf)
-legend('Load Case 1', 'Load Case 2', 'Load Case 3')
+legend('Load Case 1 MTOW', 'Load Case 2 MTOW', 'Load Case 3 MTOW', 'Load Case 1 MZFW', 'Load Case 2 MZFW', 'Load Case 3 MZFW')
+saveas(gcf, fullfile(fig_path, 'bending_moment'), 'epsc')
 hold off;
 
 figure;
@@ -78,7 +81,8 @@ xlabel('y [m]')
 ylabel('Torque [Nm]')
 grid on;
 improvePlot(gcf)
-legend('Load Case 1', 'Load Case 2', 'Load Case 3')
+legend('Load Case 1 MTOW', 'Load Case 2 MTOW', 'Load Case 3 MTOW', 'Load Case 1 MZFW', 'Load Case 2 MZFW', 'Load Case 3 MZFW')
+saveas(gcf, fullfile(fig_path, 'torque'), 'epsc')
 hold off;
 
 torque_dists = [A1.torque; A2.torque; A3.torque; A11.torque; A22.torque; A33.torque];
@@ -97,21 +101,24 @@ limiting_loadcase_distributions.shear = shear_dists(max_shear_idx);
 
 figure;
 subplot(3, 1, 1);
-plot(limiting_loadcase_distributions.points, limiting_loadcase_distributions.shear);
+plot(limiting_loadcase_distributions.points, limiting_loadcase_distributions.shear, 'b');
 grid on;
 xlabel("y [m]")
-ylabel("Shear Force [N]")
+ylabel("SF [N]")
 subplot(3, 1, 2);
-plot(limiting_loadcase_distributions.points, limiting_loadcase_distributions.bm)
+plot(limiting_loadcase_distributions.points, limiting_loadcase_distributions.bm, 'b')
 grid on;
 xlabel("y [m]")
-ylabel("Bending Moment [Nm]")
+ylabel("BM [Nm]")
 subplot(3, 1, 3);
-plot(limiting_loadcase_distributions.points, limiting_loadcase_distributions.torque)
+plot(limiting_loadcase_distributions.points, limiting_loadcase_distributions.torque, 'b')
 grid on;
 xlabel("y [m]")
 ylabel("Torque [Nm]")
 improvePlot(gcf)
+ax = gca;
+ax.YRuler.Exponent = 4;
+saveas(gcf, fullfile(fig_path, 'combined_loading'), 'epsc')
 
 save('limiting_loadcase_distributions', 'limiting_loadcase_distributions');
 
