@@ -48,6 +48,7 @@ flag = false;
 
  [HeavyFrames.engine.t, HeavyFrames.engine.lf, HeavyFrames.engine.H, HeavyFrames.engine.tf, HeavyFrames.engine.mass] = framedimensioncalc(Loads_E, Torque_E, angles_E, D_E, "Engines Heavy Frame", flag);
 
+ 
 save('HeavyFrames.mat', 'HeavyFrames');
 %%
 function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, LoadcaseSTR, flag)
@@ -147,7 +148,7 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
         xlabel("Theta (deg)")
         ylabel("N (N), M (Nm), S (N)")
         legend("Normal Force","Moment","Shear Force")
-        title(LoadcaseSTR)
+        %title(LoadcaseSTR)
         improvePlot(gcf)
         saveas(gcf, fullfile(fig_path, 'Heavyframestress'), 'epsc')
     end
