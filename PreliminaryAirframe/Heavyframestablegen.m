@@ -4,7 +4,7 @@ clc
 fig_path = fullfile('./Tables');
 
 load('HeavyFrames.mat');
-heavyframes.Labels = {'Heavy Frame','Mass (Kg)','Web Thickness (m)','Flange Thickness','Web Height (m)','Flange Length (m)'};
+heavyframes.Labels = {'Heavy Frame','Mass (Kg)','t_{Web} (m)','t_{Flange}','l_{Web}(m)','l_{Flange} (m)'};
 
 framenames = {'Wing Front'; 'Wing Rear'; 'Tail Front'; 'Tail Rear'};
 masses = [round(HeavyFrames.wing.massfront, 1); round(HeavyFrames.wing.massrear,1); round(HeavyFrames.engine.mass,1); round(HeavyFrames.tail.mass,1)];

@@ -87,7 +87,7 @@ hold off
 axis equal
 
 %% 
-y = [0:0.001:(span/2)];
+y = [0:0.0001:(span/2)];
 %a = %web panel spacing design
 c = chord(y) * (0.77-0.1); %Distance between spars
 b2front = (aerofoiltop(0.1) - aerofoilbottom(0.1)).*chord(y);
@@ -103,7 +103,7 @@ Shearflow_Shearrear = Shear_Load(y)' ./ (2 .* b2rear); %N/mm note here we assume
 
 Shearflow_Torque = Torque_Load(y)' ./ (0.5 * c .* (b2front + b2rear) * 2); %T/2A
 
-Shearflow_Fspar = Shearflow_Shearfront + Shearflow_Torque;
+Shearflow_Fspar = abs(Shearflow_Shearfront + Shearflow_Torque);
 Shearflow_Rspar = abs(Shearflow_Shearrear - Shearflow_Torque);
 
 t_fs = (Shearflow_Fspar .* (b2front.^2) ./ (Ks * E_sp)).^(1/3);
@@ -236,7 +236,7 @@ axis equal
 
 %% 
 s_h = 2.3887;
-y = [0:0.001:s_h/2];
+y = [0:0.0001:s_h/2];
 %a = %web panel spacing design
 c = chord(y) * (0.68-0.15); %Distance between spars
 b2front = (aerofoiltop(0.15) - aerofoilbottom(0.15)).*chord(y);
@@ -244,8 +244,8 @@ b2rear = (aerofoiltop(0.68) - aerofoilbottom(0.68)).*chord(y);
 Ks = 8.1;%lookup from graph
 E_sp = materialLib{3}.E;%Youngs modulus of spar web 
 
-Shear_Load = fit(HorizontalTail.y', HorizontalTail.ShearforceFO', 'cubicspline'); %N
-Torque_Load = fit(HorizontalTail.y', HorizontalTail.TorqueFO', 'cubicspline'); %Nm
+Shear_Load = fit(HorizontalTail.y', HorizontalTail.ShearforceVA', 'cubicspline'); %N
+Torque_Load = fit(HorizontalTail.y', HorizontalTail.TorqueVA', 'cubicspline'); %Nm
 
 Shearflow_Shearfront = Shear_Load(y)' ./ (2 .* b2front); %N/m
 Shearflow_Shearrear = Shear_Load(y)' ./ (2 .* b2rear); %N/mm note here we assume that each spar takes half of vertical load despite having different heights
