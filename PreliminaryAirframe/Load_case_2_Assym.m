@@ -54,20 +54,20 @@ figure;
 % grid on
 subplot(3,1,1)
 plot(z, VerticalTail.ShearForce_vt(z))
-xlabel("Span (m)")
-ylabel("SF (N)")
+xlabel("Span [m]")
+ylabel("SF [N]")
 improvePlot(gcf)
 grid on
 subplot(3,1,2)
 plot(z, VerticalTail.BendingMoment_vt(z))
-xlabel("Span (m)")
-ylabel("BM (Nm)")
+xlabel("Span [m]")
+ylabel("BM [Nm]")
 improvePlot(gcf)
 grid on
 subplot(3,1,3)
 plot(z, VerticalTail.Torque)
-xlabel("Span (m)")
-ylabel("Torque (Nm)")
+xlabel("Span [m]")
+ylabel("Torque [Nm]")
 improvePlot(gcf)
 grid on
 saveas(gcf, fullfile(fig_path, 'verticalloads'), 'epsc')
