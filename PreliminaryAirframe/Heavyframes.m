@@ -1,8 +1,8 @@
 %% HEAVY FRAMES CALCULATOR
 %WINGS FRONT AND REAR SPAR, VERTICAL TAIL FRON AND REAR SPAR, ENGINES
-clear 
-clc
-close all
+% clear 
+% clc
+% close all
 
 load("HeavyFrames.mat");
 load("fuselageLoading.mat");
@@ -145,8 +145,8 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
         plot(theta, Stot)
         hold off
         grid on
-        xlabel("Theta (deg)")
-        ylabel("N (N), M (Nm), S (N)")
+        xlabel("Theta (degrees)")
+        ylabel("N [N], M [Nm], S [N]")
         legend("Normal Force","Moment","Shear Force")
         %title(LoadcaseSTR)
         improvePlot(gcf)
@@ -193,13 +193,13 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
 
     x0 = [3e-3,3e-3,H_max,0.3];
 
-<<<<<<< HEAD
+
     lb = [1e-2,1e-3,1e-3,1e-3];
     ub = [0.05,0.05,H_max,0.1];
 
 
     options = optimoptions('fmincon','ScaleProblem',true,'EnableFeasibilityMode',true,'ConstraintTolerance',1e-20,'MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'Display','iter','UseParallel',true)
-=======
+
     lb = [2.5e-3,2.5e-3,1e-2,1e-3];
     ub = [0.06,0.02,0.2,0.3]; %lol a meter
     
@@ -207,7 +207,7 @@ function [t, lf, H, tf, mass] = framedimensioncalc(L, Torque, angles, D, Loadcas
     assert(all(a(1:end-1) <= 0), 'ub not large enough');
     
     options = optimoptions('fmincon','ScaleProblem',true,'ConstraintTolerance',1e-20,'MaxFunctionEvaluations',1e6,'MaxIterations',1e6,'Display','final','UseParallel',true)
->>>>>>> 4f7b48cf076db060473350d04d2a82f063444171
+%>>>>>>> 4f7b48cf076db060473350d04d2a82f063444171
 
     gs = GlobalSearch('Display','iter','PlotFcn',@gsplotbestf);
     problem = createOptimProblem('fmincon','objective',...
