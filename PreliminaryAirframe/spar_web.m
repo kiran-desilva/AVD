@@ -125,8 +125,8 @@ hold on
 plot(y,wing.t_rs, 'b')
 hold off
 legend("Calculated front spar web thickness","Calculated rear spar web thickness","Actual front spar web thickness", "Actual rear spar web thickness")
-xlabel("Span (m)")
-ylabel("Web Thickness (m)")
+xlabel("Span [m]")
+ylabel("Web Thickness [m]")
 grid on
 improvePlot(gcf)
 saveas(gcf, fullfile(fig_path, 'Wingsparweb'), 'epsc')
@@ -277,8 +277,8 @@ plot(y,HorizontalTail.t_rs, 'b')
 hold off
 legend("Calculated front spar web thickness","Calculated rear spar web thickness","Actual front spar web thickness", "Actual rear spar web thickness")
 axis([0 0.5*s_h 0 0.0015])
-xlabel("Span (m)")
-ylabel("Web Thickness (m)")
+xlabel("Span [m]")
+ylabel("Web Thickness [m]")
 grid on
 improvePlot(gcf)
 saveas(gcf, fullfile(fig_path, 'Htailsparweb'), 'epsc')
