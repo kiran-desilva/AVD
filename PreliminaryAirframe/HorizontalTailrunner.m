@@ -33,7 +33,7 @@ grid on
 improvePlot(gcf)
 xlabel("Span [m]")
 ylabel("Shear Force [N]")
-legend("Va Load Case", "Vd Load Case", "Front off Load Case")
+legend("Load Case 1", "Load Case 2", "Load Case 3")
 saveas(gcf, fullfile(fig_path, 'tailshearforce'), 'epsc')
 
 figure 
@@ -47,7 +47,7 @@ grid on
 improvePlot(gcf)
 xlabel("Span [m]")
 ylabel("Bending Moment [Nm]")
-legend("Va Load Case", "Vd Load Case", "Front off Load Case")
+legend("Load Case 1", "Load Case 2", "Load Case 3")
 saveas(gcf, fullfile(fig_path, 'tailbendingmoments'), 'epsc')
 
 figure 
@@ -61,7 +61,7 @@ grid on
 improvePlot(gcf)
 xlabel("Span [m]")
 ylabel("Torque [Nm]")
-legend("Va Load Case", "Vd Load Case", "Front off Load Case")
+legend("Load Case 1", "Load Case 2", "Load Case 3")
 saveas(gcf, fullfile(fig_path, 'tailtorque'), 'epsc')
 
 
