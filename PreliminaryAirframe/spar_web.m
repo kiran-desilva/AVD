@@ -116,15 +116,17 @@ wing.t_fs(wing.t_fs < 0.001) = 0.001;
 wing.t_rs(wing.t_rs < 0.001) = 0.001; 
 
 figure
-plot(y, wing.t_fs)
-hold on
-plot(y,wing.t_rs)
-hold on
 plot(y, t_fs)
 hold on
 plot(y,t_rs)
+hold on
+plot(y, wing.t_fs)
+hold on
+plot(y,wing.t_rs)
 hold off
-legend("Actual front spar web thickness", "Actual rear spar web thickness","Calculated front spar web thickness","Calculated rear spar web thickness")
+legend("Calculated front spar web thickness","Calculated rear spar web thickness","Actual front spar web thickness", "Actual rear spar web thickness")
+xlabel("Span (m)")
+ylabel("Web Thickness (m)")
 grid on
 improvePlot(gcf)
 saveas(gcf, fullfile(fig_path, 'Wingsparweb'), 'epsc')
@@ -265,16 +267,17 @@ HorizontalTail.t_fs(HorizontalTail.t_fs < 0.001) = 0.001;
 HorizontalTail.t_rs(HorizontalTail.t_rs < 0.001) = 0.001; 
  
 figure
-plot(y, HorizontalTail.t_fs)
-hold on
-plot(y,HorizontalTail.t_rs)
-hold on
 plot(y, t_fs)
 hold on
 plot(y,t_rs)
+plot(y, HorizontalTail.t_fs)
+hold on
+plot(y,HorizontalTail.t_rs)
 hold off
-legend("Actual front spar web thickness", "Actual rear spar web thickness","Calculated front spar web thickness","Calculated rear spar web thickness")
+legend("Calculated front spar web thickness","Calculated rear spar web thickness","Actual front spar web thickness", "Actual rear spar web thickness")
 axis([0 0.5*s_h 0 0.0015])
+xlabel("Span (m)")
+ylabel("Web Thickness (m)")
 grid on
 improvePlot(gcf)
 saveas(gcf, fullfile(fig_path, 'Htailsparweb'), 'epsc')
